@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statki</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,600;1,600&family=Roboto+Mono:ital@0;1&display=swap" rel="stylesheet">    <link rel="stylesheet" href="assets/css/board.css">
+</head>
+<body>
+    <div class="container">
+        <div>
+            <h1>Statki</h1>
+            <div class="panelContainer">
+                <div class="shapes">
+                    <div class="ownBoardInfo">
+                        <h3>Wybrany statek</h3>
+                        <h2 class="dynamic" id="selectedShip">Jednomasztowiec</h2>
+                        <h3>Dostępne: <span class="dynamic danger">1</span></h3>
+                    </div>
+                    <span class="break"></span>
+                    <h2>Sterowanie</h2>
+                    <h3 class="controlsOwnBoard"><span class="important">S</span> Zmiana statku</h3>
+                    <h3 class="controlsOwnBoard"><span class="important">R</span> Obrót statku</h3>
+                    <h3><span class="important">B</span> Zamiana planszy</h3>
+                    <span class="break"></span>
+                    <h3>Ruch: <span class="dynamic">Przeciwnik</span></h3>
+                    <h2 class="important">∞</h2>
+                </div>
+                <div class="boardContainer">
+                    <div id="board" oncontextmenu="return false;"></div>
+                    <div id="secondaryBoard" class="secondary" oncontextmenu="return false;"></div>
+                </div>
+                <div class="spaceFiller"></div>
+            </div>
+            
+            <span class="designerTag">Designed by Maciejka</span>
+        </div>
+    </div>
+
+    <script src="/assets/js/battleships_lib.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/key_handling.js"></script>
+</body>
+</html>

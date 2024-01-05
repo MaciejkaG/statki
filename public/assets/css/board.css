@@ -1,0 +1,165 @@
+:root {
+    font-size: 20px;
+
+
+    --field: rgb(201, 201, 201);
+    --mark-line: rgb(136, 136, 136);
+    --mark-spot: rgb(68, 68, 68);
+    --mark-ship-valid: hsl(120, 100%, 80%);
+    --mark-ship-invalid: hsl(0, 100%, 80%);
+    --ship-valid: hsl(120, 70%, 55%);
+    --ship-invalid: hsl(0, 70%, 55%);
+
+    --dynamic: rgb(83, 83, 245);
+    --danger: rgb(243, 56, 56);
+    --important: rgb(203, 50, 241);
+    color: rgb(136, 136, 136)
+}
+
+body {
+    background: black;
+    color: white;
+    font-family: 'Lato', sans-serif;
+    transition: opacity 0.3s ease;
+    animation: fadeIn 1 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Poppins', sans-serif;
+}
+
+.designerTag {
+    position: fixed;
+    bottom: 5px;
+    left: 5px;
+    color: rgb(0, 255, 0);
+    font-size: 9px;
+    pointer-events: none;
+    user-select: none;
+    z-index: 999;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.board {
+    display: flex;
+    grid-template-columns: auto auto auto;
+    flex-direction: column;
+}
+
+.row {
+    margin-bottom: 0.4rem;
+    display: flex;
+    gap: 0.4rem;
+}
+
+.field {
+    background-color: var(--field);
+    width: 2rem;
+    aspect-ratio: 1;
+    border-radius: 20%;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.field svg {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.3s;
+}
+
+.field.hit svg {
+    opacity: 1;
+}
+
+.dynamic {
+    color: var(--dynamic);
+}
+
+.danger {
+    color: var(--danger);
+}
+
+.important {
+    color: var(--important);
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.shapes h2, .shapes h3 {
+    margin: 0;
+}
+
+.shapes, .spaceFiller {
+    width: 15rem;
+    user-select: none;
+    pointer-events: none;
+}
+
+.break {
+    display: block;
+    margin-top: 3rem;
+}
+
+.panelContainer {
+    display: flex;
+    gap: 1rem;
+}
+
+.boardContainer {
+    width: 25rem;
+    display: flex;
+    justify-content: center;
+}
+
+#secondaryBoard, #board {
+    position: absolute;
+    transition: transform 0.3s;
+    background: black;
+}
+
+.ownBoardInfo {
+    transition: opacity 0.3s;
+}
+
+.secondary {
+    transform: translateX(75%) scale(0.3);
+    pointer-events: none;
+    z-index: 1;
+}
+
+#board:not(.secondary), #secondaryBoard:not(.secondary) {
+    z-index: 2;
+}
+
+.controlsOwnBoard {
+    transition: opacity 0.3s;
+}
+
+@keyframes changingOut {
+    from {transform: translateX(0);opacity:1;}
+    to {transform: translateX(30%);opacity:0;}
+}
+
+@keyframes changingIn {
+    from {transform: translateX(-30%);opacity:0;}
+    to {transform: translateX(0);opacity:1;}
+}
+
+#selectedShip.changing {
+    opacity: 0;
+    animation: changingOut 1 0.2s ease;
+}
+
+#selectedShip {
+    animation: changingIn 1 0.2s ease;
+}
