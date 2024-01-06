@@ -27,7 +27,6 @@ window.addEventListener("load", () => {
         if (elem != null) {
             switchView(elem.id, true);
             activeView = elem.id;
-            
         }
     } else {
         switchView("mainMenuView");

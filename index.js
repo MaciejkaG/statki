@@ -19,6 +19,7 @@ app.set('views', './views');
 const server = createServer(app);
 const io = new Server(server);
 
+app.set('trust proxy', 1);
 const sessionMiddleware = session({
     secret: uuidv4(),
     resave: true,
@@ -31,6 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 io.engine.use(sessionMiddleware);
 
 app.get("/", (req, res) => {
+    
     res.render('index');
 });
 
