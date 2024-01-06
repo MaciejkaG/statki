@@ -93,6 +93,7 @@ h1,h2,h3,h4,h5,h6 {
     display: flex;
     justify-content: center;
     text-align: center;
+    transition: 0.15s opacity;
 }
 
 .shapes h2, .shapes h3 {

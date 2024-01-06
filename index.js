@@ -34,21 +34,14 @@ app.get("/", (req, res) => {
     res.render('index');
 });
 
-app.get("/pvp", (req, res) => {
-    res.render('pvp/index');
+app.get("/*", (req, res) => {
+    res.redirect("/?path=" + req.originalUrl);
 });
-
-app.get("/pvp/join", (req, res) => {
-    res.render('pvp/join');
-});
-
-app.get("/pvp/create", (req, res) => {
-    res.render('pvp/create');
-});
-
 
 io.on('connection', (socket) => {
     const session = socket.request.session;
+
+    
 
     socket.on('chat message', (msg) => {
         console.log('message: ' + msg);

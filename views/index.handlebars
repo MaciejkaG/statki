@@ -1,63 +1,130 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statki</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,600;1,600&family=Roboto+Mono:ital@0;1&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/board.css">
-    <style>
-        .modes {
-            display: flex;
-            gap: 2rem;
-        }
+<div class="container" id="loadingView" data-title="Statki" data-path="/">
 
-        .modes div {
-            height: 10rem;
-            width: 10rem;
-            background: black;
-            border: solid 1px white;
-            border-radius: 15px;
-            user-select: none;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+</div>
 
-        .modes div:hover {
-            background: white;
-            color: black;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div>
-            <h1>Statki</h1>
-            <h2>Wybierz tryb gry</h2>
-            <div class="modes">
-                <div id="pvp">
-                    <h2>PvP</h2>
-                    <p>Graj przeciwko innemu graczowi</p>
-                </div>
-                <div>
-                    <h2 id="ai">Vs. AI</h2>
-                    <p>Graj przeciwko komputerowi</p>
-                </div>
+<div class="container" id="mainMenuView" data-title="Statki" data-path="/">
+    <div>
+        <h1>Statki</h1>
+        <h2>Wybierz tryb gry</h2>
+        <div class="modes">
+            <div id="pvpMenuButton">
+                <h2>PvP</h2>
+                <p>Graj przeciwko innemu graczowi</p>
             </div>
-
-            <span class="designerTag">Designed by Maciejka</span>
-            <script>
-                $("#pvp").on("click", function() {
-                    $("body").css("opacity", "0");
-                    setTimeout(() => {
-                        window.location.href = "pvp";
-                    }, 300);
-                });
-            </script>
+            <div>
+                <h2 id="ai">Vs. AI</h2>
+                <p>Graj przeciwko komputerowi</p>
+            </div>
         </div>
     </div>
-</body>
-</html>
+</div>
+
+<div class="container" id="pvpMenuView" data-title="Statki / PvP" data-path="/pvp">
+    <div>
+        <h1>Statki</h1>
+        <h2>PvP</h2>
+        <div class="modes">
+            <div id="createGameButton">
+                <h2>Stwórz</h2>
+                <p>Stwórz własny pokój</p>
+            </div>
+            <div onclick="switchView('gameView')">
+                <h2>Dołącz</h2>
+                <p>Dołącz do czyjegoś pokoju poprzez kod</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="pvpCreateView" data-title="Statki / PvP / Stwórz" data-path="/pvp/create">
+    <div>
+        <h1>Statki</h1>
+        <h2>PvP / Stwórz</h2>
+        <div class="modes">
+            <div>
+                <h2>Kod pokoju:</h2>
+                <input type="text" maxlength="6" readonly value="123456">
+                <h3>Oczekiwanie na gracza...</h3>
+                <button>Opuść pokój</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="pvpJoinView" data-title="Statki / PvP / Dołącz" data-path="/pvp/join">
+    <div>
+        <h1>Statki</h1>
+        <h2>PvP / Dołącz</h2>
+        <div class="modes">
+            <div>
+                <form action="/api/joinme" id="pvpJoinForm">
+                    <input type="text" maxlength="6" id="pvpJoinCode" placeholder="Kod pokoju">
+                    <input type="submit" value="Dołącz">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="gameView" data-title="Statki / Gra" data-path="/game">
+    <div>
+        <h1>Statki</h1>
+        <div class="panelContainer">
+            <div class="shapes">
+                <div class="ownBoardInfo">
+                    <h3>Wybrany statek</h3>
+                    <h2 class="dynamic" id="selectedShip">Jednomasztowiec</h2>
+                    <h3>Dostępne: <span class="dynamic danger">1</span></h3>
+                </div>
+                <span class="break"></span>
+                <h2>Sterowanie</h2>
+                <h3 class="controlsOwnBoard"><span class="important">S</span> Zmiana statku</h3>
+                <h3 class="controlsOwnBoard"><span class="important">R</span> Obrót statku</h3>
+                <h3><span class="important">B</span> Zamiana planszy</h3>
+                <span class="break"></span>
+                <h3>Ruch: <span class="dynamic">Przeciwnik</span></h3>
+                <h2 class="important">∞</h2>
+            </div>
+            <div class="boardContainer">
+                <div id="board" oncontextmenu="return false;"></div>
+                <div id="secondaryBoard" class="secondary" oncontextmenu="return false;"></div>
+            </div>
+            <div class="spaceFiller"></div>
+        </div>
+    </div>
+    <script src="/assets/js/battleships_lib.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/key_handling.js"></script>
+</div>
+
+<script src="/assets/js/socket.js"></script>
+<script src="/assets/js/spa_lib.js"></script>
+<script>
+    $("#createGameButton").on("click", function () {
+        $("#pvpCreateView .modes input").css("filter", "blur(20px)");
+        $("#pvpCreateView .modes").css("pointer-events", "none");
+
+        switchView("pvpCreateView");
+    });
+
+    $("#pvpMenuButton").on("click", function () {
+        socket.emit("check pvp eligibility", (response) => {
+            if (response.status) {
+
+            }
+        });
+
+        switchView('pvpMenuView')
+    });
+
+    const form = document.getElementById('pvpJoinForm');
+    const input = document.getElementById('pvpJoinCode');
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (input.value && input.value.length === 6) {
+            socket.emit('join game', input.value);
+            input.value = '';
+        }
+    });
+</script>
