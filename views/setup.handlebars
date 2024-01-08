@@ -1,0 +1,19 @@
+<style>
+    .container {
+        display: flex;
+    }
+</style>
+<div class="container" id="pvpJoinView">
+    <div>
+        <h1>Statki</h1>
+        <h2>Konfiguracja profilu</h2>
+        <div class="modes">
+            <div>
+                <form action="/api/setup-profile" method="post">
+                    <input type="text" name="nickname" placeholder="Nickname" style="font-size: 1rem;">
+                    <input type="submit" value="Zatwierdź">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

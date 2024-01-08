@@ -12,6 +12,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', './views');
@@ -32,8 +35,27 @@ app.use(express.static(path.join(__dirname, 'public')));
 io.engine.use(sessionMiddleware);
 
 app.get("/", (req, res) => {
-    
-    res.render('index');
+    if (req.session.nickname == null) {
+        res.redirect("/setup");
+    } else {
+        res.render('index');
+    }
+});
+
+app.get("/setup", (req, res) => {
+    if (req.session.nickname != null) {
+        res.redirect('/');
+    } else {
+        res.render("setup");
+    }
+});
+
+app.post('/api/setup-profile', function (req, res) {
+    if (req.session.nickname == null) {
+        req.session.nickname = req.body.nickname;
+    }
+
+    res.redirect("/")
 });
 
 app.get("/*", (req, res) => {
@@ -42,14 +64,67 @@ app.get("/*", (req, res) => {
 
 io.on('connection', (socket) => {
     const session = socket.request.session;
+    if (session.nickname==null) {
+        socket.disconnect();
+        return;
+    }
 
-    
+    socket.on('create lobby', (callback) => {
+        if (socket.rooms.size === 1) {
+            let id = genID();
+            callback({
+                status: "ok",
+                gameCode: id
+            });
 
-    socket.on('chat message', (msg) => {
-        console.log('message: ' + msg);
+            socket.join(id);
+        } else {
+            callback({
+                status: "alreadyInLobby",
+                gameCode: socket.rooms[1]
+            });
+        }
+    });
+
+    socket.on('join lobby', (msg, callback) => {
+        if (io.sockets.adapter.rooms.get(msg) == null) {
+            callback({
+                status: "bad_id"
+            });
+        } else {
+            if (socket.rooms.size === 1) {
+                io.to(msg).emit("joined");
+                socket.join(msg);
+                callback({
+                    status: "ok"
+                });
+            } else {
+                callback({
+                    status: "alreadyInLobby",
+                    gameCode: id
+                });
+            }
+        }
+    });
+
+    socket.on('leave lobby', (callback) => {
+        if (socket.rooms.size === 2) {
+            socket.leave(socket.rooms[1]);
+            callback({
+                status: "ok"
+            });
+        } else {
+            callback({
+                status: "youreNotInLobby"
+            });
+        }
     });
 });
 
 server.listen(7777, () => {
     console.log('Server running at http://localhost:7777');
 });
+
+function genID() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}

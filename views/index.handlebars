@@ -24,7 +24,7 @@
                 <h2>Stwórz</h2>
                 <p>Stwórz własny pokój</p>
             </div>
-            <div onclick="switchView('gameView')">
+            <div onclick="switchView('pvpJoinView')">
                 <h2>Dołącz</h2>
                 <p>Dołącz do czyjegoś pokoju poprzez kod</p>
             </div>
@@ -39,9 +39,9 @@
         <div class="modes">
             <div>
                 <h2>Kod pokoju:</h2>
-                <input type="text" maxlength="6" readonly value="123456">
+                <input type="text" maxlength="6" readonly value="123456" id="createGameCode">
                 <h3>Oczekiwanie na gracza...</h3>
-                <button>Opuść pokój</button>
+                <button id="leaveGameButton">Opuść pokój</button>
             </div>
         </div>
     </div>
@@ -95,32 +95,3 @@
 
 <script src="/assets/js/socket.js"></script>
 <script src="/assets/js/spa_lib.js"></script>
-<script>
-    $("#createGameButton").on("click", function () {
-        $("#pvpCreateView .modes input").css("filter", "blur(20px)");
-        $("#pvpCreateView .modes").css("pointer-events", "none");
-
-        switchView("pvpCreateView");
-    });
-
-    $("#pvpMenuButton").on("click", function () {
-        socket.emit("check pvp eligibility", (response) => {
-            if (response.status) {
-
-            }
-        });
-
-        switchView('pvpMenuView')
-    });
-
-    const form = document.getElementById('pvpJoinForm');
-    const input = document.getElementById('pvpJoinCode');
-
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (input.value && input.value.length === 6) {
-            socket.emit('join game', input.value);
-            input.value = '';
-        }
-    });
-</script>

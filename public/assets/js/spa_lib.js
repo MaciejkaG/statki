@@ -17,21 +17,31 @@ function switchView(viewContainerId, useReplaceState=false) {
     }, 150);
 }
 
+function lockUI(doLock) {
+    if (doLock) {
+        $("body").css("pointer-events", "none");
+        $("body").css("opacity", "0.4");
+    } else {
+        $("body").css("pointer-events", "inherit");
+        $("body").css("opacity", "1");
+    }
+}
+
 const initialURLParams = new URLSearchParams(window.location.search);
 const initialPath = initialURLParams.get('path');
 
 window.addEventListener("load", () => {
-    if (initialPath != null) {
-        let elem = document.querySelector(`.container[data-path="${initialPath}"]`);
+    // if (initialPath != null) {
+    //     let elem = document.querySelector(`.container[data-path="${initialPath}"]`);
 
-        if (elem != null) {
-            switchView(elem.id, true);
-            activeView = elem.id;
-        }
-    } else {
+    //     if (elem != null) {
+    //         switchView(elem.id, true);
+    //         activeView = elem.id;
+    //     }
+    // } else {
         switchView("mainMenuView");
         activeView = "mainMenuView";
-    }
+    //}
 });
 
 addEventListener("popstate", (event) => {
