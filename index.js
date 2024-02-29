@@ -51,7 +51,7 @@ app.get("/setup", (req, res) => {
 });
 
 app.post('/api/setup-profile', function (req, res) {
-    if (req.session.nickname == null) {
+    if (req.session.nickname == null && 4 < req.body.nickname.length && req.body.nickname.length < 16) {
         req.session.nickname = req.body.nickname;
     }
 
@@ -93,15 +93,18 @@ io.on('connection', (socket) => {
             });
         } else {
             if (socket.rooms.size === 1) {
-                io.to(msg).emit("joined");
+                io.to(msg).emit("joined", session.nickname);
+                let opp = io.sockets.sockets.get(io.sockets.adapter.rooms.get(msg).values().next().value);
+                let oppNickname = opp.request.session.nickname;
                 socket.join(msg);
                 callback({
-                    status: "ok"
+                    status: "ok",
+                    oppNickname: oppNickname,
                 });
             } else {
                 callback({
                     status: "alreadyInLobby",
-                    gameCode: id
+                    gameCode: id,
                 });
             }
         }

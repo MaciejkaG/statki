@@ -135,3 +135,27 @@ body {
     background: white;
     color: black;
 }
+
+/* Preparation */
+#preparingGame .modes {
+    display: flex;
+    gap: 2rem;
+}
+
+#preparingGame .modes div {
+    height: 13rem;
+    width: 11rem;
+    background: black;
+    border: solid 1px white;
+    border-radius: 15px;
+    user-select: none;
+    padding: 1rem 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+#preparingGame .modes div * {
+    margin: 0;
+    width: 100%;
+}

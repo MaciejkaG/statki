@@ -1,7 +1,10 @@
 const socket = io();
 
-socket.on("joined", () => {
-    console.log("Someone joined the lobby!");
+socket.on("joined", (nick) => {
+    lockUI(true);
+    $("#oppNameField").html(nick);
+    switchView("preparingGame");
+    lockUI(false);
 });
 
 $("#createGameButton").on("click", function () {
@@ -65,8 +68,8 @@ form.addEventListener('submit', (e) => {
         socket.emit("join lobby", input.value, (response) => {
             switch (response.status) {
                 case "ok":
-                    alert("Game joined!");
-                    switchView("mainMenuView");
+                    $("#oppNameField").html(response.oppNickname);
+                    switchView("preparingGame");
                     lockUI(false);
                     break;
 
