@@ -7,6 +7,35 @@ socket.on("joined", (nick) => {
     lockUI(false);
 });
 
+socket.on("player left", () => {
+    lockUI(true);
+    switchView("mainMenuView");
+    lockUI(false);
+});
+
+socket.on("gameReady", (gameId) => {
+    setTimeout(() => {
+        window.location.replace("/game?id=" + gameId);
+    }, 2000);
+});
+
+var nickname;
+
+socket.emit("whats my nick", (myNickname) => {
+    nickname = myNickname;
+});
+
+socket.on("game start", (gameInfo) => {
+    let opp;
+    if (gameInfo.players[0]!==nickname) {
+        opp = gameInfo.players[0];
+    } else {
+        opp = gameInfo.players[1];
+    }
+
+    alert(`Grasz przeciwko: ${opp}`);
+});
+
 $("#createGameButton").on("click", function () {
     lockUI(true);
     socket.emit("create lobby", (response) => {
