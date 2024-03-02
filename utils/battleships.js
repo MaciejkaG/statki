@@ -111,10 +111,86 @@ export function getShipsAvailable(data, playerIdx) {
     return shipsLeft;
 }
 
-export function checkShot(data, playerIdx) {
-    playerIdx = playerIdx === 0 ? 1 : 0
+export function checkHit(data, playerIdx, posX, posY) {
+    playerIdx = playerIdx === 0 ? 1 : 0;
 
-    data.boards[playerIdx]
+    let enemyBoard = data.boards[playerIdx];
+
+    let boardRender = [];
+
+    for (let i = 0; i < 10; i++) {
+        var array = [];
+        for (let i = 0; i < 10; i++) {
+            array.push(false);
+        }
+        boardRender.push(array);
+    }
+
+    enemyBoard.ships.forEach(ship => {
+        let multips;
+
+        switch (ship.rot) {
+            case 0:
+                multips = [1, 0];
+                break;
+
+            case 1:
+                multips = [0, 1];
+                break;
+
+            case 2:
+                multips = [-1, 0];
+                break;
+
+            case 3:
+                multips = [0, -1];
+                break;
+        }
+
+        for (let i = 0; i < ship.type + 2; i++) {
+            boardRender[ship.posY + multips[1] * i][ship.posX + multips[0] * i] = true;
+        }
+    });
+
+    boardRender.forEach(row => {
+        let log = "";
+        row.forEach(field => {
+            log += `${field}\t`
+        });
+        console.log(log);
+    });
+
+    return boardRender[posY][posX];
+}
+
+export function validateShipPosition(type, posX, posY, rot) {
+    let multips;
+
+    switch (rot) {
+        case 0:
+            multips = [1, 0];
+            break;
+
+        case 1:
+            multips = [0, 1];
+            break;
+
+        case 2:
+            multips = [-1, 0];
+            break;
+
+        case 3:
+            multips = [0, -1];
+            break;
+    }
+
+    for (let i = 0; i < type + 2; i++) {
+        if (posY + multips[1] * i > 9 || posY + multips[1] * i < 0 || posX + multips[0] * i > 9 || posX + multips[0] * i < 0) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 export function checkTurn(data, playerId) {
@@ -126,6 +202,29 @@ export function checkTurn(data, playerId) {
     }
 }
 
-// timer(5, () => {
-//     console.log("out of time");
-// });
+// let type = 3;
+// let posX = 3;
+// let posY = 0;
+// let rot = 2;
+
+// let data = {
+//     hostId: "123456",
+//     state: "action",
+//     boards: [
+//         {
+//             ships: [
+//                 { type: type, posX: posX, posY: posY, rot: rot, hits: [false, false, false] },
+//             ],
+//             shots: [],
+//         },
+//         {
+//             ships: [],
+//             shots: [],
+//         }
+//     ],
+//     nextPlayer: 0,
+// }
+
+// checkHit(data, 1, 0, 0);
+
+// console.log(validateShipPosition(type, posX, posY, rot));
