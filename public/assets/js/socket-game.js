@@ -18,7 +18,12 @@ socket.on("player idx", (idx) => {
 });
 
 socket.on('turn update', (turnData) => {
-    turnData.turn == playerIdx ? $("#whosTurn").html("Ty") : $("#whosTurn").html("Przeciwnik");
+    if (turnData.phase === "preparation") {
+        $("#whosTurn").html("Faza przygotowań");
+    } else {
+        turnData.turn === playerIdx ? $("#whosTurn").html("Twoja tura") : $("#whosTurn").html("Tura przeciwnika");
+    }
+    
 
     timerDestination = turnData.timerToUTC;
     gamePhase = turnData.phase;

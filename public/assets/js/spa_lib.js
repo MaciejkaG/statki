@@ -1,10 +1,10 @@
 var activeView;
 
 function switchView(viewContainerId, useReplaceState=false) {
-    $(`.container`).css("opacity", 0);
+    $(`.container`).css({ opacity: 0, animation: "OutAnim 0.2s 1 ease" });
     setTimeout(() => {
         $(`.container`).css("display", "none");
-        $(`.container#${viewContainerId}`).css({"display": "flex", "opacity": "1"});
+        $(`.container#${viewContainerId}`).css({ display: "flex", opacity: 1, animation: "InAnim 0.2s 1 ease" });
         let path = $(`.container#${viewContainerId}`).data("path");
         let title = $(`.container#${viewContainerId}`).data("title");
         if (useReplaceState) {
@@ -14,7 +14,7 @@ function switchView(viewContainerId, useReplaceState=false) {
         }
 
         activeView = viewContainerId;
-    }, 150);
+    }, 200);
 }
 
 function lockUI(doLock) {

@@ -1,9 +1,20 @@
-body {
-    transition: opacity 0.1s;
-}
-
 .container {
     display: none;
+    transition: opacity 0.175s;
+}
+
+@keyframes OutAnim {
+    from {transform: translateY(0)}
+    to {transform: translateY(5%);}
+}
+
+@keyframes InAnim {
+    from {transform: translateY(-5%)}
+    to {transform: translateY(0%);}
+}
+
+.header {
+    text-align: center;
 }
 
 /* index */

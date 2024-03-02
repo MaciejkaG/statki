@@ -3,10 +3,11 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, validate } from 'uuid';
 import session from "express-session";
 import { engine } from 'express-handlebars';
 import { createClient } from 'redis';
+import * as bships from './utils/battleships.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +27,8 @@ const redis = createClient();
 redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
 redis.flushDb();
+
+const GInfo = new bships.GameInfo(redis, io);
 
 app.set('trust proxy', 1);
 const sessionMiddleware = session({
@@ -69,7 +72,7 @@ app.get("/game", async (req, res) => {
     const game = await redis.json.get(`game:${req.query.id}`);
     if (req.session.nickname == null) {
         res.redirect("/setup");
-    } else if (req.query.id == null || game == null || game.state == "expired") {
+    } else if (req.query.id == null || game == null || game.state == "expired" || req.session.activeGame == null) {
         res.status(400).send('badGameId');
     } else {
         res.render('board');
@@ -89,7 +92,7 @@ io.on('connection', async (socket) => {
         return;
     }
 
-    if (!await isPlayerInGame(socket)) {
+    if (!await GInfo.isPlayerInGame(socket)) {
         socket.on('whats my nick', (callback) => {
             callback(session.nickname);
         });
@@ -132,18 +135,19 @@ io.on('connection', async (socket) => {
                     // Teraz utwórz objekt partii w trakcie w bazie Redis
                     const gameId = uuidv4();
                     redis.json.set(`game:${gameId}`, '$', {
+                        hostId: opp.id,
                         state: "pregame",
-                        boards: {
-                            host: { //    typ 2 to trójmasztowiec  pozycja i obrót na planszy  które pola zostały trafione
+                        boards: [
+                            { //          typ 2 to trójmasztowiec  pozycja i obrót na planszy  które pola zostały trafione
                                 ships: [], // zawiera np. {type: 2, posX: 3, posY: 4, rot: 2, hits: [false, false, true]}
                                 //                       pozycja na planszy  czy strzał miał udział w zatopieniu statku?
                                 shots: [], // zawiera np. {posX: 3, posY: 5, sunk: true}
                             },
-                            guest: {
+                            {
                                 ships: [],
                                 shots: [],
                             }
-                        },
+                        ],
                         nextPlayer: 0,
                     });
 
@@ -193,12 +197,12 @@ io.on('connection', async (socket) => {
         });
 
         socket.on('disconnecting', () => {
-            if (isPlayerInRoom(socket)) {
+            if (bships.isPlayerInRoom(socket)) {
                 io.to(socket.rooms[1]).emit("player left");
             }
         });
     } else {
-        const playerGame = await getPlayerGameData(socket);
+        const playerGame = await GInfo.getPlayerGameData(socket);
 
         if (playerGame.data.state === 'pregame') {
             socket.join(playerGame.id);
@@ -213,22 +217,33 @@ io.on('connection', async (socket) => {
 
                 let UTCTs = Math.floor((new Date()).getTime() / 1000 + 90);
                 io.to(playerGame.id).emit('turn update', { turn: 0, phase: "preparation", timerToUTC: UTCTs });
-                io.to(playerGame.id).emit();
+                bships.timer(90, () => GInfo.endPrepPhase(socket));
             }
         }
 
-        // socket.on('shoot', async () => {
-        //     const playerGame = await getPlayerGameData(socket);
+        socket.on('place ship', async (type, posX, posY, rot) => {
+            const playerGame = await GInfo.getPlayerGameData(socket);
 
-        //     if (playerGame.state === 'action') {
+            if (playerGame.state === 'preparation') {
                 
-        //     }
-        // });
+            }
+        });
+
+        socket.on('shoot', async () => {
+            const playerGame = await GInfo.getPlayerGameData(socket);
+
+            if (playerGame.state === 'action') {
+                if (bships.checkTurn(playerGame, socket.id)) {
+
+                }
+            }
+        });
 
         socket.on('disconnecting', async () => {
-            io.to(playerGame.id).emit("player left");
-
-            redis.json.del(`game:${playerGame.id}`);
+            const playerGame = await GInfo.getPlayerGameData(socket);
+            if (playerGame !== null) {
+                AFKEnd(playerGame.id);
+            }
         });
     }
 });
@@ -241,35 +256,32 @@ function genID() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// async function emitToParty(partyuuid) {
-//     const party = gameData.find((element) => element.partyId===partyuuid);
+function resetUserGame(req) {
+    req.session.reload((err) => {
+        if (err) return socket.disconnect();
 
-//     if (party!==null) {
-//         party.members.forEach(socketId => {
-            
-//             io.to(socketId).emit();
-//         });
-//     }
-// }
-
-function isPlayerInRoom(socket) {
-    return !socket.rooms.size === 1;
+        req.session.activeGame = null;
+        req.session.save();
+    });
 }
 
-async function isPlayerInGame(socket) {
-    const game = await redis.json.get(`game:${socket.session.activeGame}`);
-    return game != null;
+function endGame(gameId) {
+    const members = [...roomMemberIterator(gameId)];
+    for (let i = 0; i < members.length; i++) {
+        const sid = members[i][0];
+        const socket = io.sockets.sockets.get(sid);
+        resetUserGame(socket.request);
+        socket.leave(gameId);
+    }
+
+    redis.json.del(`game:${gameId}`);
 }
 
-async function getPlayerGameData(socket) {
-    const game = await redis.json.get(`game:${socket.session.activeGame}`);
-    return game == null ? null : {id: socket.session.activeGame, data: game};
+function AFKEnd(gameId) {
+    io.to(gameId).emit("player left");
+    endGame(gameId);
 }
 
 function roomMemberIterator(id) {
     return io.sockets.adapter.rooms.get(id).entries();
-}
-
-function getPlayerRoom(socket) {
-    return socket.rooms.entries()[1] === undefined ? null : socket.rooms.entries()[1][0];
 }
