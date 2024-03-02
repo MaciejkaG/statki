@@ -1,5 +1,5 @@
 <div class="cover">
-    <h1>Oczekiwanie na przeciwnika...</h1>
+    <h1>Łączenie...</h1>
 </div>
 
 <div class="container" id="gameView">
@@ -18,8 +18,8 @@
                 <h3 class="controlsOwnBoard"><span class="important">R</span> Obrót statku</h3>
                 <h3><span class="important">B</span> Zamiana planszy</h3>
                 <span class="break"></span>
-                <h3>Ruch: <span class="dynamic">Przeciwnik</span></h3>
-                <h2 class="important">∞</h2>
+                <h3>Ruch: <span class="dynamic" id="whosTurn">Przeciwnik</span></h3>
+                <h2 class="important" id="timer">∞</h2>
             </div>
             <div class="boardContainer">
                 <div id="board" oncontextmenu="return false;"></div>
@@ -28,7 +28,9 @@
             <div class="spaceFiller"></div>
         </div>
     </div>
-    <script src="/assets/js/battleships_lib.js"></script>
-    <script src="/assets/js/main.js"></script>
-    <script src="/assets/js/key_handling.js"></script>
 </div>
+
+<script src="/assets/js/battleships-lib.js"></script>
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/key-handling.js"></script>
+<script src="/assets/js/socket-game.js"></script>

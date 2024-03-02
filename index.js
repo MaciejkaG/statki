@@ -25,8 +25,7 @@ const io = new Server(server);
 const redis = createClient();
 redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
-
-var gameData = [];
+redis.flushDb();
 
 app.set('trust proxy', 1);
 const sessionMiddleware = session({
@@ -60,6 +59,7 @@ app.post('/api/setup-profile', (req, res) => {
     if (req.session.nickname == null && 4 < req.body.nickname.length && req.body.nickname.length < 16) {
         req.session.nickname = req.body.nickname;
         req.session.playerID = uuidv4();
+        req.session.activeGame = null;
     }
 
     res.redirect("/")
@@ -80,15 +80,16 @@ app.get("/*", (req, res) => {
     res.redirect("/?path=" + req.originalUrl);
 });
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
+    const req = socket.request;
     const session = socket.request.session;
+    socket.session = session;
     if (session.nickname==null) {
         socket.disconnect();
         return;
     }
 
-    console.log(isPlayerInGame(socket));
-    if (!isPlayerInGame(socket)) {
+    if (!await isPlayerInGame(socket)) {
         socket.on('whats my nick', (callback) => {
             callback(session.nickname);
         });
@@ -146,9 +147,26 @@ io.on('connection', (socket) => {
                         nextPlayer: 0,
                     });
 
+                    req.session.reload((err) => {
+                        if (err) return socket.disconnect();
+
+                        req.session.activeGame = gameId;
+                        req.session.save();
+                    });
+
+                    const oppReq = opp.request;
+
+                    oppReq.session.reload((err) => {
+                        if (err) return socket.disconnect();
+
+                        oppReq.session.activeGame = gameId;
+                        oppReq.session.save();
+                    });
+
                     io.to(msg).emit("gameReady", gameId);
 
-                    io.sockets.clients(msg).forEach((s) => {
+                    io.sockets.adapter.rooms.get(msg).forEach((sid) => {
+                        const s = io.sockets.sockets.get(sid);
                         s.leave(msg);
                     });
                 } else {
@@ -180,18 +198,37 @@ io.on('connection', (socket) => {
             }
         });
     } else {
-        socket.on('shoot', () => {
-            const playerGame = getPlayerGameData(socket);
+        const playerGame = await getPlayerGameData(socket);
 
-            if (playerGame.state === "action") {
+        if (playerGame.data.state === 'pregame') {
+            socket.join(playerGame.id);
+            if (io.sockets.adapter.rooms.get(playerGame.id).size === 2) {
+                io.to(playerGame.id).emit('players ready');
+
+                const members = [...roomMemberIterator(playerGame.id)];
+                for (let i = 0; i < members.length; i++) {
+                    const sid = members[i][0];
+                    io.to(sid).emit('player idx', i);
+                }
+
+                let UTCTs = Math.floor((new Date()).getTime() / 1000 + 90);
+                io.to(playerGame.id).emit('turn update', { turn: 0, phase: "preparation", timerToUTC: UTCTs });
+                io.to(playerGame.id).emit();
+            }
+        }
+
+        // socket.on('shoot', async () => {
+        //     const playerGame = await getPlayerGameData(socket);
+
+        //     if (playerGame.state === 'action') {
                 
-            }
-        });
+        //     }
+        // });
 
-        socket.on('disconnecting', () => {
-            if (isPlayerInRoom(socket)) {
-                io.to(socket.rooms).emit("player left");
-            }
+        socket.on('disconnecting', async () => {
+            io.to(playerGame.id).emit("player left");
+
+            redis.json.del(`game:${playerGame.id}`);
         });
     }
 });
@@ -220,19 +257,19 @@ function isPlayerInRoom(socket) {
 }
 
 async function isPlayerInGame(socket) {
-    const room = getPlayerRoom(socket);
-
-    const game = await redis.json.get(`game:${room}`);
+    const game = await redis.json.get(`game:${socket.session.activeGame}`);
     return game != null;
 }
 
-function getPlayerGameData(socket) {
-    const room = getPlayerRoom(socket);
+async function getPlayerGameData(socket) {
+    const game = await redis.json.get(`game:${socket.session.activeGame}`);
+    return game == null ? null : {id: socket.session.activeGame, data: game};
+}
 
-    const game = redis.json.get(`game:${room}`);
-    return game;
+function roomMemberIterator(id) {
+    return io.sockets.adapter.rooms.get(id).entries();
 }
 
 function getPlayerRoom(socket) {
-    return socket.rooms.values().next().value;
+    return socket.rooms.entries()[1] === undefined ? null : socket.rooms.entries()[1][0];
 }
