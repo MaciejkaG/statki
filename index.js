@@ -217,7 +217,12 @@ io.on('connection', async (socket) => {
 
                 let UTCTs = Math.floor((new Date()).getTime() / 1000 + 90);
                 io.to(playerGame.id).emit('turn update', { turn: 0, phase: "preparation", timerToUTC: UTCTs });
-                bships.timer(90, () => GInfo.endPrepPhase(socket));
+                bships.timer(90, () => {
+                    GInfo.endPrepPhase(socket);
+                    bships.timer(30, () => {
+                        AFKEnd(playerGame.id);
+                    });
+                });
             }
         }
 
