@@ -20,8 +20,8 @@ refreshBoardView();
 $("#board .field").hover(function () {
     hoveredField = this;
     // Pokaż "miarki"
-    let posY = parseInt($(this).data("pos-x"));
-    let posX = parseInt($(this).data("pos-y"));
+    let posX = parseInt($(this).data("pos-x"));
+    let posY = parseInt($(this).data("pos-y"));
     let row = bsc.getRow(posY);
     let column = bsc.getColumn(posX);
 
@@ -168,8 +168,8 @@ function refreshBoardView() {
         });
         changedFields.length = 0;
 
-        let posY = parseInt($(hoveredField).data("pos-x"));
-        let posX = parseInt($(hoveredField).data("pos-y"));
+        let posX = parseInt($(hoveredField).data("pos-x"));
+        let posY = parseInt($(hoveredField).data("pos-y"));
         let row = bsc.getRow(posY);
         let column = bsc.getColumn(posX);
 

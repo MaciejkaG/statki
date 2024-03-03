@@ -12,7 +12,7 @@ class Battleships {
         for (var i = 0; i < size; i++) {
             let row = "<div class=\"row\">";
             for (var n = 0; n < size; n++) {
-                row += `<div class="field" data-pos-x="${i}" data-pos-y="${n}"><div class="shipField"><svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 100 100'><path d='M100 0 L0 100 ' stroke='black' stroke-width='3'/><path d='M0 0 L100 100 ' stroke='black' stroke-width='3'/></svg></div></div>`;
+                row += `<div class="field" data-pos-x="${n}" data-pos-y="${i}"><div class="shipField"><svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 100 100'><path d='M100 0 L0 100 ' stroke='black' stroke-width='3'/><path d='M0 0 L100 100 ' stroke='black' stroke-width='3'/></svg></div></div>`;
             }
             row += "</div>";
             board += row;
@@ -77,5 +77,7 @@ class Battleships {
         fields.forEach(field => {
             this.getField(field[0], field[1]).children(".shipField").addClass("active");
         });
+
+        return fields;
     }
 }

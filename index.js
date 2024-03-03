@@ -229,6 +229,8 @@ io.on('connection', async (socket) => {
                 });
 
                 await redis.json.set(`game:${playerGame.id}`, '$.state', "preparation");
+            } else if (io.sockets.adapter.rooms.get(playerGame.id).size > 2) {
+                socket.disconnect();
             }
         }
 
@@ -246,8 +248,17 @@ io.on('connection', async (socket) => {
                     socket.emit("toast", "Nie masz już statków tego typu");
                 } else {
                     await GInfo.placeShip(socket, { type: type, posX: posX, posY: posY, rot: rot });
-                    socket.emit("placed ship", { type: type, posX: posY, posY: posX, rot: rot });
+                    socket.emit("placed ship", { type: type, posX: posX, posY: posY, rot: rot });
                 }
+            }
+        });
+
+        socket.on('remove ship', async (posX, posY) => {
+            const playerGame = await GInfo.getPlayerGameData(socket);
+
+            if (playerGame.data.state === 'preparation') {
+                const deletedShip = await GInfo.removeShip(socket, posX, posY);
+                socket.emit("removed ship", { posX: posX, posY: posY, type: deletedShip.type });
             }
         });
 

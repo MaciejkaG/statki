@@ -19,11 +19,11 @@
   },
   "homepage": "https://github.com/MaciejkaG/statki-backend#readme",
   "dependencies": {
-    "express": "^4.18.2",
+    "express": "^4.18.3",
     "express-handlebars": "^7.1.2",
-    "express-session": "^1.17.3",
-    "redis": "^4.6.12",
-    "socket.io": "^4.7.2",
+    "express-session": "^1.18.0",
+    "redis": "^4.6.13",
+    "socket.io": "^4.7.4",
     "uuid": "^9.0.1",
     "uuid4": "^2.0.3"
   }

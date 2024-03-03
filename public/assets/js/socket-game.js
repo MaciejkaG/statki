@@ -3,9 +3,18 @@ const socket = io();
 var playerIdx;
 var timerDestination = null;
 var gamePhase = 'pregame';
+var occupiedFields = [];
 
 $('.field').on('click', function () {
     socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
+});
+
+$('.field').on('contextmenu', function () {
+    if ($(this).children('.shipField').hasClass('active')) {
+        let originPos = occupiedFields.find((elem) => elem.pos[0] == $(this).data('pos-x') && elem.pos[1] == $(this).data('pos-y')).origin;
+
+        socket.emit("remove ship", originPos[0], originPos[1]);
+    }
 });
 
 socket.on('toast', (msg) => {
@@ -21,8 +30,26 @@ socket.on('toast', (msg) => {
 });
 
 socket.on("placed ship", (data) => {
-    bsc.placeShip(data);
+    let shipFields = bsc.placeShip(data);
+    shipFields.forEach(field => {
+        occupiedFields.push({pos: field, origin: [data.posX, data.posY]});
+    });
     shipsLeft[data.type]--;
+    refreshBoardView();
+});
+
+socket.on("removed ship", (data) => {
+    const shipFields = occupiedFields.filter(elem => { 
+        return elem.origin[0] == data.posX && elem.origin[1] == data.posY;
+    });
+
+    shipFields.forEach(field => {
+        bsc.getField(field.pos[0], field.pos[1]).children('.shipField').removeClass("active");
+    });
+
+    occupiedFields = shipFields.filter(n => !occupiedFields.includes(n));
+
+    shipsLeft[data.type]++;
     refreshBoardView();
 });
 
