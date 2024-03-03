@@ -13,6 +13,18 @@
     to {transform: translateY(0%);}
 }
 
+.bshipstoast {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 15px;
+    border: solid 2px white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .header {
     text-align: center;
 }

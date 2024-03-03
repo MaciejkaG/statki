@@ -1,13 +1,3 @@
-// export class Client {
-//     constructor(clientId, clientSecret, redirectUri) {
-//         this.clientId = clientId;
-//         this.clientSecret = clientSecret;
-//         this.redirectUri = redirectUri;
-//     }
-//     getAccessToken(code) {
-//     }
-// }
-
 export class GameInfo {
     constructor(redis, io) {
         this.redis = redis;
@@ -22,6 +12,12 @@ export class GameInfo {
     async getPlayerGameData(socket) {
         const game = await this.redis.json.get(`game:${socket.session.activeGame}`);
         return game == null ? null : { id: socket.session.activeGame, data: game };
+    }
+
+    async getPlayerShips(socket) {
+        const game = await this.redis.json.get(`game:${socket.session.activeGame}`);
+        const idx = socket.request.session.id === game.hostId ? 0 : 1;
+        return game.boards[idx].ships;
     }
 
     async endPrepPhase(socket) {
@@ -152,40 +148,71 @@ export function checkHit(data, playerIdx, posX, posY) {
         }
     });
 
-    boardRender.forEach(row => {
-        let log = "";
-        row.forEach(field => {
-            log += `${field}\t`
-        });
-        console.log(log);
-    });
-
     return boardRender[posY][posX];
 }
 
-export function validateShipPosition(type, posX, posY, rot) {
+export function validateShipPosition(ships, type, posX, posY, rot) {
     let multips;
+
+    let boardRender = [];
+
+    for (let i = 0; i < 10; i++) {
+        var array = [];
+        for (let i = 0; i < 10; i++) {
+            array.push(false);
+        }
+        boardRender.push(array);
+    }
+
+    ships.forEach(ship => {
+        let multips;
+
+        switch (ship.rot) {
+            case 0:
+                multips = [0, 1];
+                break;
+
+            case 1:
+                multips = [1, 0];
+                break;
+
+            case 2:
+                multips = [0, -1];
+                break;
+
+            case 3:
+                multips = [1, 0];
+                break;
+        }
+
+        for (let i = 0; i < ship.type + 1; i++) {
+            boardRender[ship.posY + multips[1] * i][ship.posX + multips[0] * i] = true;
+        }
+    });
 
     switch (rot) {
         case 0:
-            multips = [1, 0];
-            break;
-
-        case 1:
             multips = [0, 1];
             break;
 
+        case 1:
+            multips = [1, 0];
+            break;
+
         case 2:
-            multips = [-1, 0];
+            multips = [0, -1];
             break;
 
         case 3:
-            multips = [0, -1];
+            multips = [1, 0];
             break;
     }
 
-    for (let i = 0; i < type + 2; i++) {
+    for (let i = 0; i < type + 1; i++) {
         if (posY + multips[1] * i > 9 || posY + multips[1] * i < 0 || posX + multips[0] * i > 9 || posX + multips[0] * i < 0) {
+            return false;
+        }
+        if (boardRender[posY + multips[1] * i][posX + multips[0] * i]) {
             return false;
         }
     }

@@ -2,7 +2,24 @@ const socket = io();
 
 var playerIdx;
 var timerDestination = null;
-var gamePhase = "pregame";
+var gamePhase = 'pregame';
+
+$('.field').on('click', function () {
+    console.log("Clicked");
+    socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
+});
+
+socket.on('toast', (msg) => {
+    Toastify({
+        text: msg,
+        duration: 5000,
+        newWindow: true,
+        gravity: "bottom",
+        position: "right",
+        stopOnFocus: true,
+        className: "bshipstoast",
+    }).showToast();
+});
 
 socket.on('connect', () => {
     $(".cover h1").html("Oczekiwanie na serwer...");
@@ -15,6 +32,7 @@ socket.on("players ready", () => {
 socket.on("player idx", (idx) => {
     console.log(idx);
     playerIdx = idx;
+    console.log(playerIdx);
 });
 
 socket.on('turn update', (turnData) => {

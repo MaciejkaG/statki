@@ -70,6 +70,20 @@ h1,h2,h3,h4,h5,h6 {
     transition: background 0.05s;
 }
 
+.field .shipField {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 20%;
+    background: var(--ship-valid);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+#secondaryBoard .field .shipField {
+    background: var(--ship-invalid);
+}
+
 .field svg {
     opacity: 0;
     width: 100%;
