@@ -3,7 +3,7 @@ class Battleships {
         if (boardSize>0) {
             this.boardSize = boardSize;
         } else {
-            throw new Error("Wrong boardSize for the 'Battleships' class");
+            throw new Error("Incorrect boardSize for the 'Battleships' class");
         }
     }
 
@@ -22,7 +22,9 @@ class Battleships {
     }
 
     getField(x, y) {
-        if (0 < x && x <= this.boardSize && 0 < y && y <= this.boardSize) {
+        if (0 <= x && x < this.boardSize && 0 <= y && y < this.boardSize) {
+            x++;
+            y++;
             return $(`#board .row:nth-child(${y}) .field:nth-child(${x})`);
         } else {
             throw new RangeError("getField position out of range.");
@@ -30,20 +32,50 @@ class Battleships {
     }
 
     getRow(row) {
-        row = parseInt(row)+1
+        row++;
         if (row<=this.boardSize) {
             return $(`#board .row:nth-child(${row}) .field`);
         } else {
-            throw new RangeError("getColumn position out of range.");
+            throw new RangeError("getRow position out of range.");
         }
     }
 
     getColumn(column) {
-        column = parseInt(column)+1
+        column++;
         if (column<=this.boardSize) {
             return $(`#board .row .field:nth-child(${column})`);
         } else {
             throw new RangeError("getColumn position out of range.");
         }
+    }
+
+    placeShip(data) {
+        let fields = [];
+        switch (data.rot) {
+            case 0:
+                for (let i = 0; i <= data.type; i++) {
+                    fields.push([data.posX + i, data.posY]);
+                }
+                break;
+            case 1:
+                for (let i = 0; i <= data.type; i++) {
+                    fields.push([data.posX, data.posY + i]);
+                }
+                break;
+            case 2:
+                for (let i = 0; i <= data.type; i++) {
+                    fields.push([data.posX - i, data.posY]);
+                }
+                break;
+            case 3:
+                for (let i = 0; i <= data.type; i++) {
+                    fields.push([data.posX, data.posY - i]);
+                }
+                break;
+        }
+
+        fields.forEach(field => {
+            this.getField(field[0], field[1]).children(".shipField").addClass("active");
+        });
     }
 }

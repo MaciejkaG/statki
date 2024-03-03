@@ -10,9 +10,12 @@ var previousRow = $(":not(*)");
 var previousColumn = $(":not(*)");
 var selectedShip = 0;
 var shipRotation = 0;
+var shipsLeft = [4, 3, 2, 1];
 var changedFields = [];
 
 var hoveredField = null;
+
+refreshBoardView();
 
 $("#board .field").hover(function () {
     hoveredField = this;
@@ -24,17 +27,15 @@ $("#board .field").hover(function () {
 
     changedFields.push(row, column, $(this));
 
-    row.css("background", "rgb(136, 136, 136)");
-    column.css("background", "rgb(136, 136, 136)");
+    row.css("background", "var(--mark-line)");
+    column.css("background", "var(--mark-line)");
 
-    $(this).css("background", "rgb(68, 68, 68)");
+    $(this).css("background", "var(--mark-spot)");
 
     previousRow = row;
     previousColumn = column;
 
     // Pokaż podgląd statku
-    posX++;
-    posY++;
     var fields = [];
     switch (shipRotation) {
         case 0:
@@ -61,7 +62,7 @@ $("#board .field").hover(function () {
 
     var fieldElem;
     let failed = false;
-    for (let i = 0; i < selectedShip+1; i++) {
+    for (let i = 0; i <= selectedShip; i++) {
         const field = fields[i];
 
         try {
@@ -74,9 +75,9 @@ $("#board .field").hover(function () {
         }
         
         if (failed) {
-            fieldElem.css("background", "rgb(255, 163, 163)");
+            fieldElem.css("background", "var(--mark-ship-invalid)");
         } else {
-            fieldElem.css("background", "rgb(163, 255, 163)");
+            fieldElem.css("background", "var(--mark-ship-valid)");
         }
         changedFields.push(fieldElem);
     }
@@ -84,7 +85,7 @@ $("#board .field").hover(function () {
     hoveredField = null;
     // Wyłącz "miarki" po wyjściu kursora z pola (aby się nie duplikowały w przyszłości)
     changedFields.forEach(field => {
-        field.css("background", "rgb(201, 201, 201)");
+        field.css("background", "var(--field)");
     });
     changedFields.length = 0;
 });
@@ -153,9 +154,17 @@ function switchRotation() {
 }
 
 function refreshBoardView() {
+    let shipsOfType = shipsLeft[selectedShip];
+    $("#shipsLeft").html(shipsOfType);
+    if (!shipsOfType) {
+        $("#shipsLeft").addClass("danger");
+    } else {
+        $("#shipsLeft").removeClass("danger");
+    }
+
     if (hoveredField) {
         changedFields.forEach(field => {
-            field.css("background", "rgb(201, 201, 201)");
+            field.css("background", "var(--field)");
         });
         changedFields.length = 0;
 
@@ -166,16 +175,14 @@ function refreshBoardView() {
 
         changedFields.push(row, column, $(hoveredField));
 
-        row.css("background", "rgb(136, 136, 136)");
-        column.css("background", "rgb(136, 136, 136)");
+        row.css("background", "var(--mark-line)");
+        column.css("background", "var(--mark-line)");
 
-        $(hoveredField).css("background", "rgb(68, 68, 68)");
+        $(hoveredField).css("background", "var(--mark-field)");
 
         previousRow = row;
         previousColumn = column;
 
-        posX++;
-        posY++;
         var fields = [];
         switch (shipRotation) {
             case 0:
@@ -202,7 +209,7 @@ function refreshBoardView() {
 
         var fieldElem;
         let failed = false;
-        for (let i = 0; i < selectedShip + 1; i++) {
+        for (let i = 0; i <= selectedShip; i++) {
             const field = fields[i];
 
             try {
@@ -215,9 +222,9 @@ function refreshBoardView() {
             }
 
             if (failed) {
-                fieldElem.css("background", "rgb(255, 163, 163)");
+                fieldElem.css("background", "var(--mark-ship-invalid)");
             } else {
-                fieldElem.css("background", "rgb(163, 255, 163)");
+                fieldElem.css("background", "var(--mark-ship-valid)");
             }
             changedFields.push(fieldElem);
         }

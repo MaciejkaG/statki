@@ -5,7 +5,6 @@ var timerDestination = null;
 var gamePhase = 'pregame';
 
 $('.field').on('click', function () {
-    console.log("Clicked");
     socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
 });
 
@@ -21,6 +20,12 @@ socket.on('toast', (msg) => {
     }).showToast();
 });
 
+socket.on("placed ship", (data) => {
+    bsc.placeShip(data);
+    shipsLeft[data.type]--;
+    refreshBoardView();
+});
+
 socket.on('connect', () => {
     $(".cover h1").html("Oczekiwanie na serwer...");
 });
@@ -30,9 +35,7 @@ socket.on("players ready", () => {
 });
 
 socket.on("player idx", (idx) => {
-    console.log(idx);
     playerIdx = idx;
-    console.log(playerIdx);
 });
 
 socket.on('turn update', (turnData) => {

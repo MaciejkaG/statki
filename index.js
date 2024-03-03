@@ -238,11 +238,15 @@ io.on('connection', async (socket) => {
             if (playerGame.data.state === 'preparation') {
                 const playerShips = await GInfo.getPlayerShips(socket);
                 let canPlace = bships.validateShipPosition(playerShips, type, posX, posY, rot);
+                let shipAvailable = bships.getShipsAvailable(playerShips)[type] > 0;
 
-                if (canPlace) {
-                    console.log("placed");
+                if (!canPlace) {
+                    socket.emit("toast", "Nie możesz postawić tak statku");
+                } else if (!shipAvailable) {
+                    socket.emit("toast", "Nie masz już statków tego typu");
                 } else {
-                    socket.emit("toast", "Nie możesz postawić tak statku")
+                    await GInfo.placeShip(socket, { type: type, posX: posX, posY: posY, rot: rot });
+                    socket.emit("placed ship", { type: type, posX: posY, posY: posX, rot: rot });
                 }
             }
         });
@@ -252,7 +256,7 @@ io.on('connection', async (socket) => {
 
             if (playerGame.data.state === 'action') {
                 if (bships.checkTurn(playerGame, socket.id)) {
-
+                    
                 }
             }
         });
