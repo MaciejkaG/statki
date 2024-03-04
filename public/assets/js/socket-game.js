@@ -47,7 +47,9 @@ socket.on("removed ship", (data) => {
         bsc.getField(field.pos[0], field.pos[1]).children('.shipField').removeClass("active");
     });
 
-    occupiedFields = shipFields.filter(n => !occupiedFields.includes(n));
+    console.log(occupiedFields);
+    occupiedFields = occupiedFields.filter(n => !shipFields.includes(n));
+    console.log(occupiedFields);
 
     shipsLeft[data.type]++;
     refreshBoardView();

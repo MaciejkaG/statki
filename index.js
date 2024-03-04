@@ -1,3 +1,5 @@
+const PORT = 3737;
+
 import express from 'express';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
@@ -266,7 +268,7 @@ io.on('connection', async (socket) => {
             const playerGame = await GInfo.getPlayerGameData(socket);
 
             if (playerGame.data.state === 'action') {
-                if (bships.checkTurn(playerGame, socket.id)) {
+                if (bships.checkTurn(playerGame, socket.request.session.id)) {
                     
                 }
             }
@@ -281,8 +283,8 @@ io.on('connection', async (socket) => {
     }
 });
 
-server.listen(7777, () => {
-    console.log('Server running at http://localhost:7777');
+server.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
 });
 
 function genID() {

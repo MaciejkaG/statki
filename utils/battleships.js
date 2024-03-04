@@ -47,18 +47,21 @@ export class GameInfo {
     async placeShip(socket, shipData) {
         const gameId = socket.session.activeGame;
         const key = `game:${gameId}`;
-        const hostId = (await this.redis.json.get(key, {path: '.hostId'}))[0];
+        const hostId = (await this.redis.json.get(key, {path: '.hostId'}));
 
         const playerIdx = socket.request.session.id === hostId ? 0 : 1;
+        console.log(socket.request.session.id, "=", hostId);
+        console.log("placeship", playerIdx);
         await this.redis.json.arrAppend(key, `.boards[${playerIdx}].ships`, shipData);
     }
 
     async removeShip(socket, posX, posY) {
         const gameId = socket.session.activeGame;
         const key = `game:${gameId}`;
-        const hostId = (await this.redis.json.get(key, { path: '.hostId' }))[0];
+        const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
 
         const playerIdx = socket.request.session.id === hostId ? 0 : 1;
+        console.log("removeship", playerIdx);
         let playerShips = await this.redis.json.get(key, {path: `.boards[${playerIdx}].ships`});
 
         var deletedShip;
@@ -191,29 +194,28 @@ export function validateShipPosition(ships, type, posX, posY, rot) {
     }
 
     ships.forEach(ship => {
-
         let multips;
 
         switch (ship.rot) {
             case 0:
-                multips = [0, 1];
-                break;
-
-            case 1:
                 multips = [1, 0];
                 break;
 
+            case 1:
+                multips = [0, 1];
+                break;
+
             case 2:
-                multips = [0, -1];
+                multips = [-1, 0];
                 break;
 
             case 3:
-                multips = [-1, 0];
+                multips = [0, -1];
                 break;
         }
 
         for (let i = 0; i < ship.type + 1; i++) {
-            boardRender[ship.posX + multips[1] * i][ship.posY + multips[0] * i] = true;
+            boardRender[ship.posX + multips[0] * i][ship.posY + multips[1] * i] = true;
         }
     });
 
@@ -221,31 +223,31 @@ export function validateShipPosition(ships, type, posX, posY, rot) {
 
     switch (rot) {
         case 0:
-            multips = [0, 1];
-            break;
-
-        case 1:
             multips = [1, 0];
             break;
 
+        case 1:
+            multips = [0, 1];
+            break;
+
         case 2:
-            multips = [0, -1];
+            multips = [-1, 0];
             break;
 
         case 3:
-            multips = [-1, 0];
+            multips = [0, -1];
             break;
     }
 
     for (let x = 0; x <= type; x++) {
-        if (posX + multips[1] * x > 9 || posX + multips[1] * x < 0 || posY + multips[0] * x > 9 || posX + multips[0] * x < 0) {
+        if (posX + multips[0] * x > 9 || posX + multips[0] * x < 0 || posY + multips[1] * x > 9 || posY + multips[1] * x < 0) {
             return false;
         }
 
         let subtrahents = [[0, 0], [0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [-1, -1], [1, -1], [-1, 1]]; // Usuń cztery ostatnie elementy jeżeli chcesz by statki mogły się stykać rogami
         for (let y = 0; y < subtrahents.length; y++) {
-            const idxX = posX - subtrahents[y][1] + multips[0] * x;
-            const idxY = posY - subtrahents[y][0] + multips[1] * x;
+            const idxX = posX - subtrahents[y][0] + multips[0] * x;
+            const idxY = posY - subtrahents[y][1] + multips[1] * x;
             if (!(idxX < 0 || idxX > 9 || idxY < 0 || idxY > 9) && boardRender[idxX][idxY]) {
                 return false;
             }
