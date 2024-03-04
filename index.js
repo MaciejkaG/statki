@@ -1,5 +1,6 @@
-const PORT = 3737;
+import 'dotenv/config';
 
+const PORT = parseInt(process.env.port);
 import express from 'express';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';

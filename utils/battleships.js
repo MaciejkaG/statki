@@ -50,8 +50,6 @@ export class GameInfo {
         const hostId = (await this.redis.json.get(key, {path: '.hostId'}));
 
         const playerIdx = socket.request.session.id === hostId ? 0 : 1;
-        console.log(socket.request.session.id, "=", hostId);
-        console.log("placeship", playerIdx);
         await this.redis.json.arrAppend(key, `.boards[${playerIdx}].ships`, shipData);
     }
 
@@ -61,7 +59,6 @@ export class GameInfo {
         const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
 
         const playerIdx = socket.request.session.id === hostId ? 0 : 1;
-        console.log("removeship", playerIdx);
         let playerShips = await this.redis.json.get(key, {path: `.boards[${playerIdx}].ships`});
 
         var deletedShip;

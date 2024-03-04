@@ -71,12 +71,14 @@ socket.on('turn update', (turnData) => {
     if (turnData.phase === "preparation") {
         $("#whosTurn").html("Faza przygotowań");
     } else {
+        postPrep = true;
+        myTurn = turnData.turn === playerIdx;
         turnData.turn === playerIdx ? $("#whosTurn").html("Twoja tura") : $("#whosTurn").html("Tura przeciwnika");
     }
-    
 
     timerDestination = turnData.timerToUTC;
     gamePhase = turnData.phase;
+    refreshBoardView();
 });
 
 socket.on('player left', () => {

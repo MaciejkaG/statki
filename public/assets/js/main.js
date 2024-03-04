@@ -13,6 +13,9 @@ var shipRotation = 0;
 var shipsLeft = [4, 3, 2, 1];
 var changedFields = [];
 
+var postPrep = false;
+var myTurn = false;
+
 var hoveredField = null;
 
 refreshBoardView();
@@ -30,56 +33,66 @@ $("#board .field").hover(function () {
     row.css("background", "var(--mark-line)");
     column.css("background", "var(--mark-line)");
 
-    $(this).css("background", "var(--mark-spot)");
-
     previousRow = row;
     previousColumn = column;
 
-    // Pokaż podgląd statku
-    var fields = [];
-    switch (shipRotation) {
-        case 0:
-            for (let i = 0; i < 4; i++) {
-                fields.push([posX + i, posY]);
-            }
-            break;
-        case 1:
-            for (let i = 0; i < 4; i++) {
-                fields.push([posX, posY + i]);
-            }
-            break;
-        case 2:
-            for (let i = 0; i < 4; i++) {
-                fields.push([posX - i, posY]);
-            }
-            break;
-        case 3:
-            for (let i = 0; i < 4; i++) {
-                fields.push([posX, posY - i]);
-            }
-            break;
-    }
-
-    var fieldElem;
-    let failed = false;
-    for (let i = 0; i <= selectedShip; i++) {
-        const field = fields[i];
-
-        try {
-            fieldElem = bsc.getField(field[0], field[1]);
-        } catch {
-            if (!failed) {
-                failed = true;
-                i = -1;
-            }
-        }
-        
-        if (failed) {
-            fieldElem.css("background", "var(--mark-ship-invalid)");
+    if (postPrep) {
+        if (myTurn) {
+            $(this).css("background", "var(--mark-ship-invalid)");
         } else {
-            fieldElem.css("background", "var(--mark-ship-valid)");
+            (this).css("background", "var(--mark-spot)");
         }
-        changedFields.push(fieldElem);
+    } else {
+        $(this).css("background", "var(--mark-spot)");
+
+        // Pokaż podgląd statku
+
+        var fields = [];
+
+        switch (shipRotation) {
+            case 0:
+                for (let i = 0; i < 4; i++) {
+                    fields.push([posX + i, posY]);
+                }
+                break;
+            case 1:
+                for (let i = 0; i < 4; i++) {
+                    fields.push([posX, posY + i]);
+                }
+                break;
+            case 2:
+                for (let i = 0; i < 4; i++) {
+                    fields.push([posX - i, posY]);
+                }
+                break;
+            case 3:
+                for (let i = 0; i < 4; i++) {
+                    fields.push([posX, posY - i]);
+                }
+                break;
+        }
+
+        var fieldElem;
+        let failed = false;
+        for (let i = 0; i <= selectedShip; i++) {
+            const field = fields[i];
+
+            try {
+                fieldElem = bsc.getField(field[0], field[1]);
+            } catch {
+                if (!failed) {
+                    failed = true;
+                    i = -1;
+                }
+            }
+
+            if (failed) {
+                fieldElem.css("background", "var(--mark-ship-invalid)");
+            } else {
+                fieldElem.css("background", "var(--mark-ship-valid)");
+            }
+            changedFields.push(fieldElem);
+        }
     }
 }, function () {
     hoveredField = null;
