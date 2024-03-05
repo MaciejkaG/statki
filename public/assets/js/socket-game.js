@@ -10,7 +10,7 @@ $('.field').on('click', function () {
 });
 
 $('.field').on('contextmenu', function () {
-    if ($(this).children('.shipField').hasClass('active')) {
+    if ($(this).hasClass('active')) {
         let originPos = occupiedFields.find((elem) => elem.pos[0] == $(this).data('pos-x') && elem.pos[1] == $(this).data('pos-y')).origin;
 
         socket.emit("remove ship", originPos[0], originPos[1]);
@@ -44,13 +44,12 @@ socket.on("removed ship", (data) => {
     });
 
     shipFields.forEach(field => {
-        bsc.getField(field.pos[0], field.pos[1]).children('.shipField').removeClass("active");
+        bsc.getField(field.pos[0], field.pos[1]).removeClass("active");
     });
 
-    console.log(occupiedFields);
     occupiedFields = occupiedFields.filter(n => !shipFields.includes(n));
-    console.log(occupiedFields);
 
+    console.log(`shipsLeft[${data.type}] = ${shipsLeft[data.type]}`)
     shipsLeft[data.type]++;
     refreshBoardView();
 });
@@ -70,10 +69,12 @@ socket.on("player idx", (idx) => {
 socket.on('turn update', (turnData) => {
     if (turnData.phase === "preparation") {
         $("#whosTurn").html("Faza przygotowań");
+        $("#boardSwitch").css("opacity", 0.3);
     } else {
         postPrep = true;
         myTurn = turnData.turn === playerIdx;
         turnData.turn === playerIdx ? $("#whosTurn").html("Twoja tura") : $("#whosTurn").html("Tura przeciwnika");
+        $("#boardSwitch").css("opacity", 1);
     }
 
     timerDestination = turnData.timerToUTC;
@@ -93,6 +94,12 @@ setInterval(() => {
         const UTCNow = Math.floor((new Date()).getTime() / 1000);
 
         const time = Math.abs(UTCNow - timerDestination);
+
+        if (time < 10) {
+            $("#timer").addClass("active");
+        } else {
+            $("#timer").removeClass("active");
+        }
 
         const minutes = Math.floor(time / 60).toLocaleString('pl-PL', {minimumIntegerDigits: 2, useGrouping: false});
         const seconds = (time - minutes * 60).toLocaleString('pl-PL', { minimumIntegerDigits: 2, useGrouping: false });

@@ -63,7 +63,7 @@ export class GameInfo {
 
         var deletedShip;
         playerShips = playerShips.filter(function (ship) {
-            if (!ship.posX != posX || ship.posY != posY) {
+            if (ship.posX == posX && ship.posY == posY) {
                 deletedShip = ship;
             }
 
