@@ -30,20 +30,20 @@ $(".board .field").hover(function () {
 
     changedFields.push(row, column, $(this));
 
-    row.css("background", "var(--mark-line)");
-    column.css("background", "var(--mark-line)");
+    row.css("background-color", "var(--mark-line)");
+    column.css("background-color", "var(--mark-line)");
 
     previousRow = row;
     previousColumn = column;
 
     if (postPrep) {
         if (myTurn) {
-            $(this).css("background", "var(--mark-ship-invalid)");
+            $(this).css("background-color", "var(--mark-ship-invalid)");
         } else {
-            (this).css("background", "var(--mark-spot)");
+            $(this).css("background-color", "var(--mark-spot)");
         }
     } else {
-        $(this).css("background", "var(--mark-spot)");
+        $(this).css("background-color", "var(--mark-spot)");
 
         // Pokaż podgląd statku
 
@@ -87,9 +87,9 @@ $(".board .field").hover(function () {
             }
 
             if (failed) {
-                fieldElem.css("background", "var(--mark-ship-invalid)");
+                fieldElem.css("background-color", "var(--mark-ship-invalid)");
             } else {
-                fieldElem.css("background", "var(--mark-ship-valid)");
+                fieldElem.css("background-color", "var(--mark-ship-valid)");
             }
             changedFields.push(fieldElem);
         }
@@ -98,7 +98,7 @@ $(".board .field").hover(function () {
     hoveredField = null;
     // Wyłącz "miarki" po wyjściu kursora z pola (aby się nie duplikowały w przyszłości)
     changedFields.forEach(field => {
-        field.css("background", "var(--field)");
+        field.css("background-color", "var(--field)");
     });
     changedFields.length = 0;
 });
@@ -185,7 +185,7 @@ function refreshBoardView() {
 
     if (hoveredField) {
         changedFields.forEach(field => {
-            field.css("background", "var(--field)");
+            field.css("background-color", "var(--field)");
         });
         changedFields.length = 0;
 
@@ -196,10 +196,10 @@ function refreshBoardView() {
 
         changedFields.push(row, column, $(hoveredField));
 
-        row.css("background", "var(--mark-line)");
-        column.css("background", "var(--mark-line)");
+        row.css("background-color", "var(--mark-line)");
+        column.css("background-color", "var(--mark-line)");
 
-        $(hoveredField).css("background", "var(--mark-field)");
+        $(hoveredField).css("background-color", "var(--mark-field)");
 
         previousRow = row;
         previousColumn = column;
@@ -243,9 +243,9 @@ function refreshBoardView() {
             }
 
             if (failed) {
-                fieldElem.css("background", "var(--mark-ship-invalid)");
+                fieldElem.css("background-color", "var(--mark-ship-invalid)");
             } else {
-                fieldElem.css("background", "var(--mark-ship-valid)");
+                fieldElem.css("background-color", "var(--mark-ship-valid)");
             }
             changedFields.push(fieldElem);
         }

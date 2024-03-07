@@ -29,7 +29,7 @@ const io = new Server(server);
 const redis = createClient();
 redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
-redis.flushDb();
+// redis.flushDb();
 
 const GInfo = new bships.GameInfo(redis, io);
 
@@ -224,7 +224,16 @@ io.on('connection', async (socket) => {
 
                 let UTCTs = Math.floor((new Date()).getTime() / 1000 + 90);
                 io.to(playerGame.id).emit('turn update', { turn: 0, phase: "preparation", timerToUTC: UTCTs });
-                bships.timer(90, () => {
+                bships.timer(20, async () => {
+                    const playerGame = await GInfo.getPlayerGameData(socket);
+                    for (let i = 0; i < playerGame.data.boards.length; i++) {
+                        const ships = playerGame.data.boards[i].ships;
+                        if (!ships.length) {
+                            AFKEnd(playerGame.id);
+                            return;
+                        }
+                    }
+
                     GInfo.endPrepPhase(socket);
                     bships.timer(30, () => {
                         AFKEnd(playerGame.id);
@@ -250,7 +259,7 @@ io.on('connection', async (socket) => {
                 } else if (!shipAvailable) {
                     socket.emit("toast", "Nie masz już statków tego typu");
                 } else {
-                    await GInfo.placeShip(socket, { type: type, posX: posX, posY: posY, rot: rot });
+                    await GInfo.placeShip(socket, { type: type, posX: posX, posY: posY, rot: rot, hits: Array.from(new Array(type+1), () => false) });
                     socket.emit("placed ship", { type: type, posX: posX, posY: posY, rot: rot });
                 }
             }
@@ -265,12 +274,24 @@ io.on('connection', async (socket) => {
             }
         });
 
-        socket.on('shoot', async () => {
+        socket.on('shoot', async (posX, posY) => {
             const playerGame = await GInfo.getPlayerGameData(socket);
 
             if (playerGame.data.state === 'action') {
-                if (bships.checkTurn(playerGame, socket.request.session.id)) {
-                    
+                if (bships.checkTurn(playerGame.data, socket.request.session.id)) {
+                    const enemyIdx = socket.request.session.id === playerGame.data.hostId ? 1 : 0;
+
+                    if (await GInfo.shootShip(socket, posX, posY)) {
+                        io.to(playerGame.id).emit("shot hit", enemyIdx, posX, posY);
+                    } else {
+                        io.to(playerGame.id).emit("shot missed", enemyIdx, posX, posY);
+                    }
+
+                    await GInfo.passTurn(socket);
+                    bships.resetTimers();
+                    bships.timer(30, () => {
+                        AFKEnd(playerGame.id);
+                    });
                 }
             }
         });

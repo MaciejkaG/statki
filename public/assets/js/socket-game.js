@@ -5,9 +5,14 @@ var timerDestination = null;
 var gamePhase = 'pregame';
 var occupiedFields = [];
 
-$('.field').on('click', function () {
+$('#board .field').on('click', function () {
     socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
 });
+
+$('#secondaryBoard .field').on('click', function () {
+    socket.emit("shoot", $(this).data('pos-x'), $(this).data('pos-y'));
+});
+
 
 $('.field').on('contextmenu', function () {
     if ($(this).hasClass('active')) {
@@ -52,6 +57,24 @@ socket.on("removed ship", (data) => {
     console.log(`shipsLeft[${data.type}] = ${shipsLeft[data.type]}`)
     shipsLeft[data.type]++;
     refreshBoardView();
+});
+
+socket.on("shot hit", (victimIdx, posX, posY) => {
+    console.log("hit");
+    if (victimIdx === playerIdx) {
+        bsc.setField(posX, posY, "hit");
+    } else {
+        bsc.setFieldEnemy(posX, posY, "hit");
+    }
+});
+
+socket.on("shot missed", (victimIdx, posX, posY) => {
+    console.log("missed");
+    if (victimIdx === playerIdx) {
+        bsc.setField(posX, posY, "miss");
+    } else {
+        bsc.setFieldEnemy(posX, posY, "miss");
+    }
 });
 
 socket.on('connect', () => {

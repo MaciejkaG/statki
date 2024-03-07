@@ -36,12 +36,12 @@ export class GameInfo {
         const key = `game:${gameId}`;
 
         await this.redis.json.set(key, '.state', 'action');
-        let nextPlayer = await this.redis.json.get(key, '.nextPlayer');
+        let nextPlayer = await this.redis.json.get(key, { path:'.nextPlayer' });
         nextPlayer = nextPlayer === 0 ? 1 : 0;
         await this.redis.json.set(key, '.nextPlayer', nextPlayer);
 
         const UTCTs = Math.floor((new Date()).getTime() / 1000 + 30);
-        this.io.to(gameId).emit('turn update', { turn: 0, phase: "action", timerToUTC: UTCTs });
+        this.io.to(gameId).emit('turn update', { turn: nextPlayer, phase: "action", timerToUTC: UTCTs });
     }
 
     async placeShip(socket, shipData) {
@@ -72,6 +72,37 @@ export class GameInfo {
 
         await this.redis.json.set(key, `.boards[${playerIdx}].ships`, playerShips);
         return deletedShip;
+    }
+
+    async shootShip(socket, posX, posY) {
+        const gameId = socket.session.activeGame;
+        const key = `game:${gameId}`;
+        const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
+
+        const enemyIdx = socket.request.session.id === hostId ? 1 : 0;
+        const playerIdx = enemyIdx ? 0 : 1;
+
+        let playerShips = await this.redis.json.get(key, { path: `.boards[${enemyIdx}].ships` });
+
+        var check = checkHit(playerShips, posX, posY);
+
+        if (!check) {
+            return false;
+        }
+
+        var shotShip;
+        for (let i = 0; i < playerShips.length; i++) {
+            const ship = playerShips[i];
+
+            if (ship.posX === check.originPosX & ship.posY === check.originPosY) {
+                shotShip = ship;
+                playerShips[i].hits[check.fieldIdx] = true;
+            }
+        }
+
+        await this.redis.json.set(key, `.boards[${enemyIdx}].ships`, playerShips);
+
+        return true;
     }
 }
 
@@ -135,11 +166,7 @@ export function getShipsAvailable(ships) {
     return shipsLeft;
 }
 
-export function checkHit(data, playerIdx, posX, posY) {
-    playerIdx = playerIdx === 0 ? 1 : 0;
-
-    let enemyBoard = data.boards[playerIdx];
-
+export function checkHit(ships, posX, posY) {
     let boardRender = [];
 
     for (let i = 0; i < 10; i++) {
@@ -150,7 +177,7 @@ export function checkHit(data, playerIdx, posX, posY) {
         boardRender.push(array);
     }
 
-    enemyBoard.ships.forEach(ship => {
+    ships.forEach(ship => {
         let multips;
 
         switch (ship.rot) {
@@ -172,7 +199,8 @@ export function checkHit(data, playerIdx, posX, posY) {
         }
 
         for (let i = 0; i < ship.type + 2; i++) {
-            boardRender[ship.posX + multips[1] * i][ship.posY + multips[0] * i] = true;
+            console.log(`boardRender[${ship.posX + multips[1] * i}][${ship.posY + multips[0] * i}]`)
+            boardRender[ship.posX + multips[1] * i][ship.posY + multips[0] * i] = {fieldIdx: i, originPosX: ship.posX, originPosY: ship.posY};
         }
     });
 
@@ -180,6 +208,10 @@ export function checkHit(data, playerIdx, posX, posY) {
 }
 
 export function validateShipPosition(ships, type, posX, posY, rot) {
+    if (type < 0 || type > 3 || rot < 0 || rot > 3) {
+        return false;
+    }
+
     let boardRender = [];
 
     for (let i = 0; i < 10; i++) {
