@@ -14,6 +14,9 @@
     --ship-invalid: hsl(0, 70%, 55%);
     --ship-miss: hsl(0, 0%, 18%);
 
+    --ship-ally-sunken: hsl(120, 30%, 40%);
+    --ship-enemy-sunken: hsl(0, 30%, 40%);
+
     --dynamic: rgb(83, 83, 245);
     --danger: rgb(243, 56, 56);
     --important: rgb(203, 50, 241);
@@ -83,7 +86,7 @@ h1,h2,h3,h4,h5,h6 {
     pointer-events: none;
     opacity: 0;
     transform: scale(0);
-    transition: opacity 0.25s, transform 0.25s 0.05s;
+    transition: opacity 0.25s, transform 0.25s 0.05s, background-color 0.25s;
 }
 
 #secondaryBoard .field .shipField {
@@ -108,6 +111,14 @@ h1,h2,h3,h4,h5,h6 {
 .field.hit svg {
     transform: scale(1);
     opacity: 1;
+}
+
+#board .field.sunken .shipField {
+    background-color: var(--ship-ally-sunken);
+}
+
+#secondaryBoard .field.sunken .shipField {
+    background-color: var(--ship-enemy-sunken);
 }
 
 .dynamic {

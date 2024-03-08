@@ -1,5 +1,6 @@
 const socket = io();
 
+// Handling server-sent events
 socket.on("joined", (nick) => {
     lockUI(true);
     $("#oppNameField").html(nick);

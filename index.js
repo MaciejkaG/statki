@@ -281,10 +281,18 @@ io.on('connection', async (socket) => {
                 if (bships.checkTurn(playerGame.data, socket.request.session.id)) {
                     const enemyIdx = socket.request.session.id === playerGame.data.hostId ? 1 : 0;
 
-                    if (await GInfo.shootShip(socket, posX, posY)) {
-                        io.to(playerGame.id).emit("shot hit", enemyIdx, posX, posY);
-                    } else {
+                    let hit = await GInfo.shootShip(socket, posX, posY);
+                    if (!hit.status) {
                         io.to(playerGame.id).emit("shot missed", enemyIdx, posX, posY);
+                    } else if (hit.status === 1) {
+                        io.to(playerGame.id).emit("shot hit", enemyIdx, posX, posY);
+                    } else if (hit.status === 2) {
+                        io.to(playerGame.id).emit("shot hit", enemyIdx, posX, posY);
+                        io.to(playerGame.id).emit("ship sunk", enemyIdx, hit.ship);
+
+                        if (hit.gameFinished) {
+                            io.to(playerGame.id).emit("game finished", !enemyIdx ? 1 : 0);
+                        }
                     }
 
                     await GInfo.passTurn(socket);

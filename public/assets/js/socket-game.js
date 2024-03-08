@@ -5,20 +5,29 @@ var timerDestination = null;
 var gamePhase = 'pregame';
 var occupiedFields = [];
 
+var lastTimeClick = 0;
+
 $('#board .field').on('click', function () {
-    socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
+    console.log(new Date().getTime() / 1000 - lastTimeClick);
+    if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {
+        socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
+        lastTimeClick = new Date().getTime() / 1000;
+    }
 });
 
 $('#secondaryBoard .field').on('click', function () {
-    socket.emit("shoot", $(this).data('pos-x'), $(this).data('pos-y'));
+    if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {
+        socket.emit("shoot", $(this).data('pos-x'), $(this).data('pos-y'));
+        lastTimeClick = new Date().getTime() / 1000;
+    }
 });
 
-
 $('.field').on('contextmenu', function () {
-    if ($(this).hasClass('active')) {
+    if ($(this).hasClass('active') && new Date().getTime() / 1000 - lastTimeClick > 0.3) {
         let originPos = occupiedFields.find((elem) => elem.pos[0] == $(this).data('pos-x') && elem.pos[1] == $(this).data('pos-y')).origin;
 
         socket.emit("remove ship", originPos[0], originPos[1]);
+        lastTimeClick = new Date().getTime() / 1000;
     }
 });
 
@@ -48,19 +57,20 @@ socket.on("removed ship", (data) => {
         return elem.origin[0] == data.posX && elem.origin[1] == data.posY;
     });
 
-    shipFields.forEach(field => {
-        bsc.getField(field.pos[0], field.pos[1]).removeClass("active");
-    });
+    for (let i = 0; i < shipFields.length; i++) {
+        const field = shipFields[i];
+        setTimeout(() => {
+            bsc.getField(field.pos[0], field.pos[1]).removeClass("active");
+        }, i * 150);
+    }
 
     occupiedFields = occupiedFields.filter(n => !shipFields.includes(n));
 
-    console.log(`shipsLeft[${data.type}] = ${shipsLeft[data.type]}`)
     shipsLeft[data.type]++;
     refreshBoardView();
 });
 
 socket.on("shot hit", (victimIdx, posX, posY) => {
-    console.log("hit");
     if (victimIdx === playerIdx) {
         bsc.setField(posX, posY, "hit");
     } else {
@@ -69,11 +79,55 @@ socket.on("shot hit", (victimIdx, posX, posY) => {
 });
 
 socket.on("shot missed", (victimIdx, posX, posY) => {
-    console.log("missed");
     if (victimIdx === playerIdx) {
         bsc.setField(posX, posY, "miss");
     } else {
         bsc.setFieldEnemy(posX, posY, "miss");
+    }
+});
+
+socket.on("ship sunk", (victimIdx, ship) => {
+    switch (ship.rot) {
+        case 0:
+            multips = [1, 0];
+            break;
+
+        case 1:
+            multips = [0, 1];
+            break;
+
+        case 2:
+            multips = [-1, 0];
+            break;
+
+        case 3:
+            multips = [0, -1];
+            break;
+    }
+
+    let l = !ship.type ? ship.type + 1 : ship.type + 2;
+    if (victimIdx === playerIdx) {
+        for (let i = 0; i < l; i++) {
+            console.log("ourship");
+            setTimeout(() => {
+                bsc.setField(ship.posX + multips[0] * i, ship.posY + multips[1] * i, "sunken");
+            }, i * 150);
+        }
+    } else {
+        for (let i = 0; i < l; i++) {
+            console.log("theirship");
+            setTimeout(() => {
+                bsc.setFieldEnemy(ship.posX + multips[0] * i, ship.posY + multips[1] * i, "sunken");
+            }, i * 150);
+        }
+    }
+});
+
+socket.on("game finished", (winnerIdx) => {
+    if (winnerIdx === playerIdx) {
+        alert("Wygrałeś!");
+    } else {
+        alert("Przegrałeś!");
     }
 });
 

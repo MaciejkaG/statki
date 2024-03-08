@@ -37,7 +37,7 @@ export class GameInfo {
 
         await this.redis.json.set(key, '.state', 'action');
         let nextPlayer = await this.redis.json.get(key, { path:'.nextPlayer' });
-        nextPlayer = nextPlayer === 0 ? 1 : 0;
+        nextPlayer = !nextPlayer ? 1 : 0;
         await this.redis.json.set(key, '.nextPlayer', nextPlayer);
 
         const UTCTs = Math.floor((new Date()).getTime() / 1000 + 30);
@@ -80,14 +80,14 @@ export class GameInfo {
         const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
 
         const enemyIdx = socket.request.session.id === hostId ? 1 : 0;
-        const playerIdx = enemyIdx ? 0 : 1;
+        // const playerIdx = enemyIdx ? 0 : 1;
 
         let playerShips = await this.redis.json.get(key, { path: `.boards[${enemyIdx}].ships` });
 
         var check = checkHit(playerShips, posX, posY);
 
         if (!check) {
-            return false;
+            return { status: 0 };
         }
 
         var shotShip;
@@ -97,12 +97,26 @@ export class GameInfo {
             if (ship.posX === check.originPosX & ship.posY === check.originPosY) {
                 shotShip = ship;
                 playerShips[i].hits[check.fieldIdx] = true;
+                if (!playerShips[i].hits.includes(false)) {
+                    console.log(playerShips);
+                    let gameFinished = true;
+                    await this.redis.json.set(key, `.boards[${enemyIdx}].ships`, playerShips);
+                    playerShips.every(ship => {
+                        if (ship.hits.includes(false)) {
+                            gameFinished = false;
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    });
+
+                    return { status: 2, ship: ship, gameFinished: gameFinished };
+                }
             }
         }
 
         await this.redis.json.set(key, `.boards[${enemyIdx}].ships`, playerShips);
-
-        return true;
+        return { status: 1, ship: shotShip };
     }
 }
 
@@ -198,9 +212,13 @@ export function checkHit(ships, posX, posY) {
                 break;
         }
 
-        for (let i = 0; i < ship.type + 2; i++) {
-            console.log(`boardRender[${ship.posX + multips[1] * i}][${ship.posY + multips[0] * i}]`)
-            boardRender[ship.posX + multips[1] * i][ship.posY + multips[0] * i] = {fieldIdx: i, originPosX: ship.posX, originPosY: ship.posY};
+        let l = !ship.type ? ship.type + 1 : ship.type + 2;
+        for (let i = 0; i < l; i++) {
+            // console.log("a");
+            let x = clamp(ship.posX + multips[0] * i, 0, 9);
+            let y = clamp(ship.posY + multips[1] * i, 0, 9);
+
+            boardRender[x][y] = {fieldIdx: i, originPosX: ship.posX, originPosY: ship.posY};
         }
     });
 
@@ -295,29 +313,6 @@ export function checkTurn(data, playerId) {
     }
 }
 
-// let type = 3;
-// let posX = 3;
-// let posY = 0;
-// let rot = 2;
-
-// let data = {
-//     hostId: "123456",
-//     state: "action",
-//     boards: [
-//         {
-//             ships: [
-//                 { type: type, posX: posX, posY: posY, rot: rot, hits: [false, false, false] },
-//             ],
-//             shots: [],
-//         },
-//         {
-//             ships: [],
-//             shots: [],
-//         }
-//     ],
-//     nextPlayer: 0,
-// }
-
-// checkHit(data, 1, 0, 0);
-
-// console.log(validateShipPosition(type, posX, posY, rot));
+function clamp(n, min, max) {
+    return Math.min(Math.max(n, min), max);
+}

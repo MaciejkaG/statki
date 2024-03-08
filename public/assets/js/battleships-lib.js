@@ -59,7 +59,7 @@ class Battleships {
         }
     }
 
-    setField(x, y, state, primary = false) {
+    setField(x, y, state) {
         if (state==="hit") {
             this.getField(x, y).children().children("svg").html("<path d='M100 0 L0 100 ' stroke='#ffffff' stroke-width='10'/><path d='M0 0 L100 100 ' stroke='#ffffff' stroke-width='10'/>");
             this.getField(x, y).addClass("hit");
@@ -67,12 +67,12 @@ class Battleships {
             this.getField(x, y).children(".shipField").css("background-color", "var(--ship-miss)");
             this.getField(x, y).addClass("active hit");
             this.getField(x, y).children().children("svg").html("<circle fill='#ffffff' cx='50' cy='50' r='20' />");
+        } else if (state === "sunken") {
+            this.getField(x, y).addClass("sunken");
         }
-
-        this.getFieldSecondary(x, y).addClass("hit");
     }
 
-    setFieldEnemy(x, y, state, primary = false) {
+    setFieldEnemy(x, y, state) {
         if (state === "hit") {
             this.getFieldSecondary(x, y).children().children("svg").html("<path d='M100 0 L0 100 ' stroke='#ffffff' stroke-width='10'/><path d='M0 0 L100 100 ' stroke='#ffffff' stroke-width='10'/>");
             this.getFieldSecondary(x, y).addClass("active hit");
@@ -80,9 +80,9 @@ class Battleships {
             this.getFieldSecondary(x, y).children(".shipField").css("background-color", "var(--ship-miss)");
             this.getFieldSecondary(x, y).addClass("active hit");
             this.getFieldSecondary(x, y).children().children("svg").html("<circle fill='#ffffff' cx='50' cy='50' r='20' />");
+        } else if (state === "sunken") {
+            this.getFieldSecondary(x, y).addClass("sunken");
         }
-
-        this.getFieldSecondary(x, y).addClass("hit");
     }
 
     placeShip(data) {
