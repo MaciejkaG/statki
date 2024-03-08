@@ -4,6 +4,34 @@ export class GameInfo {
         this.io = io;
     }
 
+    async timer(tId, time, callback) {
+        await this.redis.set(`timer:${tId}`, new Date().getTime() / 1000);
+        let localLastUpdate = await this.redis.get(`timer:${tId}`);
+
+        let timeout = setTimeout(callback, time * 1000);
+
+        let interval = setInterval(async () => {
+            if (timeout._destroyed) {
+                // timer is finished, stop monitoring turn changes
+                clearInterval(interval);
+                return;
+            }
+
+            let lastUpdate = await this.redis.get(`timer:${tId}`);
+            if (localLastUpdate != lastUpdate) {
+                // timer has been reset
+                clearTimeout(timeout);
+                clearInterval(interval);
+                return;
+            }
+        }, 200);
+    }
+
+    async resetTimer(tId) {
+        let lastUpdate = await this.redis.get(`timer:${tId}`);
+        await this.redis.set(`timer:${tId}`, -lastUpdate);
+    }
+
     async isPlayerInGame(socket) {
         const game = await this.redis.json.get(`game:${socket.session.activeGame}`);
         return game != null;
@@ -124,28 +152,6 @@ export function isPlayerInRoom(socket) {
 }
 
 var lastTimeChange = new Date().getTime();
-
-export function timer(time, callback) {
-    let localLastChange = lastTimeChange;
-
-    let timeout = setTimeout(callback, time * 1000);
-
-    let interval = setInterval(() => {
-        if (timeout._destroyed) {
-            // timer is finished, stop monitoring turn changes
-            clearInterval(interval);
-        }
-        if (localLastChange != lastTimeChange) {
-            // timer has been reset
-            clearTimeout(timeout);
-            clearInterval(interval);
-        }
-    }, 200);
-}
-
-export function resetTimers() {
-    lastTimeChange = -lastTimeChange;
-}
 
 // export function getShipsLeft(data, playerIdx) {
 //     let shipsLeft = [4, 3, 2, 1];

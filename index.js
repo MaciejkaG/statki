@@ -224,7 +224,7 @@ io.on('connection', async (socket) => {
 
                 let UTCTs = Math.floor((new Date()).getTime() / 1000 + 90);
                 io.to(playerGame.id).emit('turn update', { turn: 0, phase: "preparation", timerToUTC: UTCTs });
-                bships.timer(90, async () => {
+                GInfo.timer(playerGame.id, 15, async () => {
                     const playerGame = await GInfo.getPlayerGameData(socket);
                     for (let i = 0; i < playerGame.data.boards.length; i++) {
                         const ships = playerGame.data.boards[i].ships;
@@ -235,7 +235,7 @@ io.on('connection', async (socket) => {
                     }
 
                     GInfo.endPrepPhase(socket);
-                    bships.timer(30, () => {
+                    GInfo.timer(playerGame.id, 30, () => {
                         AFKEnd(playerGame.id);
                     });
                 });
@@ -316,15 +316,15 @@ io.on('connection', async (socket) => {
                                 }
                             }
 
-                            bships.resetTimers();
+                            GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);
                             return;
                         }
                     }
 
                     await GInfo.passTurn(socket);
-                    bships.resetTimers();
-                    bships.timer(30, () => {
+                    GInfo.resetTimer(playerGame.id);
+                    GInfo.timer(playerGame.id, 30, () => {
                         AFKEnd(playerGame.id);
                     });
                 }
