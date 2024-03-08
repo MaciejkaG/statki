@@ -224,7 +224,7 @@ io.on('connection', async (socket) => {
 
                 let UTCTs = Math.floor((new Date()).getTime() / 1000 + 90);
                 io.to(playerGame.id).emit('turn update', { turn: 0, phase: "preparation", timerToUTC: UTCTs });
-                bships.timer(20, async () => {
+                bships.timer(90, async () => {
                     const playerGame = await GInfo.getPlayerGameData(socket);
                     for (let i = 0; i < playerGame.data.boards.length; i++) {
                         const ships = playerGame.data.boards[i].ships;
