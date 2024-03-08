@@ -230,6 +230,47 @@ h1,h2,h3,h4,h5,h6 {
     z-index: 999;
 }
 
+.cover .dialog {
+    background-color: rgba(0, 0, 0, 0.6);
+    text-align: center;
+    padding: 2rem 4rem;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 15px;
+    gap: 1rem;
+    border: solid 1px white;
+}
+
+.cover .dialog button {
+    padding: 0.5em 3em;
+    font-size: 1rem;
+    background-color: black;
+    border: solid 1px white;
+    color: white;
+    border-radius: 15px;
+    outline: none;
+    cursor: pointer;
+}
+
+.cover .dialog button:hover {
+    background-color: white;
+    color: black;
+}
+
+.cover .dialog * {
+    margin: 0;
+}
+
+.cover.postGame .title {
+    display: none;
+}
+
+.cover.postGame .dialog {
+    display: flex;
+}
+
 #timer {
     transition: color 0.3s;
 }

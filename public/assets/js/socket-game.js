@@ -123,20 +123,52 @@ socket.on("ship sunk", (victimIdx, ship) => {
     }
 });
 
-socket.on("game finished", (winnerIdx) => {
-    if (winnerIdx === playerIdx) {
-        alert("Wygrałeś!");
+// Update timer
+var updateTimer = setInterval(() => {
+    if (timerDestination == null) {
+        $("#timer").html("");
     } else {
-        alert("Przegrałeś!");
+        const UTCNow = Math.floor((new Date()).getTime() / 1000);
+
+        const time = Math.abs(UTCNow - timerDestination);
+
+        if (time < 10) {
+            $("#timer").addClass("active");
+        } else {
+            $("#timer").removeClass("active");
+        }
+
+        const minutes = Math.floor(time / 60).toLocaleString('pl-PL', { minimumIntegerDigits: 2, useGrouping: false });
+        const seconds = (time - minutes * 60).toLocaleString('pl-PL', { minimumIntegerDigits: 2, useGrouping: false });
+
+        $("#timer").html(`${minutes}:${seconds}`);
     }
+}, 250);
+
+socket.on("game finished", (winnerIdx, oppName) => {
+    socket.disconnect();
+    $("#opponent").html(`Vs. <span class="important">${oppName}</span>`);
+
+    if (winnerIdx === playerIdx) {
+        $("#state").html("Zwycięstwo");
+        $("#state").addClass("dynamic");
+    } else {
+        $("#state").html("Porażka");
+        $("#state").addClass("danger");
+    }
+
+    $(".cover").addClass("postGame");
+    clearInterval(updateTimer);
+    $("#timer").html(`00:00`);
+    $(".cover").css({ opacity: 1, pointerEvents: "all" });
 });
 
 socket.on('connect', () => {
-    $(".cover h1").html("Oczekiwanie na serwer...");
+    $(".cover .title").html("Oczekiwanie na serwer...");
 });
 
 socket.on("players ready", () => {
-    $(".cover").css({opacity: 0, pointerEvents: "none"});
+    $(".cover").css({ opacity: 0, pointerEvents: "none" });
 });
 
 socket.on("player idx", (idx) => {
@@ -162,25 +194,3 @@ socket.on('turn update', (turnData) => {
 socket.on('player left', () => {
     window.location.replace("/");
 });
-
-// Update timer
-setInterval(() => {
-    if (timerDestination == null) {
-        $("#timer").html("");
-    } else {
-        const UTCNow = Math.floor((new Date()).getTime() / 1000);
-
-        const time = Math.abs(UTCNow - timerDestination);
-
-        if (time < 10) {
-            $("#timer").addClass("active");
-        } else {
-            $("#timer").removeClass("active");
-        }
-
-        const minutes = Math.floor(time / 60).toLocaleString('pl-PL', {minimumIntegerDigits: 2, useGrouping: false});
-        const seconds = (time - minutes * 60).toLocaleString('pl-PL', { minimumIntegerDigits: 2, useGrouping: false });
-
-        $("#timer").html(`${minutes}:${seconds}`);
-    }
-}, 250);

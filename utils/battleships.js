@@ -98,7 +98,6 @@ export class GameInfo {
                 shotShip = ship;
                 playerShips[i].hits[check.fieldIdx] = true;
                 if (!playerShips[i].hits.includes(false)) {
-                    console.log(playerShips);
                     let gameFinished = true;
                     await this.redis.json.set(key, `.boards[${enemyIdx}].ships`, playerShips);
                     playerShips.every(ship => {
@@ -214,7 +213,6 @@ export function checkHit(ships, posX, posY) {
 
         let l = !ship.type ? ship.type + 1 : ship.type + 2;
         for (let i = 0; i < l; i++) {
-            // console.log("a");
             let x = clamp(ship.posX + multips[0] * i, 0, 9);
             let y = clamp(ship.posY + multips[1] * i, 0, 9);
 

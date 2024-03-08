@@ -62,7 +62,7 @@ app.get("/setup", (req, res) => {
 });
 
 app.post('/api/setup-profile', (req, res) => {
-    if (req.session.nickname == null && 4 < req.body.nickname.length && req.body.nickname.length < 16) {
+    if (req.session.nickname == null && 3 <= req.body.nickname.length && req.body.nickname.length <= 16) {
         req.session.nickname = req.body.nickname;
         req.session.playerID = uuidv4();
         req.session.activeGame = null;
@@ -224,7 +224,7 @@ io.on('connection', async (socket) => {
 
                 let UTCTs = Math.floor((new Date()).getTime() / 1000 + 90);
                 io.to(playerGame.id).emit('turn update', { turn: 0, phase: "preparation", timerToUTC: UTCTs });
-                bships.timer(90, async () => {
+                bships.timer(10, async () => {
                     const playerGame = await GInfo.getPlayerGameData(socket);
                     for (let i = 0; i < playerGame.data.boards.length; i++) {
                         const ships = playerGame.data.boards[i].ships;
@@ -291,7 +291,34 @@ io.on('connection', async (socket) => {
                         io.to(playerGame.id).emit("ship sunk", enemyIdx, hit.ship);
 
                         if (hit.gameFinished) {
-                            io.to(playerGame.id).emit("game finished", !enemyIdx ? 1 : 0);
+                            const members = [...roomMemberIterator(playerGame.id)];
+                            let hostNickname;
+                            let guestNickname;
+
+
+                            for (let i = 0; i < members.length; i++) {
+                                const sid = members[i][0];
+                                const socket = io.sockets.sockets.get(sid);
+                                if (socket.request.session.id === playerGame.data.hostId) {
+                                    hostNickname = socket.request.session.nickname;
+                                } else {
+                                    guestNickname = socket.request.session.nickname;
+                                }
+                            }
+
+                            for (let i = 0; i < members.length; i++) {
+                                const sid = members[i][0];
+                                const socket = io.sockets.sockets.get(sid);
+                                if (socket.request.session.id === playerGame.data.hostId) {
+                                    io.to(sid).emit("game finished", !enemyIdx ? 1 : 0, guestNickname);
+                                } else {
+                                    io.to(sid).emit("game finished", !enemyIdx ? 1 : 0, hostNickname);
+                                }
+                            }
+
+                            bships.resetTimers();
+                            endGame(playerGame.id);
+                            return;
                         }
                     }
 
