@@ -63,25 +63,26 @@ $("#createGameButton").on("click", function () {
 
 $("#leaveGameButton").on("click", function () {
     lockUI(true);
-    socket.emit("leave lobby", (response) => {
-        switch (response.status) {
-            case "ok":
-                switchView("mainMenuView");
-                lockUI(false);
-                break;
+    window.location.reload();
+    // socket.emit("leave lobby", (response) => {
+    //     switch (response.status) {
+    //         case "ok":
+    //             switchView("mainMenuView");
+    //             lockUI(false);
+    //             break;
 
-            case "youreNotInLobby":
-                switchView("mainMenuView");
-                lockUI(false);
-                break;
+    //         case "youreNotInLobby":
+    //             switchView("mainMenuView");
+    //             lockUI(false);
+    //             break;
 
-            default:
-                alert(`Wystąpił nieznany problem\nStatus: ${response.status}`);
-                switchView("mainMenuView");
-                lockUI(false);
-                break;
-        }
-    });
+    //         default:
+    //             alert(`Wystąpił nieznany problem\nStatus: ${response.status}`);
+    //             switchView("mainMenuView");
+    //             lockUI(false);
+    //             break;
+    //     }
+    // });
 });
 
 $("#pvpMenuButton").on("click", function () {

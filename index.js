@@ -209,6 +209,7 @@ io.on('connection', async (socket) => {
         if (playerGame.data.state === 'pregame') {
             socket.join(playerGame.id);
             if (io.sockets.adapter.rooms.get(playerGame.id).size === 2) {
+                GInfo.resetTimer(playerGame.id);
                 io.to(playerGame.id).emit('players ready');
 
                 const members = [...roomMemberIterator(playerGame.id)];
@@ -243,6 +244,10 @@ io.on('connection', async (socket) => {
                 await redis.json.set(`game:${playerGame.id}`, '$.state', "preparation");
             } else if (io.sockets.adapter.rooms.get(playerGame.id).size > 2) {
                 socket.disconnect();
+            } else {
+                GInfo.timer(playerGame.id, 30, () => {
+                    AFKEnd(playerGame.id);
+                });
             }
         }
 
@@ -292,29 +297,14 @@ io.on('connection', async (socket) => {
 
                         if (hit.gameFinished) {
                             const members = [...roomMemberIterator(playerGame.id)];
-                            let hostNickname;
-                            let guestNickname;
 
+                            let hostSocket = io.sockets.sockets.get(members[0][0]);
+                            let hostNickname = hostSocket.request.session.nickname;
+                            let guestSocket = io.sockets.sockets.get(members[1][0]);
+                            let guestNickname = guestSocket.request.session.nickname;
 
-                            for (let i = 0; i < members.length; i++) {
-                                const sid = members[i][0];
-                                const socket = io.sockets.sockets.get(sid);
-                                if (socket.request.session.id === playerGame.data.hostId) {
-                                    hostNickname = socket.request.session.nickname;
-                                } else {
-                                    guestNickname = socket.request.session.nickname;
-                                }
-                            }
-
-                            for (let i = 0; i < members.length; i++) {
-                                const sid = members[i][0];
-                                const socket = io.sockets.sockets.get(sid);
-                                if (socket.request.session.id === playerGame.data.hostId) {
-                                    io.to(sid).emit("game finished", !enemyIdx ? 1 : 0, guestNickname);
-                                } else {
-                                    io.to(sid).emit("game finished", !enemyIdx ? 1 : 0, hostNickname);
-                                }
-                            }
+                            hostSocket.emit("game finished", !enemyIdx ? 1 : 0, guestNickname);
+                            guestSocket.emit("game finished", !enemyIdx ? 1 : 0, hostNickname);
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);
