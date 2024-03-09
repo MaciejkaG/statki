@@ -29,7 +29,6 @@ const io = new Server(server);
 const redis = createClient();
 redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
-// redis.flushDb();
 
 const GInfo = new bships.GameInfo(redis, io);
 
@@ -325,6 +324,7 @@ io.on('connection', async (socket) => {
             const playerGame = await GInfo.getPlayerGameData(socket);
             if (playerGame !== null) {
                 AFKEnd(playerGame.id);
+                await GInfo.resetTimer(playerGame.id);
             }
         });
     }

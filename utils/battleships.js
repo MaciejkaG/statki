@@ -217,8 +217,7 @@ export function checkHit(ships, posX, posY) {
                 break;
         }
 
-        let l = !ship.type ? ship.type + 1 : ship.type + 2;
-        for (let i = 0; i < l; i++) {
+        for (let i = 0; i <= ship.type; i++) {
             let x = clamp(ship.posX + multips[0] * i, 0, 9);
             let y = clamp(ship.posY + multips[1] * i, 0, 9);
 
@@ -265,7 +264,7 @@ export function validateShipPosition(ships, type, posX, posY, rot) {
                 break;
         }
 
-        for (let i = 0; i < ship.type + 1; i++) {
+        for (let i = 0; i <= ship.type; i++) {
             boardRender[ship.posX + multips[0] * i][ship.posY + multips[1] * i] = true;
         }
     });
