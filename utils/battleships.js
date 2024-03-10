@@ -110,25 +110,30 @@ export class GameInfo {
         const enemyIdx = socket.request.session.id === hostId ? 1 : 0;
         // const playerIdx = enemyIdx ? 0 : 1;
 
-        let playerShips = await this.redis.json.get(key, { path: `.boards[${enemyIdx}].ships` });
+        let playerBoard = await this.redis.json.get(key, { path: `.boards[${enemyIdx}]` });
 
-        var check = checkHit(playerShips, posX, posY);
+        let shot = playerBoard.shots.find((shot) => shot.posX === posX && shot.posY === posY);
+        if (shot) {
+            return { status: -1 }
+        }
+
+        var check = checkHit(playerBoard.ships, posX, posY);
 
         if (!check) {
             return { status: 0 };
         }
 
         var shotShip;
-        for (let i = 0; i < playerShips.length; i++) {
-            const ship = playerShips[i];
+        for (let i = 0; i < playerBoard.ships.length; i++) {
+            const ship = playerBoard.ships[i];
 
             if (ship.posX === check.originPosX & ship.posY === check.originPosY) {
                 shotShip = ship;
-                playerShips[i].hits[check.fieldIdx] = true;
-                if (!playerShips[i].hits.includes(false)) {
+                playerBoard.ships[i].hits[check.fieldIdx] = true;
+                if (!playerBoard.ships[i].hits.includes(false)) {
                     let gameFinished = true;
-                    await this.redis.json.set(key, `.boards[${enemyIdx}].ships`, playerShips);
-                    playerShips.every(ship => {
+                    await this.redis.json.set(key, `.boards[${enemyIdx}]`, playerBoard);
+                    playerBoard.ships.every(ship => {
                         if (ship.hits.includes(false)) {
                             gameFinished = false;
                             return false;
@@ -142,7 +147,7 @@ export class GameInfo {
             }
         }
 
-        await this.redis.json.set(key, `.boards[${enemyIdx}].ships`, playerShips);
+        await this.redis.json.set(key, `.boards[${enemyIdx}]`, playerBoard);
         return { status: 1, ship: shotShip };
     }
 }

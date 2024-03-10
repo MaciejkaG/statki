@@ -45,6 +45,7 @@ socket.on('toast', (msg) => {
 
 socket.on("placed ship", (data) => {
     let shipFields = bsc.placeShip(data);
+    lastTimeClick = new Date().getTime() / 1000;
     shipFields.forEach(field => {
         occupiedFields.push({pos: field, origin: [data.posX, data.posY]});
     });

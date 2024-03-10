@@ -110,9 +110,12 @@ class Battleships {
                 break;
         }
 
-        fields.forEach(field => {
-            this.getField(field[0], field[1]).addClass("active");
-        });
+        for (let i = 0; i < fields.length; i++) {
+            const field = fields[i];
+            setTimeout(() => {
+                this.getField(field[0], field[1]).addClass("active");
+            }, i * 150);
+        }
 
         return fields;
     }

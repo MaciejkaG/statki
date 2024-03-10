@@ -143,7 +143,7 @@ io.on('connection', async (socket) => {
                             { //          typ 2 to trójmasztowiec  pozycja i obrót na planszy  które pola zostały trafione
                                 ships: [], // zawiera np. {type: 2, posX: 3, posY: 4, rot: 2, hits: [false, false, true]}
                                 //                       pozycja na planszy  czy strzał miał udział w zatopieniu statku?
-                                shots: [], // zawiera np. {posX: 3, posY: 5, sunk: true}
+                                shots: [], // zawiera np. {posX: 3, posY: 5}
                             },
                             {
                                 ships: [],
@@ -286,6 +286,8 @@ io.on('connection', async (socket) => {
                     const enemyIdx = socket.request.session.id === playerGame.data.hostId ? 1 : 0;
 
                     let hit = await GInfo.shootShip(socket, posX, posY);
+
+                    await redis.json.arrAppend(`game:${playerGame.id}`, `.boards[${enemyIdx}].shots`, { posX: posX, posY: posY });
                     if (!hit.status) {
                         io.to(playerGame.id).emit("shot missed", enemyIdx, posX, posY);
                     } else if (hit.status === 1) {
@@ -309,6 +311,9 @@ io.on('connection', async (socket) => {
                             endGame(playerGame.id);
                             return;
                         }
+                    } else if (hit.status === -1) {
+                        socket.emit("toast", "Już strzeliłeś w to miejsce");
+                        return;
                     }
 
                     await GInfo.passTurn(socket);
