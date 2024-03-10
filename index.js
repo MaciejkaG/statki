@@ -37,6 +37,7 @@ const sessionMiddleware = session({
     secret: uuidv4(),
     resave: true,
     saveUninitialized: true,
+    cookie: { secure: process.env.cookie_secure === "true" ? true : false }
 });
 
 app.use(sessionMiddleware);
