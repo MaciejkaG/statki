@@ -10,7 +10,8 @@ import { v4 as uuidv4, validate } from 'uuid';
 import session from "express-session";
 import { engine } from 'express-handlebars';
 import { createClient } from 'redis';
-import * as bships from './utils/battleships.js'
+import * as bships from './utils/battleships.js';
+import { MailAuth } from './utils/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,6 +32,17 @@ redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
 
 const GInfo = new bships.GameInfo(redis, io);
+const auth = new MailAuth(redis, {
+    host: process.env.mail_host,
+    user: process.env.mail_user,
+    pass: process.env.mail_pass
+},
+{
+    host: process.env.db_host,
+    user: process.env.db_user,
+    password: process.env.db_pass,
+    database: 'statki'
+});
 
 app.set('trust proxy', 1);
 const sessionMiddleware = session({
@@ -45,37 +57,110 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 io.engine.use(sessionMiddleware);
 
-app.get("/", async (req, res) => {
-    if (req.session.nickname == null) {
-        res.redirect("/setup");
+app.get('/', async (req, res) => {
+    let login = loginState(req);
+
+    if (login != 2) {
+        res.redirect('/login');
+    } else if (req.session.nickname == null) {
+        auth.getNickname(req.session.userId).then(nickname => {
+            if (nickname != null) {
+                req.session.nickname = nickname;
+                res.render('index');
+            } else {
+                res.redirect('/nickname');
+            }
+        });
     } else {
         res.render('index');
     }
 });
 
-app.get("/setup", (req, res) => {
-    if (req.session.nickname != null) {
-        res.redirect('/');
+app.get('/login', (req, res) => {
+    let login = loginState(req);
+    if (!login) {
+        res.render('login');
+    } else if (login == 1) {
+        res.redirect('/auth');
     } else {
-        res.render("setup");
+        res.redirect('/');
     }
 });
 
-app.post('/api/setup-profile', (req, res) => {
-    if (req.session.nickname == null && 3 <= req.body.nickname.length && req.body.nickname.length <= 16) {
+app.get('/auth', (req, res) => {
+    let login = loginState(req);
+    if (!login) { // Niezalogowany
+        res.redirect('/login');
+    } else if (login == 1) { // W trakcie autoryzacji
+        res.render('auth');
+    } else { // Zalogowany
+        res.redirect('/auth');
+    }
+});
+
+app.get('/nickname', (req, res) => {
+    let login = loginState(req);
+    if (!login) { // Niezalogowany
+        res.redirect('/login');
+    } else {
+        res.render('setup');
+    }
+});
+
+app.post('/api/login', (req, res) => {
+    let login = loginState(req);
+    if (login == 2) {
+        res.redirect('/');
+    } else if (login == 0 && req.body.email != null && validateEmail(req.body.email)) {
+        auth.startVerification(req.body.email).then(result => {
+            if (result.status) {
+                req.session.userId = result.uid;
+
+                req.session.loggedIn = 1;
+                res.redirect('/auth');
+            } else {
+                res.sendStatus(500);
+            }
+        });
+    } else {
+        res.sendStatus(403);
+    }
+});
+
+app.post('/api/auth', async (req, res) => {
+    let login = loginState(req);
+    if (login == 2) {
+        res.redirect('/');
+    } else if (login == 1 && req.body.code != null && req.body.code.length <= 10 && req.body.code.length >= 8) {
+        let finishResult = await auth.finishVerification(req.session.userId, req.body.code);
+        if (finishResult) {
+            req.session.loggedIn = 2;
+            res.redirect('/');
+        } else {
+            res.sendStatus(401);
+        }
+    } else {
+        res.sendStatus(403);
+    }
+});
+
+app.post('/api/nickname', (req, res) => {
+    if (loginState(req) == 2 && req.session.nickname == null && req.body.nickname != null && 3 <= req.body.nickname.length && req.body.nickname.length <= 16) {
         req.session.nickname = req.body.nickname;
-        req.session.playerID = uuidv4();
         req.session.activeGame = null;
+        auth.setNickname(req.session.userId, req.body.nickname).then(() => {
+            res.redirect('/');
+        });
+    } else {
+        res.sendStatus(400);
     }
-
-    res.redirect("/")
 });
 
-app.get("/game", async (req, res) => {
+app.get('/game', async (req, res) => {
     const game = await redis.json.get(`game:${req.query.id}`);
     if (req.session.nickname == null) {
-        res.redirect("/setup");
-    } else if (req.query.id == null || game == null || game.state == "expired" || req.session.activeGame == null) {
+        res.redirect('/setup');
+    } else if (req.query.id == null || game == null || game.state == 'expired' || req.session.activeGame == null) {
         res.status(400).send('badGameId');
     } else {
         res.render('board');
@@ -376,3 +461,19 @@ function AFKEnd(gameId) {
 function roomMemberIterator(id) {
     return io.sockets.adapter.rooms.get(id) == undefined ? null : io.sockets.adapter.rooms.get(id).entries();
 }
+
+function loginState(req) {
+    if (req.session.loggedIn == null) {
+        return 0;
+    } else {
+        return req.session.loggedIn;
+    }
+}
+
+function validateEmail(email) {
+    return String(email)
+        .toLowerCase()
+        .match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+};

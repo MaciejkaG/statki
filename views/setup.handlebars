@@ -2,6 +2,10 @@
     .container {
         display: flex;
     }
+
+    #pvpJoinView .modes div {
+        height: 11rem;
+    }
 </style>
 <div class="container" id="pvpJoinView">
     <div>
@@ -9,8 +13,9 @@
         <h2>Konfiguracja profilu</h2>
         <div class="modes">
             <div>
-                <form action="/api/setup-profile" method="post">
-                    <input type="text" name="nickname" placeholder="Nickname" style="font-size: 1rem;">
+                <p>Twój nickname będzie widoczny dla innych graczy</p>
+                <form action="/api/nickname" method="post">
+                    <input type="text" name="nickname" placeholder="Nazwa użytkownika" style="font-size: 1rem;">
                     <input type="submit" value="Zatwierdź">
                 </form>
             </div>
