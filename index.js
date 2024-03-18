@@ -49,7 +49,11 @@ const sessionMiddleware = session({
     secret: uuidv4(),
     resave: true,
     saveUninitialized: true,
-    cookie: { secure: process.env.cookie_secure === "true" ? true : false }
+    rolling: true,
+    cookie: {
+        secure: process.env.cookie_secure === "true" ? true : false,
+        maxAge: 24 * 60 * 60 * 1000,
+    },
 });
 
 app.use(sessionMiddleware);
@@ -230,10 +234,22 @@ io.on('connection', async (socket) => {
                                 ships: [], // zawiera np. {type: 2, posX: 3, posY: 4, rot: 2, hits: [false, false, true]}
                                 //                       pozycja na planszy  czy strzał miał udział w zatopieniu statku?
                                 shots: [], // zawiera np. {posX: 3, posY: 5}
+                                stats: {
+                                    shots: 0,
+                                    hits: 0,
+                                    placedShips: 0,
+                                    sunkShips: 0,
+                                },
                             },
                             {
                                 ships: [],
                                 shots: [],
+                                stats: {
+                                    shots: 0,
+                                    hits: 0,
+                                    placedShips: 0,
+                                    sunkShips: 0,
+                                },
                             }
                         ],
                         nextPlayer: 0,
@@ -310,7 +326,7 @@ io.on('connection', async (socket) => {
 
                 let UTCTs = Math.floor((new Date()).getTime() / 1000 + 90);
                 io.to(playerGame.id).emit('turn update', { turn: 0, phase: "preparation", timerToUTC: UTCTs });
-                GInfo.timer(playerGame.id, 90, async () => {
+                GInfo.timer(playerGame.id, 10, async () => {
                     const playerGame = await GInfo.getPlayerGameData(socket);
                     for (let i = 0; i < playerGame.data.boards.length; i++) {
                         const ships = playerGame.data.boards[i].ships;
@@ -351,6 +367,7 @@ io.on('connection', async (socket) => {
                 } else {
                     await GInfo.placeShip(socket, { type: type, posX: posX, posY: posY, rot: rot, hits: Array.from(new Array(type+1), () => false) });
                     socket.emit("placed ship", { type: type, posX: posX, posY: posY, rot: rot });
+                    await GInfo.incrStat(socket, 'placedShips');
                 }
             }
         });
@@ -361,6 +378,7 @@ io.on('connection', async (socket) => {
             if (playerGame.data.state === 'preparation') {
                 const deletedShip = await GInfo.removeShip(socket, posX, posY);
                 socket.emit("removed ship", { posX: posX, posY: posY, type: deletedShip.type });
+                await GInfo.incrStat(socket, 'placedShips', -1);
             }
         });
 
@@ -374,13 +392,18 @@ io.on('connection', async (socket) => {
                     let hit = await GInfo.shootShip(socket, posX, posY);
 
                     await redis.json.arrAppend(`game:${playerGame.id}`, `.boards[${enemyIdx}].shots`, { posX: posX, posY: posY });
+                    await GInfo.incrStat(socket, 'shots');
+                    
                     if (!hit.status) {
                         io.to(playerGame.id).emit("shot missed", enemyIdx, posX, posY);
                     } else if (hit.status === 1) {
                         io.to(playerGame.id).emit("shot hit", enemyIdx, posX, posY);
+                        await GInfo.incrStat(socket, 'hits');
                     } else if (hit.status === 2) {
                         io.to(playerGame.id).emit("shot hit", enemyIdx, posX, posY);
+                        await GInfo.incrStat(socket, 'hits');
                         io.to(playerGame.id).emit("ship sunk", enemyIdx, hit.ship);
+                        await GInfo.incrStat(socket, 'sunkShips');
 
                         if (hit.gameFinished) {
                             const members = [...roomMemberIterator(playerGame.id)];
@@ -393,8 +416,11 @@ io.on('connection', async (socket) => {
                             hostSocket.emit("game finished", !enemyIdx ? 1 : 0, guestNickname);
                             guestSocket.emit("game finished", !enemyIdx ? 1 : 0, hostNickname);
 
+                            const stats = await GInfo.getStats(socket);
+                            auth.saveMatch(playerGame.id, "pvp", hostSocket.request.session.userId, guestSocket.request.session.userId, stats, !enemyIdx ? 1 : 0);
+
                             GInfo.resetTimer(playerGame.id);
-                            endGame(playerGame.id);
+                            endGame(playerGame.id, !enemyIdx ? 1 : 0);
                             return;
                         }
                     } else if (hit.status === -1) {
@@ -438,7 +464,11 @@ function resetUserGame(req) {
     });
 }
 
-function endGame(gameId) {
+function endGame(gameId, winnerIdx = -1) {
+    const boards = redis.json.get(`game:${gameId}`, { keys: [".boards"] });
+    const hostUid = redis.json.get(`game:${gameId}`, { keys: [".hostUserId"] });
+    const guestUid = redis.json.get(`game:${gameId}`, { keys: [".hostUserId"] });
+
     let iterator = roomMemberIterator(gameId);
     if (iterator != null) {
         const members = [...iterator];

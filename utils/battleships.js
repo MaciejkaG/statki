@@ -42,6 +42,25 @@ export class GameInfo {
         return game == null ? null : { id: socket.session.activeGame, data: game };
     }
 
+    async getStats(socket) {
+        const boards = await this.redis.json.get(`game:${socket.session.activeGame}`, { path: ".boards" });
+        let stats = [];
+
+        console.log(boards);
+        boards.forEach(board => {
+            stats.push(board.stats);            
+        });
+
+        return stats;
+    }
+
+    async incrStat(socket, statKey, by = 1) {
+        const game = await this.redis.json.get(`game:${socket.session.activeGame}`);
+        const idx = socket.request.session.id === game.hostId ? 0 : 1;
+
+        this.redis.json.numIncrBy(`game:${socket.session.activeGame}`, `.boards[${idx}].stats.${statKey}`, by);
+    }
+
     async getPlayerShips(socket) {
         const game = await this.redis.json.get(`game:${socket.session.activeGame}`);
         const idx = socket.request.session.id === game.hostId ? 0 : 1;
@@ -75,7 +94,7 @@ export class GameInfo {
     async placeShip(socket, shipData) {
         const gameId = socket.session.activeGame;
         const key = `game:${gameId}`;
-        const hostId = (await this.redis.json.get(key, {path: '.hostId'}));
+        const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
 
         const playerIdx = socket.request.session.id === hostId ? 0 : 1;
         await this.redis.json.arrAppend(key, `.boards[${playerIdx}].ships`, shipData);

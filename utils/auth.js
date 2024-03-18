@@ -129,6 +129,19 @@ export class MailAuth {
         });
     }
 
+    saveMatch(matchId, type, hostId, guestId, stats, winnerIdx) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            conn.query(`INSERT INTO matches(match_id, match_type, host_id, guest_id) VALUES (${conn.escape(matchId)}, ${conn.escape(type)}, ${conn.escape(hostId)}, ${conn.escape(guestId)})`, async (error, response) => {
+                if (error) reject(error);
+                conn.query(`INSERT INTO statistics(match_id, user_id, shots, hits, placed_ships, sunk_ships, sunk_ships_by, won) VALUES (${conn.escape(matchId)}, ${conn.escape(hostId)}, ${conn.escape(stats[0].shots)}, ${conn.escape(stats[0].hits)}, ${conn.escape(stats[0].placedShips)}, ${conn.escape(stats[0].sunkShips)}, ${conn.escape(stats[0].sunkShipsBy)}, ${conn.escape(winnerIdx == 0)}), (${conn.escape(matchId)}, ${conn.escape(guestId)}, ${conn.escape(stats[1].shots)}, ${conn.escape(stats[1].hits)}, ${conn.escape(stats[1].placedShips)}, ${conn.escape(stats[1].sunkShips)}, ${conn.escape(stats[1].sunkShipsBy)}, ${conn.escape(winnerIdx == 1)})`).then((error) => {
+                    if (error) reject(error);
+                    resolve();
+                });
+            });
+        });
+    }
+
     async finishVerification(uid, authCode) {
         authCode = authCode.replace(/\s+/g, "");
         let redisRes = await this.redis.json.get(`code_auth:${authCode}`);
