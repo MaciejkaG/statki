@@ -12,6 +12,9 @@ import { engine } from 'express-handlebars';
 import { createClient } from 'redis';
 import * as bships from './utils/battleships.js';
 import { MailAuth } from './utils/auth.js';
+import { rateLimit } from 'express-rate-limit';
+import { RedisStore as LimiterRedisStore } from 'rate-limit-redis';
+import SessionRedisStore from 'connect-redis';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,6 +34,17 @@ const redis = createClient();
 redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
 
+const limiter = rateLimit({
+    windowMs: 40 * 1000,
+    limit: 100,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    store: new LimiterRedisStore({
+        sendCommand: (...args) => redis.sendCommand(args),
+    }),
+});
+app.use(limiter);
+
 const GInfo = new bships.GameInfo(redis, io);
 const auth = new MailAuth(redis, {
     host: process.env.mail_host,
@@ -45,7 +59,14 @@ const auth = new MailAuth(redis, {
 });
 
 app.set('trust proxy', 1);
+
+let sessionStore = new SessionRedisStore({
+    client: redis,
+    prefix: "statkiSession:",
+});
+
 const sessionMiddleware = session({
+    store: sessionStore,
     secret: uuidv4(),
     resave: true,
     saveUninitialized: true,
@@ -117,17 +138,29 @@ app.post('/api/login', (req, res) => {
         res.redirect('/');
     } else if (login == 0 && req.body.email != null && validateEmail(req.body.email)) {
         auth.startVerification(req.body.email).then(result => {
-            if (result.status) {
+            if (result.status === 1) {
                 req.session.userId = result.uid;
 
                 req.session.loggedIn = 1;
                 res.redirect('/auth');
+            } else if (result.status === -1) {
+                res.render("error", {
+                    helpers: {
+                        error: "Nie udało się zalogować",
+                        fallback: "/login"
+                    }
+                });
             } else {
                 res.sendStatus(500);
             }
         });
     } else {
-        res.sendStatus(403);
+        res.render("error", {
+            helpers: {
+                error: "Niepoprawny adres e-mail",
+                fallback: "/login"
+            }
+        });
     }
 });
 
@@ -141,10 +174,20 @@ app.post('/api/auth', async (req, res) => {
             req.session.loggedIn = 2;
             res.redirect('/');
         } else {
-            res.sendStatus(401);
+            res.render("error", {
+                helpers: {
+                    error: "Niepoprawny kod logowania",
+                    fallback: "/auth"
+                }
+            });
         }
     } else {
-        res.sendStatus(403);
+        res.render("error", {
+            helpers: {
+                error: "Niepoprawny kod logowania",
+                fallback: "/login"
+            }
+        });
     }
 });
 
@@ -212,10 +255,18 @@ io.on('connection', async (socket) => {
                     status: "bad_id"
                 });
             } else {
+                let opp = io.sockets.sockets.get(io.sockets.adapter.rooms.get(msg).values().next().value);
+
+                if (opp.request.session.userId == session.userId) {
+                    callback({
+                        status: "cantJoinYourself",
+                    });
+                    return;
+                }
                 if (socket.rooms.size === 1) {
                     io.to(msg).emit("joined", session.nickname); // Wyślij hostowi powiadomienie o dołączającym graczu
                     // Zmienna opp zawiera socket hosta
-                    let opp = io.sockets.sockets.get(io.sockets.adapter.rooms.get(msg).values().next().value);
+                    // let opp = io.sockets.sockets.get(io.sockets.adapter.rooms.get(msg).values().next().value);
                     let oppNickname = opp.request.session.nickname;
 
                     socket.join(msg); // Dołącz gracza do grupy
@@ -229,6 +280,7 @@ io.on('connection', async (socket) => {
                     redis.json.set(`game:${gameId}`, '$', {
                         hostId: opp.request.session.id,
                         state: "pregame",
+                        startTs: (new Date()).getTime() / 1000,
                         boards: [
                             { //          typ 2 to trójmasztowiec  pozycja i obrót na planszy  które pola zostały trafione
                                 ships: [], // zawiera np. {type: 2, posX: 3, posY: 4, rot: 2, hits: [false, false, true]}
@@ -416,8 +468,9 @@ io.on('connection', async (socket) => {
                             hostSocket.emit("game finished", !enemyIdx ? 1 : 0, guestNickname);
                             guestSocket.emit("game finished", !enemyIdx ? 1 : 0, hostNickname);
 
-                            const stats = await GInfo.getStats(socket);
-                            auth.saveMatch(playerGame.id, "pvp", hostSocket.request.session.userId, guestSocket.request.session.userId, stats, !enemyIdx ? 1 : 0);
+                            // const stats = await GInfo.getStats(socket);
+                            const playerGame = await GInfo.getPlayerGameData(socket);
+                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostSocket.request.session.userId, guestSocket.request.session.userId, playerGame.data.boards, !enemyIdx ? 1 : 0);
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id, !enemyIdx ? 1 : 0);
@@ -464,10 +517,10 @@ function resetUserGame(req) {
     });
 }
 
-function endGame(gameId, winnerIdx = -1) {
-    const boards = redis.json.get(`game:${gameId}`, { keys: [".boards"] });
-    const hostUid = redis.json.get(`game:${gameId}`, { keys: [".hostUserId"] });
-    const guestUid = redis.json.get(`game:${gameId}`, { keys: [".hostUserId"] });
+function endGame(gameId) {
+    // const boards = redis.json.get(`game:${gameId}`, { keys: [".boards"] });
+    // const hostUid = redis.json.get(`game:${gameId}`, { keys: [".hostUserId"] });
+    // const guestUid = redis.json.get(`game:${gameId}`, { keys: [".hostUserId"] });
 
     let iterator = roomMemberIterator(gameId);
     if (iterator != null) {
