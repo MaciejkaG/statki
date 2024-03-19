@@ -25,6 +25,26 @@
     align-items: center;
 }
 
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.7rem;
+    margin: 0.5rem;
+    font-family: 'Roboto Mono', monospace;
+}
+
+nav span {
+    cursor: pointer;
+    user-select: none;
+    padding: 0.2rem;
+}
+
+nav span:hover {
+    text-decoration: underline;
+    
+}
+
 .header {
     text-align: center;
 }
@@ -181,4 +201,45 @@
 #preparingGame .modes div * {
     margin: 0;
     width: 100%;
+}
+
+/* Profile */
+#profileView {
+    display: flex;
+    flex-direction: column;
+}
+
+#profileView .profile {
+    display: flex;
+    margin: 3rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+#profileView .matchList {
+    display: flex;
+    flex-direction: column;
+}
+
+#profileView .matchList div {
+    background: rgba(24, 24, 24, 1);
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+#profileView .matchList div .statsButton {
+    background-image: linear-gradient(to right, rgb(255, 255, 255, 1) 20%, rgba(0, 0, 0, 0) 40%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    background-position: 60%;
+    background-size: 400%;
+    background-repeat: no-repeat;
+    transition: background-position 0.7s;
+}
+
+#profileView .matchList div:hover .statsButton {
+    background-position: 0%;
 }

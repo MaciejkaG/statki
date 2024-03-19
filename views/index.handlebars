@@ -1,4 +1,5 @@
-<h1 class="header">Statki</h1>
+<nav><span>Strona główna</span> <span id="profileButton" onclick="switchView('profileView')">Profil</span></nav>
+{{!-- <h1 class="header">Statki</h1> --}}
 <div class="container" id="mainMenuView" data-title="Statki" data-path="/">
     <div>
         
@@ -74,6 +75,22 @@
     </div>
 </div>
 
+<div class="container" id="profileView" data-title="Statki / Profil" data-path="/profile">
+    <div class="profile">
+        <h1>MaciejkaG</h1>
+        <div>
+            <span>Odznaki</span>
+            <span>Deweloper, Wczesny użytkownik</span>
+        </div>
+    </div>
+    <div class="matchList">
+        <div>
+            <h1 class="dynamic">Zwycięstwo</h1><span> vs. MaciejkaG</span>
+            <h2 class="statsButton">Kliknij by wyświetlić statystyki</h2>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/js/spa_lib.js"></script>
 <script src="/assets/js/socket.js"></script>
 <script src="/assets/js/socket-err-handler.js"></script>
-<script src="/assets/js/spa_lib.js"></script>

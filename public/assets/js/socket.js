@@ -21,9 +21,16 @@ socket.on("gameReady", (gameId) => {
 });
 
 var nickname;
+var myProfile;
+
+socket.emit("my profile data", (profile) => {
+    myProfile = profile;
+});
 
 socket.emit("whats my nick", (myNickname) => {
     nickname = myNickname;
+    $("#profileButton").html(nickname);
+    console.log(nickname);
 });
 
 socket.on("game start", (gameInfo) => {
@@ -44,6 +51,7 @@ $("#createGameButton").on("click", function () {
             case "ok":
                 $("#createGameCode").val(response.gameCode);
                 switchView("pvpCreateView");
+                returnLock = true;
                 lockUI(false);
                 break;
 

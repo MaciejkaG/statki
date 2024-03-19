@@ -66,8 +66,9 @@ export class MailAuth {
             const conn = mysql.createConnection(this.mysqlOptions);
             conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
                 if (error) { reject(error); return; }
-                if (response.length !== 0 && await this.redis.get(`loginTimer:${response[0].user_id}`)) {
-                    resolve({ status: -1 });
+                let timer = await this.redis.get(`loginTimer:${response[0].user_id}`);
+                if (response.length !== 0 && timer && timer > 0) {
+                    resolve({ status: -1, uid: response[0].user_id });
                     return;
                 }
 

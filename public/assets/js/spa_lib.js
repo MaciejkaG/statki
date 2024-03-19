@@ -1,4 +1,5 @@
 var activeView;
+var returnLock = false;
 
 function switchView(viewContainerId, useReplaceState=false) {
     $(`.container`).css({ opacity: 0, animation: "OutAnim 0.2s 1 ease" });
@@ -46,8 +47,10 @@ window.addEventListener("load", () => {
 
 addEventListener("popstate", (event) => {
     event.preventDefault();
-    let elem = document.querySelector(`.container[data-path="${window.location.pathname}"]`);
-    if (elem != null) {
-        switchView(elem.id, true);
+    if (!returnLock) {
+        let elem = document.querySelector(`.container[data-path="${window.location.pathname}"]`);
+        if (elem != null) {
+            switchView(elem.id, true);
+        }
     }
 });

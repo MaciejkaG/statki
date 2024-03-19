@@ -144,12 +144,10 @@ app.post('/api/login', (req, res) => {
                 req.session.loggedIn = 1;
                 res.redirect('/auth');
             } else if (result.status === -1) {
-                res.render("error", {
-                    helpers: {
-                        error: "Nie udało się zalogować",
-                        fallback: "/login"
-                    }
-                });
+                req.session.userId = result.uid;
+
+                req.session.loggedIn = 1;
+                res.redirect('/auth');
             } else {
                 res.sendStatus(500);
             }
@@ -220,7 +218,7 @@ app.get("/*", (req, res) => {
 
 io.on('connection', async (socket) => {
     const req = socket.request;
-    const session = socket.request.session;
+    const session = req.session;
     socket.session = session;
     if (session.nickname==null) {
         socket.disconnect();
@@ -369,7 +367,7 @@ io.on('connection', async (socket) => {
                 for (let i = 0; i < members.length; i++) {
                     const sid = members[i][0];
                     const socket = io.sockets.sockets.get(sid);
-                    if (socket.request.session.id === playerGame.data.hostId) {
+                    if (socket.session.id === playerGame.data.hostId) {
                         io.to(sid).emit('player idx', 0);
                     } else {
                         io.to(sid).emit('player idx', 1);
@@ -438,8 +436,8 @@ io.on('connection', async (socket) => {
             const playerGame = await GInfo.getPlayerGameData(socket);
 
             if (playerGame.data.state === 'action') {
-                if (bships.checkTurn(playerGame.data, socket.request.session.id)) {
-                    const enemyIdx = socket.request.session.id === playerGame.data.hostId ? 1 : 0;
+                if (bships.checkTurn(playerGame.data, socket.session.id)) {
+                    const enemyIdx = socket.session.id === playerGame.data.hostId ? 1 : 0;
 
                     let hit = await GInfo.shootShip(socket, posX, posY);
 
@@ -461,16 +459,16 @@ io.on('connection', async (socket) => {
                             const members = [...roomMemberIterator(playerGame.id)];
 
                             let hostSocket = io.sockets.sockets.get(members[0][0]);
-                            let hostNickname = hostSocket.request.session.nickname;
+                            let hostNickname = hostsocket.session.nickname;
                             let guestSocket = io.sockets.sockets.get(members[1][0]);
-                            let guestNickname = guestSocket.request.session.nickname;
+                            let guestNickname = guestsocket.session.nickname;
 
                             hostSocket.emit("game finished", !enemyIdx ? 1 : 0, guestNickname);
                             guestSocket.emit("game finished", !enemyIdx ? 1 : 0, hostNickname);
 
                             // const stats = await GInfo.getStats(socket);
                             const playerGame = await GInfo.getPlayerGameData(socket);
-                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostSocket.request.session.userId, guestSocket.request.session.userId, playerGame.data.boards, !enemyIdx ? 1 : 0);
+                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostsocket.session.userId, guestsocket.session.userId, playerGame.data.boards, !enemyIdx ? 1 : 0);
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id, !enemyIdx ? 1 : 0);
