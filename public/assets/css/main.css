@@ -207,6 +207,7 @@ nav span:hover {
 #profileView {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 #profileView .profile {
@@ -214,32 +215,95 @@ nav span:hover {
     margin: 3rem;
     flex-direction: row;
     align-items: center;
-    justify-content: space-around;
+    width: 45vw;
+    justify-content: space-between;
+}
+
+#profileView .stats {
+    display: flex;
+    gap: 1rem;
+    width: 60vw;
 }
 
 #profileView .matchList {
     display: flex;
     flex-direction: column;
+    gap: 2rem;
+    flex: 2;
+
+    overflow-y: scroll;
 }
 
-#profileView .matchList div {
+#profileView .matchList::-webkit-scrollbar {
+    display: none;
+}
+
+#profileView .matchList .match {
     background: rgba(24, 24, 24, 1);
     border-radius: 15px;
     cursor: pointer;
+    padding: 0.7rem;
+
+    height: 5rem;
+    overflow: hidden;
+
+    transition: height 0.3s;
 }
 
-#profileView .matchList div .statsButton {
+#profileView .matchList .match .statsButton {
     background-image: linear-gradient(to right, rgb(255, 255, 255, 1) 20%, rgba(0, 0, 0, 0) 40%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 
+    margin: 0;
+
     background-position: 60%;
     background-size: 400%;
     background-repeat: no-repeat;
-    transition: background-position 0.7s;
+    transition: background-position 0.9s;
 }
 
-#profileView .matchList div:hover .statsButton {
+#profileView .matchList .match:hover {
+    height: 8rem;
+}
+
+#profileView .matchList .match:hover .statsButton {
     background-position: 0%;
+}
+
+#profileView .matchList .match div h1 {
+    margin: 0;
+}
+
+#profileView .matchList .match div {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    margin-top: 1rem;
+}
+
+#profileView .matchlist .match div span {
+    color: white;
+    font-size: 0.8rem;
+    line-height: 1rem;
+}
+
+#profileView .periodal {
+    flex: 1;
+}
+
+#profileView .periodal .stat {
+    margin-bottom: 1.5rem;
+}
+
+#profileView .periodal .stat h1 {
+    margin: 0.5rem;
+}
+
+#profileView .periodal .stat span {
+
 }

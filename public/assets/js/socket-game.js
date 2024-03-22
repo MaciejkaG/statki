@@ -195,3 +195,4 @@ socket.on('turn update', (turnData) => {
 socket.on('player left', () => {
     window.location.replace("/");
 });
+// SELECT ROUND((1 - AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.nickname = "MaciejkaG";

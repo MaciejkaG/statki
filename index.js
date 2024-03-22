@@ -433,7 +433,7 @@ io.on('connection', async (socket) => {
         });
 
         socket.on('shoot', async (posX, posY) => {
-            const playerGame = await GInfo.getPlayerGameData(socket);
+            let playerGame = await GInfo.getPlayerGameData(socket);
 
             if (playerGame.data.state === 'action') {
                 if (bships.checkTurn(playerGame.data, socket.session.id)) {
@@ -459,16 +459,15 @@ io.on('connection', async (socket) => {
                             const members = [...roomMemberIterator(playerGame.id)];
 
                             let hostSocket = io.sockets.sockets.get(members[0][0]);
-                            let hostNickname = hostsocket.session.nickname;
+                            let hostNickname = hostSocket.session.nickname;
                             let guestSocket = io.sockets.sockets.get(members[1][0]);
-                            let guestNickname = guestsocket.session.nickname;
+                            let guestNickname = guestSocket.session.nickname;
 
                             hostSocket.emit("game finished", !enemyIdx ? 1 : 0, guestNickname);
                             guestSocket.emit("game finished", !enemyIdx ? 1 : 0, hostNickname);
 
-                            // const stats = await GInfo.getStats(socket);
-                            const playerGame = await GInfo.getPlayerGameData(socket);
-                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostsocket.session.userId, guestsocket.session.userId, playerGame.data.boards, !enemyIdx ? 1 : 0);
+                            playerGame = await GInfo.getPlayerGameData(socket);
+                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostSocket.session.userId, guestSocket.session.userId, playerGame.data.boards, !enemyIdx ? 1 : 0);
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id, !enemyIdx ? 1 : 0);
@@ -516,10 +515,6 @@ function resetUserGame(req) {
 }
 
 function endGame(gameId) {
-    // const boards = redis.json.get(`game:${gameId}`, { keys: [".boards"] });
-    // const hostUid = redis.json.get(`game:${gameId}`, { keys: [".hostUserId"] });
-    // const guestUid = redis.json.get(`game:${gameId}`, { keys: [".hostUserId"] });
-
     let iterator = roomMemberIterator(gameId);
     if (iterator != null) {
         const members = [...iterator];
