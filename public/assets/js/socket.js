@@ -23,8 +23,39 @@ socket.on("gameReady", (gameId) => {
 var nickname;
 var myProfile;
 
-socket.emit("my profile data", (profile) => {
-    myProfile = profile;
+socket.emit("my profile", (profile) => {
+    console.log(profile);
+    // General profile data
+    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    $("#playerSince").html(new Date(profile.profile.account_creation).toLocaleDateString("pl-PL", options));
+    $("#nickname").html(profile.profile.nickname);
+
+    // Profile stats
+    $("#monthlyPlayed").html(profile.stats.monthly_matches);
+    $("#totalPlayed").html(profile.stats.alltime_matches);
+    $("#winrate").html(`${profile.stats.winrate}%`);
+
+    var matchHistory = profile.matchHistory;
+    var matchHistoryDOM = "";
+
+    options = { hour: '2-digit', minute: '2-digit', time: 'numeric', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+    for (let i = 0; i < matchHistory.length; i++) {
+        const match = matchHistory[i];
+
+        console.log();
+
+        let date = new Date(match.date).toLocaleDateString("pl-PL", options);
+
+        const minutes = Math.floor(match.duration / 60).toLocaleString('pl-PL', { minimumIntegerDigits: 2, useGrouping: false });
+        const seconds = (match.duration - minutes * 60).toLocaleString('pl-PL', { minimumIntegerDigits: 2, useGrouping: false });
+        
+        const duration = `${minutes}:${seconds}`;
+
+        matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? "Zwycięstwo" : "Porażka"}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "AI"}</span></div><h2 class="statsButton">Kliknij by wyświetlić statystyki</h2><span>${date}</span><br><span>${duration}</span></div>`;
+    }
+
+    $(".matchList").html(matchHistoryDOM);
 });
 
 socket.emit("whats my nick", (myNickname) => {

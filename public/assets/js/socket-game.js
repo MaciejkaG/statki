@@ -195,5 +195,8 @@ socket.on('turn update', (turnData) => {
 socket.on('player left', () => {
     window.location.replace("/");
 });
-// SELECT ROUND((1 - AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.nickname = "MaciejkaG";
-// 
+
+// Profile stats: SELECT ROUND((AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.nickname = "MaciejkaG";
+// Match history: SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = "c231c4f7-e179-11ee-920b-fa163e32c013";
+// Profile: SELECT nickname, account_creation FROM accounts WHERE user_id = "c231c4f7-e179-11ee-920b-fa163e32c013";
+// Badges: SELECT badge, achievement_date FROM badges WHERE user_id = "c231c4f7-e179-11ee-920b-fa163e32c013";

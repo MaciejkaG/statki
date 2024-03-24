@@ -257,6 +257,7 @@ nav span:hover {
     -webkit-text-fill-color: transparent;
 
     margin: 0;
+    margin-bottom: 1rem;
 
     background-position: 60%;
     background-size: 400%;
@@ -265,7 +266,7 @@ nav span:hover {
 }
 
 #profileView .matchList .match:hover {
-    height: 8rem;
+    height: 11rem;
 }
 
 #profileView .matchList .match:hover .statsButton {
@@ -302,8 +303,4 @@ nav span:hover {
 
 #profileView .periodal .stat h1 {
     margin: 0.5rem;
-}
-
-#profileView .periodal .stat span {
-
 }

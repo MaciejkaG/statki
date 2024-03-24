@@ -1,4 +1,4 @@
-<nav><span>Strona główna</span> <span id="profileButton" onclick="switchView('profileView')">Profil</span></nav>
+<nav><span onclick="switchView('mainMenuView')">Menu główne</span> <span id="profileButton" onclick="switchView('profileView')">Profil</span></nav>
 {{!-- <h1 class="header">Statki</h1> --}}
 <div class="container" id="mainMenuView" data-title="Statki" data-path="/">
     <div>
@@ -77,27 +77,27 @@
 
 <div class="container" id="profileView" data-title="Statki / Profil" data-path="/profile">
     <div class="profile">
-        <h1>MaciejkaG</h1>
+        <h1 id="nickname">Wczytywanie...</h1>
         <div>
-            <span>Odznaki: </span>
-            <span>Deweloper, Wczesny użytkownik</span>
+            <span>Gracz od: </span>
+            <span id="playerSince">-</span>
         </div>
     </div>
     <div class="stats">
         <div class="matchList">
             <div class="match">
-                <div><h1 class="dynamic danger">Porażka</h1><span> vs. MaciejkaG</span></div>
+                <div><h1 class="dynamic danger">Porażka</h1><span> vs. Wczytywanie...</span></div>
                 <h2 class="statsButton">Kliknij by wyświetlić statystyki</h2>
             </div>
             <div class="match">
-                <div><h1 class="dynamic">Zwycięstwo</h1><span> vs. MaciejkaG</span></div>
+                <div><h1 class="dynamic">Zwycięstwo</h1><span> vs. Wczytywanie...</span></div>
                 <h2 class="statsButton">Kliknij by wyświetlić statystyki</h2>
             </div>
         </div>
         <div class="periodal">
-            <div class="stat"><h1>10</h1><span>meczów zagranych w ostatnim miesiącu</span></div>
-            <div class="stat"><h1>100</h1><span>meczów zagranych łącznie</span></div>
-            <div class="stat"><h1>50%</h1><span>winrate</span></div>
+            <div class="stat"><h1 id="monthlyPlayed">-</h1><span>meczów zagranych w ostatnim miesiącu</span></div>
+            <div class="stat"><h1 id="totalPlayed">-</h1><span>meczów zagranych łącznie</span></div>
+            <div class="stat"><h1 id="winrate">-</h1><span>winrate</span></div>
         </div>
     </div>
 </div>

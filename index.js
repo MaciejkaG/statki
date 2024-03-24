@@ -230,6 +230,12 @@ io.on('connection', async (socket) => {
             callback(session.nickname);
         });
 
+        socket.on('my profile', (callback) => {
+            auth.getProfile(session.userId).then((profile) => {
+                callback(profile);
+            });
+        });
+
         socket.on('create lobby', (callback) => {
             if (socket.rooms.size === 1) {
                 let id = genID();
