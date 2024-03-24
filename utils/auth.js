@@ -15,8 +15,6 @@ const rl = readline.createInterface({
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const saltRounds = 10;
-
 export class MailAuth {
     constructor(redis, options, mysqlOptions) {
         this.redis = redis;
@@ -66,15 +64,19 @@ export class MailAuth {
             const conn = mysql.createConnection(this.mysqlOptions);
             conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
                 if (error) { reject(error); return; }
-                let timer = await this.redis.get(`loginTimer:${response[0].user_id}`);
-                if (response.length !== 0 && timer && timer > 0) {
-                    resolve({ status: -1, uid: response[0].user_id });
-                    return;
+                if (response.length !== 0) {
+                    let timer = await this.redis.get(`loginTimer:${response[0].user_id}`);
+                    if (timer && timer > 0) {
+                        resolve({ status: -1, uid: response[0].user_id });
+                        return;
+                    }
                 }
 
                 if (response.length === 0 || response[0].nickname == null) {
+                    if (response.length === 0) {
+                        conn.query(`INSERT INTO accounts(email) VALUES (${conn.escape(email)});`, (error) => { if (error) reject(error) });
+                    }
 
-                    conn.query(`INSERT INTO accounts(email) VALUES (${conn.escape(email)});`, (error) => { if (error) reject(error) });
                     conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
                         if (error) reject(error);
                         const row = response[0];
@@ -82,7 +84,7 @@ export class MailAuth {
                         const html = fs.readFileSync(path.join(__dirname, 'mail/auth-code-firsttime.html'), 'utf8');
                         let authCode = genCode();
 
-                        await this.redis.json.set(`codeAuth:${authCode}`, "$", { uid: row.user_id, tid: tId });
+                        await this.redis.set(`codeAuth:${authCode}`, row.user_id);
 
                         await this.timer(row.user_id, 600, async () => {
                             await this.redis.json.del(`codeAuth:${authCode}`);
