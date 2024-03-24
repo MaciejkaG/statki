@@ -24,7 +24,6 @@ var nickname;
 var myProfile;
 
 socket.emit("my profile", (profile) => {
-    console.log(profile);
     // General profile data
     let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     $("#playerSince").html(new Date(profile.profile.account_creation).toLocaleDateString("pl-PL", options));
@@ -35,6 +34,7 @@ socket.emit("my profile", (profile) => {
     $("#totalPlayed").html(profile.stats.alltime_matches);
     $("#winrate").html(`${profile.stats.winrate}%`);
 
+    // Match history
     var matchHistory = profile.matchHistory;
     var matchHistoryDOM = "";
 
@@ -42,8 +42,6 @@ socket.emit("my profile", (profile) => {
 
     for (let i = 0; i < matchHistory.length; i++) {
         const match = matchHistory[i];
-
-        console.log();
 
         let date = new Date(match.date).toLocaleDateString("pl-PL", options);
 
