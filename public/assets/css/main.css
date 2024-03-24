@@ -266,7 +266,7 @@ nav span:hover {
 }
 
 #profileView .matchList .match:hover {
-    height: 11rem;
+    height: 12rem;
 }
 
 #profileView .matchList .match:hover .statsButton {
