@@ -147,6 +147,9 @@ h1,h2,h3,h4,h5,h6 {
 .shapes, .spaceFiller {
     width: 15rem;
     user-select: none;
+}
+
+.spaceFiller {
     pointer-events: none;
 }
 
@@ -176,7 +179,7 @@ h1,h2,h3,h4,h5,h6 {
     transition: opacity 0.3s;
 }
 
-#boardSwitch {
+.boardSwitch {
     opacity: 0.3;
     transition: opacity 0.3s;
 }
@@ -216,8 +219,8 @@ h1,h2,h3,h4,h5,h6 {
 
 .cover {
     position: fixed;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     top: 0;
     left: 0;
     display: flex;
@@ -290,6 +293,32 @@ h1,h2,h3,h4,h5,h6 {
     display: none;
 }
 
+.tippyBtn {
+    border-radius: 15px;
+    padding: 5px;
+    text-align: center;
+    width: 2rem;
+    aspect-ratio: 1;
+    color: white;
+
+    outline: none;
+    border: none;
+}
+
 .mobileControls {
     display: none;
+}
+
+.mobileControls button {
+    padding: 0.5rem 2rem;
+    font-size: 1rem;
+    background-color: black;
+    border: solid 1px white;
+    color: white;
+    border-radius: 15px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    margin-bottom: 1.5rem;
 }

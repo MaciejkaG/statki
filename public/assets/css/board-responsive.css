@@ -24,5 +24,17 @@
     .mobileControls {
         display: block;
     }
+
+    .break {
+        margin-top: 1rem;
+    }
+
+    .spaceFiller {
+        display: none;
+    }
+
+    body {
+        overflow-x: hidden;
+    }
 }
 

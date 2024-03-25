@@ -1,2 +1,0 @@
--- SELECT nickname, host_id, board, match_type, date FROM accounts NATURAL JOIN statistics JOIN matches ON matches.host_id = accounts.user_id WHERE nickname = "deeznuts24";
-SELECT accounts.nickname, statistics.board, matches.match_type, matches.duration, date FROM statistics JOIN matches ON statistics.match_id = matches.match_id NATURAL JOIN accounts me JOIN accounts opp ON matches.guest_id = a WHERE me.nickname = "deeznuts24";

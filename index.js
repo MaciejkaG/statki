@@ -36,7 +36,7 @@ await redis.connect();
 
 const limiter = rateLimit({
     windowMs: 40 * 1000,
-    limit: 100,
+    limit: 500,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     store: new LimiterRedisStore({
@@ -73,7 +73,7 @@ const sessionMiddleware = session({
     rolling: true,
     cookie: {
         secure: process.env.cookie_secure === "true" ? true : false,
-        maxAge: 24 * 60 * 60 * 1000,
+        maxAge: 3 * 24 * 60 * 60 * 1000,
     },
 });
 
@@ -206,7 +206,12 @@ app.get('/game', async (req, res) => {
     if (req.session.nickname == null) {
         res.redirect('/setup');
     } else if (req.query.id == null || game == null || game.state == 'expired' || req.session.activeGame == null) {
-        res.status(400).send('badGameId');
+        res.render("error", {
+            helpers: {
+                error: "Nie znaleziono wskazanej gry",
+                fallback: "/"
+            }
+        });
     } else {
         res.render('board');
     }
@@ -338,20 +343,6 @@ io.on('connection', async (socket) => {
                         status: "alreadyInLobby",
                     });
                 }
-            }
-        });
-
-        socket.on('leave lobby', (callback) => {
-            if (socket.rooms.size === 2) {
-                socket.leave(socket.rooms[1]);
-                io.to(socket.rooms[1]).emit("player left");
-                callback({
-                    status: "ok"
-                });
-            } else {
-                callback({
-                    status: "youreNotInLobby"
-                });
             }
         });
 

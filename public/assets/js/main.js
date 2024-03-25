@@ -21,6 +21,13 @@ var hoveredField = null;
 refreshBoardView();
 
 $(".board .field").hover(function () {
+    if ($(window).width() <= 820) {
+        changedFields.forEach(field => {
+            field.css("background-color", "var(--field)");
+        });
+        changedFields.length = 0;
+    }
+
     hoveredField = this;
     // Pokaż "miarki"
     let posX = parseInt($(this).data("pos-x"));
@@ -95,12 +102,14 @@ $(".board .field").hover(function () {
         }
     }
 }, function () {
-    hoveredField = null;
-    // Wyłącz "miarki" po wyjściu kursora z pola (aby się nie duplikowały w przyszłości)
-    changedFields.forEach(field => {
-        field.css("background-color", "var(--field)");
-    });
-    changedFields.length = 0;
+    if ($(window).width() > 820) {
+        hoveredField = null;
+        // Wyłącz "miarki" po wyjściu kursora z pola (aby się nie duplikowały w przyszłości)
+        changedFields.forEach(field => {
+            field.css("background-color", "var(--field)");
+        });
+        changedFields.length = 0;
+    }
 });
 
 // $(".board .field").on("click", function() {

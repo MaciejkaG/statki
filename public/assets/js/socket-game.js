@@ -7,38 +7,53 @@ var occupiedFields = [];
 
 var lastTimeClick = 0;
 
-tippy('#board .field', {
-    allowHTML: true,
-    placement: "top",
-    theme: "translucent",
-    animation: "shift-toward-subtle",
-    interactive: true,
-    content: (reference) => {
-        let fieldData = `${$(reference).data('pos-x') }, ${$(reference).data('pos-y') }`;
+if ($(window).width() <= 820) {
+    tippy('#board .field', {
+        allowHTML: true,
+        placement: "top",
+        theme: "translucent",
+        animation: "shift-toward-subtle",
+        interactive: true,
+        content: (reference) => {
+            let fieldData = `${$(reference).data('pos-x')}, ${$(reference).data('pos-y')}`;
 
-        return $('#mainTippyTemplate').html().replaceAll("[[FIELDPOS]]", fieldData);
-    },
-});
+            return $('#mainTippyTemplate').html().replaceAll("[[FIELDPOS]]", fieldData);
+        },
+    });
+
+    tippy('#secondaryBoard .field', {
+        allowHTML: true,
+        placement: "top",
+        theme: "translucent",
+        animation: "shift-toward-subtle",
+        interactive: true,
+        content: (reference) => {
+            let fieldData = `${$(reference).data('pos-x')}, ${$(reference).data('pos-y')}`;
+
+            return $('#secondaryTippyTemplate').html().replaceAll("[[FIELDPOS]]", fieldData);
+        },
+    });
+}
 
 $('#board .field').on('click', function () {
     if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {
         if ($(window).width() > 820) {
             socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
             lastTimeClick = new Date().getTime() / 1000;
-        } // else {
-        // }
+        }
     }
 });
 
 function manualPlace(posX, posY) {
-    // console.log(args);
     socket.emit("place ship", selectedShip, posX, posY, shipRotation);
 }
 
 $('#secondaryBoard .field').on('click', function () {
     if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {
-        socket.emit("shoot", $(this).data('pos-x'), $(this).data('pos-y'));
-        lastTimeClick = new Date().getTime() / 1000;
+        if ($(window).width() > 820) {
+            socket.emit("shoot", $(this).data('pos-x'), $(this).data('pos-y'));
+            lastTimeClick = new Date().getTime() / 1000;
+        }
     }
 });
 
@@ -199,12 +214,12 @@ socket.on("player idx", (idx) => {
 socket.on('turn update', (turnData) => {
     if (turnData.phase === "preparation") {
         $("#whosTurn").html("Faza przygotowań");
-        $("#boardSwitch").css("opacity", 0.3);
+        $(".boardSwitch").css("opacity", 0.3);
     } else {
         postPrep = true;
         myTurn = turnData.turn === playerIdx;
         turnData.turn === playerIdx ? $("#whosTurn").html("Twoja tura") : $("#whosTurn").html("Tura przeciwnika");
-        $("#boardSwitch").css("opacity", 1);
+        $(".boardSwitch").css("opacity", 1);
     }
 
     timerDestination = turnData.timerToUTC;
