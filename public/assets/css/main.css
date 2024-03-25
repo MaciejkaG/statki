@@ -228,6 +228,8 @@ nav span:hover {
     align-items: center;
     width: 45vw;
     justify-content: space-between;
+
+    gap: 1rem;
 }
 
 #profileView .stats {
@@ -315,4 +317,8 @@ nav span:hover {
 
 #profileView .periodal .stat h1 {
     margin: 0.5rem;
+}
+
+.tippyTemplate {
+    display: none;
 }

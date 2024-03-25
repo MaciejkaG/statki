@@ -7,13 +7,33 @@ var occupiedFields = [];
 
 var lastTimeClick = 0;
 
+tippy('#board .field', {
+    allowHTML: true,
+    placement: "top",
+    theme: "translucent",
+    animation: "shift-toward-subtle",
+    interactive: true,
+    content: (reference) => {
+        let fieldData = `${$(reference).data('pos-x') }, ${$(reference).data('pos-y') }`;
+
+        return $('#mainTippyTemplate').html().replaceAll("[[FIELDPOS]]", fieldData);
+    },
+});
+
 $('#board .field').on('click', function () {
-    console.log(new Date().getTime() / 1000 - lastTimeClick);
     if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {
-        socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
-        lastTimeClick = new Date().getTime() / 1000;
+        if ($(window).width() > 820) {
+            socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
+            lastTimeClick = new Date().getTime() / 1000;
+        } // else {
+        // }
     }
 });
+
+function manualPlace(posX, posY) {
+    // console.log(args);
+    socket.emit("place ship", selectedShip, posX, posY, shipRotation);
+}
 
 $('#secondaryBoard .field').on('click', function () {
     if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {

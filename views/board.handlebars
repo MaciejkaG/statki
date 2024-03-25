@@ -18,10 +18,16 @@
                     <h3>Dostępne: <span class="dynamic danger" id="shipsLeft">1</span></h3>
                 </div>
                 <span class="break"></span>
-                <h2>Sterowanie</h2>
-                <h3 class="controlsOwnBoard"><span class="important">S</span> Zmiana statku</h3>
-                <h3 class="controlsOwnBoard"><span class="important">R</span> Obrót statku</h3>
-                <h3 id="boardSwitch"><span class="important">B</span> Zamiana planszy</h3>
+                <div class="controls">
+                    <h2>Sterowanie</h2>
+                    <h3 class="controlsOwnBoard"><span class="important">S</span> Zmiana statku</h3>
+                    <h3 class="controlsOwnBoard"><span class="important">R</span> Obrót statku</h3>
+                    <h3 id="boardSwitch"><span class="important">B</span> Zamiana planszy</h3>
+                </div>
+                <div class="mobileControls">
+                    <button>Zmień statek</button>
+                    <button>Zmień planszę</button>
+                </div>
                 <span class="break"></span>
                 <h3><span class="dynamic" id="whosTurn"></span></h3>
                 <h2 class="important" id="timer">∞</h2>
@@ -33,6 +39,15 @@
             <div class="spaceFiller"></div>
         </div>
     </div>
+</div>
+
+<div id="mainTippyTemplate" class="tippyTemplate">
+    <button onclick="manualPlace([[FIELDPOS]])">Postaw</button>
+    <button>Obróć</button>
+</div>
+
+<div id="secondaryTippyTemplate" class="tippyTemplate">
+    <button>Strzel</button>
 </div>
 
 <script src="/assets/js/battleships-lib.js"></script>

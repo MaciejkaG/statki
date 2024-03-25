@@ -2,6 +2,7 @@ const socket = io();
 
 // Handling server-sent events
 socket.on("joined", (nick) => {
+    returnLock = false;
     lockUI(true);
     $("#oppNameField").html(nick);
     switchView("preparingGame");
@@ -21,7 +22,6 @@ socket.on("gameReady", (gameId) => {
 });
 
 var nickname;
-var myProfile;
 
 socket.emit("my profile", (profile) => {
     // General profile data
@@ -32,7 +32,7 @@ socket.emit("my profile", (profile) => {
     // Profile stats
     $("#monthlyPlayed").html(profile.stats.monthly_matches);
     $("#totalPlayed").html(profile.stats.alltime_matches);
-    $("#winrate").html(`${profile.stats.winrate}%`);
+    $("#winrate").html(profile.stats.winrate !== null ? `${profile.stats.winrate}%` : "-");
 
     // Match history
     var matchHistory = profile.matchHistory;
@@ -53,6 +53,10 @@ socket.emit("my profile", (profile) => {
         matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? "Zwycięstwo" : "Porażka"}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "AI"}</span></div><h2 class="statsButton">Kliknij by wyświetlić statystyki</h2><span>${date}</span><br><span>${duration}</span></div>`;
     }
 
+    if (matchHistoryDOM === "") {
+        matchHistoryDOM = "<h2>Brak zagranych meczów</h2>";
+    }
+
     $(".matchList").html(matchHistoryDOM);
 });
 
@@ -60,17 +64,6 @@ socket.emit("whats my nick", (myNickname) => {
     nickname = myNickname;
     $("#profileButton").html(nickname);
     console.log(nickname);
-});
-
-socket.on("game start", (gameInfo) => {
-    let opp;
-    if (gameInfo.players[0]!==nickname) {
-        opp = gameInfo.players[0];
-    } else {
-        opp = gameInfo.players[1];
-    }
-
-    alert(`Grasz przeciwko: ${opp}`);
 });
 
 $("#createGameButton").on("click", function () {
