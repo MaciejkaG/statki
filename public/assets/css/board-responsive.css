@@ -10,10 +10,19 @@
 
     .panelContainer {
         flex-direction: column-reverse;
+        align-items: center;
     }
 
     .field {
         width: 7.5vw; /* still need to test that */
+    }
+
+    .controls {
+        display: none;
+    }
+
+    .mobileControls {
+        display: block;
     }
 }
 
