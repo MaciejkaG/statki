@@ -1,0 +1,42 @@
+@media only screen and (max-width: 1280px) {
+    #profileView .stats  {
+        flex-direction: column;
+    }
+
+    #profileView .profile {
+        width: auto;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+@media only screen and (max-width: 820px) {
+    #pvpCreateView .modes div {
+        max-width: 90vw;
+        height: 19rem;
+        padding: 0.5rem 1.5rem;
+        box-sizing: border-box;
+    }
+
+    #pvpJoinView .modes div {
+        max-width: 90vw;
+        height: 8rem;
+        padding: 2rem 1.5rem;
+    }
+
+    #profileView .matchList .match:hover {
+        height: 16rem;
+    }
+
+    #profileView .stats {
+        width: 90vw;
+    }
+
+    #profileView .matchList .match {
+        height: 7rem;
+    }
+
+    #profileView .match div {
+        flex-direction: column;
+    }
+}

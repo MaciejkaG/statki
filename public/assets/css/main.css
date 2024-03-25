@@ -52,6 +52,8 @@ nav span:hover {
 /* index */
 #mainMenuView .modes {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 }
 
@@ -74,6 +76,8 @@ nav span:hover {
 /* PvP/index */
 #pvpMenuView .modes {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 }
 
@@ -96,6 +100,8 @@ nav span:hover {
 /* PvP/create */
 #pvpCreateView .modes {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 }
 
@@ -138,6 +144,8 @@ nav span:hover {
 /* PvP/join */
 #pvpJoinView .modes {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 }
 
@@ -182,6 +190,8 @@ nav span:hover {
 /* Preparation */
 #preparingGame .modes {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 }
 
@@ -214,6 +224,7 @@ nav span:hover {
     display: flex;
     margin: 3rem;
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     width: 45vw;
     justify-content: space-between;
@@ -223,6 +234,7 @@ nav span:hover {
     display: flex;
     gap: 1rem;
     width: 60vw;
+    flex-wrap: wrap;
 }
 
 #profileView .matchList {
