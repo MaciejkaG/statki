@@ -43,10 +43,10 @@ socket.emit("my profile", (profile) => {
     for (let i = 0; i < matchHistory.length; i++) {
         const match = matchHistory[i];
 
-        let date = new Date(match.date).toLocaleDateString("pl-PL", options);
+        let date = new Date(match.date).toLocaleDateString(undefined, options);
 
-        const minutes = Math.floor(match.duration / 60).toLocaleString('pl-PL', { minimumIntegerDigits: 2, useGrouping: false });
-        const seconds = (match.duration - minutes * 60).toLocaleString('pl-PL', { minimumIntegerDigits: 2, useGrouping: false });
+        const seconds = (match.duration - minutes * 60).toLocaleString(undefined, { minimumIntegerDigits: 2, useGrouping: false });
+        const minutes = Math.floor(match.duration / 60).toLocaleString(undefined, { minimumIntegerDigits: 2, useGrouping: false });
         
         const duration = `${minutes}:${seconds}`;
 
@@ -54,7 +54,7 @@ socket.emit("my profile", (profile) => {
     }
 
     if (matchHistoryDOM === "") {
-        matchHistoryDOM = "<h2>Brak zagranych meczów</h2>";
+        matchHistoryDOM = `<h2>${locale["No matches played"]}</h2>`;
     }
 
     $(".matchList").html(matchHistoryDOM);
@@ -84,7 +84,7 @@ $("#createGameButton").on("click", function () {
                 break;
 
             default:
-                alert(`Wystąpił nieznany problem\nStatus: ${response.status}`);
+                alert(`${locale["Unknown error occured"]}\n${locale["Status:"]} ${response.status}`);
                 lockUI(false);
                 break;
         }
@@ -122,7 +122,7 @@ form.addEventListener('submit', (e) => {
                 //    break;
 
                 default:
-                    alert(`Wystąpił nieznany problem\nStatus: ${response.status}`);
+                    alert(`${locale["Unknown error occured"]}\n${locale["Status:"]} ${response.status}`);
                     lockUI(false);
                     switchView("mainMenuView");
                     break;

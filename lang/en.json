@@ -1,0 +1,65 @@
+{
+    "errors": {
+        "Reonnecting...": "Reconnecting...",
+        "Reconnected": "Reconnected",
+        "Reconnection error occured": "Reconnection error occured",
+        "Reconection failed": "Reconnection failed",
+        "Disconnected": "Disconnected",
+        "Try to refresh the page if this error reoccurs": "Try to refresh the page if this error reoccurs",
+        "Connection error": "Connection error"
+    },
+    "menu": {
+        "navbar": {
+            "Main menu": "Main menu",
+            "Profile": "Profile"
+        },
+        "index": {
+            "Select game mode": "Select game mode",
+            "PvP": "PvP",
+            "Play against another player": "Play against another player",
+            "Vs. AI": "Vs. AI",
+            "Play against the computer": "Play against the computer"
+        },
+        "PvP": {
+            "PvP": "PvP",
+            "Create": "Create",
+            "Create your own room": "Create your own room",
+            "Join": "Join",
+            "Join a room by a code": "Join a room by a code"
+        },
+        "PvP/Create": {
+            "PvP / Create": "PvP / Create",
+            "Room code:": "Room code:",
+            "Waiting for an opponent": "Waiting for an opponent",
+            "Leave the room": "Leave the room"
+        },
+        "PvP/Join": {
+            "PvP / Join": "PvP / Join",
+            "Room code": "Room code",
+            "Join": "Join"
+        },
+        "PvP/Prepairing": {
+            "PvP / Loading": "PvP / Loading",
+            "Wait...": "Wait...",
+            "You will be redirected soon": "You will be redirected soon",
+            "Opponent:": "Opponent"
+        },
+        "Profile": {
+            "Loading...": "Loading...",
+            "Player since: ": "Player since: ",
+            "Victory": "Victory",
+            "Defeat": "Defeat",
+            "Click to view match statistics": "Click to view match statistics",
+            "matches played this month": "matches played this month",
+            "total matches played": "total matches played",
+            "winrate": "winrate",
+
+            "No matches played": "No matches played"
+        },
+
+        "General": {
+            "Unknown error occured": "Unknown error occured",
+            "Status:": "Status:"
+        }
+    }
+}

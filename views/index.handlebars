@@ -39,7 +39,7 @@
         <div class="modes">
             <div>
                 <h2>Kod pokoju:</h2>
-                <input type="text" maxlength="6" readonly value="123456" id="createGameCode">
+                <input type="text" maxlength="6" readonly value="-" id="createGameCode">
                 <h3>Oczekiwanie na gracza...</h3>
                 <button id="leaveGameButton">Opuść pokój</button>
             </div>
@@ -102,6 +102,11 @@
     </div>
 </div>
 
+<script>
+    locale = {
+        "Unknown error occured": "{{ __('Profile.') }}"
+    }
+</script>
 <script src="/assets/js/spa_lib.js"></script>
 <script src="/assets/js/socket.js"></script>
 <script src="/assets/js/socket-err-handler.js"></script>

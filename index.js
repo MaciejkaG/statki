@@ -15,11 +15,14 @@ import { MailAuth } from './utils/auth.js';
 import { rateLimit } from 'express-rate-limit';
 import { RedisStore as LimiterRedisStore } from 'rate-limit-redis';
 import SessionRedisStore from 'connect-redis';
+import { I18n } from 'i18n';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+const flags = process.env.flags.split(",");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -33,6 +36,11 @@ const io = new Server(server);
 const redis = createClient();
 redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
+
+const i18n = new I18n({
+    locales: ['en', 'pl'],
+    directory: path.join(__dirname, 'lang')
+});
 
 const limiter = rateLimit({
     windowMs: 40 * 1000,
@@ -72,7 +80,7 @@ const sessionMiddleware = session({
     saveUninitialized: true,
     rolling: true,
     cookie: {
-        secure: process.env.cookie_secure === "true" ? true : false,
+        secure: checkFlag("cookie_secure"),
         maxAge: 3 * 24 * 60 * 60 * 1000,
     },
 });
@@ -137,13 +145,17 @@ app.post('/api/login', (req, res) => {
     if (login == 2) {
         res.redirect('/');
     } else if (login == 0 && req.body.email != null && validateEmail(req.body.email)) {
-        auth.startVerification(req.body.email).then(result => {
-            if (result.status === 1) {
+        if (checkFlag('authless')) {
+            auth.loginAuthless(req.body.email).then(async result => {
                 req.session.userId = result.uid;
+                req.session.loggedIn = 2;
+                res.redirect('/');
+            });
 
-                req.session.loggedIn = 1;
-                res.redirect('/auth');
-            } else if (result.status === -1) {
+            return;
+        }
+        auth.startVerification(req.body.email, getIP(req, req.get('User-Agent'))).then(async result => {
+            if (result.status === 1 || result.status === -1) {
                 req.session.userId = result.uid;
 
                 req.session.loggedIn = 1;
@@ -151,6 +163,14 @@ app.post('/api/login', (req, res) => {
             } else {
                 res.sendStatus(500);
             }
+        }).catch((err) => {
+            res.render("error", {
+                helpers: {
+                    error: "Wystąpił nieznany błąd logowania",
+                    fallback: "/login"
+                }
+            });
+            throw err;
         });
     } else {
         res.render("error", {
@@ -550,3 +570,15 @@ function validateEmail(email) {
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         );
 };
+
+function getIP(req) {
+    if (checkFlag("cloudflare_mode")) {
+        return req.headers['cf-connecting-ip'];
+    } else {
+        return req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    }
+}
+
+function checkFlag(key) {
+    return flags.includes(key);
+}

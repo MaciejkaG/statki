@@ -1,8 +1,8 @@
 import nodemailer from 'nodemailer';
-import uuid4 from 'uuid4';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import geoip from 'geoip-lite';
 
 import mysql from 'mysql';
 import readline from "node:readline";
@@ -60,7 +60,35 @@ export class MailAuth {
         await this.redis.set(`loginTimer:${tId}`, -lastUpdate);
     }
 
-    startVerification(email) {
+    loginAuthless(email) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
+                if (error) { reject(error); return; }
+
+                if (response.length === 0 || response[0].nickname == null) {
+                    if (response.length === 0) {
+                        conn.query(`INSERT INTO accounts(email) VALUES (${conn.escape(email)});`, (error) => { if (error) reject(error) });
+                    }
+
+                    conn.query(`SELECT user_id FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
+                        if (error) reject(error);
+                        const row = response[0];
+
+                        resolve({ status: 1, uid: row.user_id });
+                    });
+
+                    return;
+                }
+
+                const row = response[0];
+
+                resolve({ status: 1, uid: row.user_id });
+            });
+        });
+    }
+
+    startVerification(email, ip, agent) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
@@ -68,7 +96,7 @@ export class MailAuth {
                 if (response.length !== 0) {
                     let timer = await this.redis.get(`loginTimer:${response[0].user_id}`);
                     if (timer && timer > 0) {
-                        resolve({ status: -1, uid: response[0].user_id });
+                        resolve({ status: -1, uid: response[0].user_id, });
                         return;
                     }
                 }
@@ -104,7 +132,7 @@ export class MailAuth {
                             reject(e);
                         }
 
-                        resolve({ status: 1, uid: row.user_id });
+                        resolve({ status: 1, uid: row.user_id, code: authCode });
                     });
 
                     return;
@@ -123,11 +151,15 @@ export class MailAuth {
 
                 authCode = authCode.slice(0, 4) + " " + authCode.slice(4);
 
+                const lookup = geoip.lookup(ip);
+
+                const lookupData = `User-Agent: ${agent}\nAdres IP: ${ip}\nKraj: ${lookup.country}\nRegion: ${lookup.region}\nMiasto: ${lookup.city}`
+
                 await this.mail.sendMail({
                     from: this.mailFrom,
                     to: email,
                     subject: `${authCode} to twój kod logowania do Statków`,
-                    html: html.replace("{{ NICKNAME }}", row.nickname).replace("{{ CODE }}", authCode),
+                    html: html.replace("{{ NICKNAME }}", row.nickname).replace("{{ CODE }}", authCode).replace("{{ LOOKUP }}", lookupData),
                 });
 
                 resolve({ status: 1, uid: row.user_id });
