@@ -1,0 +1,117 @@
+{
+    "errors": {
+        "Reconnecting": "Ponowne łączenie...",
+        "Reconnected": "Połączono ponownie",
+        "Reconnection error occured": "Wystąpił problem podczas ponownego łączenia",
+        "Reconnection failed": "Ponowne łączenie nieudane",
+        "Disconnected": "Rozłączono",
+        "Try to refresh the page if this error reoccurs": "Spróbuj odświeżyć stronę jeżeli błąd będzie się powtarzał",
+        "Connection error": "Błąd połączenia"
+    },
+
+    "menu": {
+        "navbar": {
+            "Main menu": "Menu główne",
+            "Profile": "Profil"
+        },
+        "index": {
+            "Select game mode": "Wybierz tryb gry",
+            "PvP": "PvP",
+            "Play against another player": "Graj przeciwko innemu graczowi",
+            "Vs AI": "Vs. AI",
+            "Play against the computer": "Graj przeciwko komputerowi"
+        },
+        "PvP": {
+            "PvP": "PvP",
+            "Create": "Stwórz",
+            "Create your own room": "Stwórz własny pokój",
+            "Join": "Dołącz",
+            "Join a room by a code": "Dołącz do pokoju poprzez kod"
+        },
+        "PvP/Create": {
+            "PvP / Create": "PvP / Stwórz",
+            "Room code:": "Kod pokoju:",
+            "Waiting for an opponent": "Oczekiwanie na przeciwnika",
+            "Leave the room": "Opuść pokój"
+        },
+        "PvP/Join": {
+            "PvP / Join": "PvP / Dołącz",
+            "Room code": "Kod pokoju",
+            "Join": "Dołącz"
+        },
+        "PvP/Loading": {
+            "PvP / Loading": "PvP / Wczytywanie",
+            "Wait": "Czekaj...",
+            "You will be redirected soon": "Wkrótce zostaniesz przekierowany(-a)",
+            "Opponent:": "Przeciwnik"
+        },
+        "Profile": {
+            "Loading": "Wczytywanie...",
+            "Player since:": "Gracz od:",
+            "Victory": "Zwycięstwo",
+            "Defeat": "Porażka",
+            "Click to view match statistics": "Kliknij by wyświetlić statystyki meczu",
+            "matches played this month": "meczy zagranych w tym miesiącu",
+            "total matches played": "meczy zagranych łącznie",
+            "winrate": "winrate",
+
+            "No matches played": "Nie zagrano meczy"
+        },
+
+        "General": {
+            "Unknown error occured": "Wystąpił nieznany błąd",
+            "Status:": "Status:"
+        }
+    },
+
+    "login": {
+        "Login": "Zaloguj się",
+        "E-mail address": "Adres e-mail",
+        "Proceed": "Kontynuuj"
+    },
+
+    "auth": {
+        "Authorisation": "Autoryzacja",
+        "Enter the code sent to your e-mail box": "Podaj kod wysłany do twojej skrzynki e-mail",
+        "Code": "Kod",
+        "Login": "Zaloguj się"
+    },
+
+    "setup": {
+        "Profile setup": "Konfiguracja profilu",
+        "Your nickname will be visible to other players": "Twoja nazwa użytkownika będzie widoczna dla innych graczy",
+        "Nickname": "Nazwa użytkownika",
+        "Confirm": "Potwierdź"
+    },
+
+    "error": {
+        "Error": "Błąd",
+        "Return": "Wróć"
+    },
+
+    "board": {
+        "Connecting": "Łączenie...",
+        "Waiting for the server": "Oczekiwanie na serwer...",
+        "Back to menu": "Powrót do menu",
+
+        "Selected ship": "Wybrany statek",
+        "Single-masted": "Jednomasztowiec",
+        "Two-masted": "Dwumasztowiec",
+        "Three-masted": "Trójmasztowiec",
+        "Four-masted": "Czteromasztowiec",
+        "Available:": "Dostępne:",
+
+        "Controls": "Sterowanie",
+        "Change ship": "Zmień statek",
+        "Rotate ship": "Obróć statek",
+        "Change boards": "Zmień plansze",
+
+        "Preparation phase": "Faza przygotowań",
+        "Your turn": "Twoja tura",
+        "Opponents turn": "Tura przeciwnika",
+
+        "You cannot place a ship like this": "Nie możesz tak postawić statku",
+        "You have ran out of ships of that type": "Skończyły ci się statki tego typu",
+        "You have already shot at this field": "Już strzelałeś w to pole"
+    }
+}

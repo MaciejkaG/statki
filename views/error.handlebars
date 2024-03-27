@@ -28,11 +28,11 @@
 <div class="container" id="pvpJoinView">
     <div>
         <h1>Statki</h1>
-        <h2>Błąd</h2>
+        <h2>{{ t 'error.Error' }}</h2>
         <div class="modes">
             <div>
                 <p>{{ error }}</p>
-                <button onclick="window.location.href = '{{ fallback }}'">Wróć</button>
+                <button onclick="window.location.href = '{{ fallback }}'">{{ t 'error.Return' }}</button>
             </div>
         </div>
     </div>

@@ -26,7 +26,7 @@ var nickname;
 socket.emit("my profile", (profile) => {
     // General profile data
     let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    $("#playerSince").html(new Date(profile.profile.account_creation).toLocaleDateString("pl-PL", options));
+    $("#playerSince").html(new Date(profile.profile.account_creation).toLocaleDateString(undefined, options));
     $("#nickname").html(profile.profile.nickname);
 
     // Profile stats
@@ -45,16 +45,16 @@ socket.emit("my profile", (profile) => {
 
         let date = new Date(match.date).toLocaleDateString(undefined, options);
 
-        const seconds = (match.duration - minutes * 60).toLocaleString(undefined, { minimumIntegerDigits: 2, useGrouping: false });
         const minutes = Math.floor(match.duration / 60).toLocaleString(undefined, { minimumIntegerDigits: 2, useGrouping: false });
+        const seconds = (match.duration - minutes * 60).toLocaleString(undefined, { minimumIntegerDigits: 2, useGrouping: false });
         
         const duration = `${minutes}:${seconds}`;
 
-        matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? "Zwycięstwo" : "Porażka"}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "AI"}</span></div><h2 class="statsButton">Kliknij by wyświetlić statystyki</h2><span>${date}</span><br><span>${duration}</span></div>`;
+        matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "AI"}</span></div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
     }
 
     if (matchHistoryDOM === "") {
-        matchHistoryDOM = `<h2>${locale["No matches played"]}</h2>`;
+        matchHistoryDOM = `<h2>${window.locale["No matches played"]}</h2>`;
     }
 
     $(".matchList").html(matchHistoryDOM);
@@ -84,7 +84,7 @@ $("#createGameButton").on("click", function () {
                 break;
 
             default:
-                alert(`${locale["Unknown error occured"]}\n${locale["Status:"]} ${response.status}`);
+                alert(`${window.locale["Unknown error occured"]}\n${window.locale["Status:"]} ${response.status}`);
                 lockUI(false);
                 break;
         }
@@ -122,7 +122,7 @@ form.addEventListener('submit', (e) => {
                 //    break;
 
                 default:
-                    alert(`${locale["Unknown error occured"]}\n${locale["Status:"]} ${response.status}`);
+                    alert(`${window.locale["Unknown error occured"]}\n${window.locale["Status:"]} ${response.status}`);
                     lockUI(false);
                     switchView("mainMenuView");
                     break;

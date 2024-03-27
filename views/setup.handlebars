@@ -10,13 +10,13 @@
 <div class="container" id="pvpJoinView">
     <div>
         <h1>Statki</h1>
-        <h2>Konfiguracja profilu</h2>
+        <h2>{{ t 'setup.Profile setup' }}</h2>
         <div class="modes">
             <div>
-                <p>Twój nickname będzie widoczny dla innych graczy</p>
+                <p>{{ t 'setup.Your nickname will be visible to other players' }}</p>
                 <form action="/api/nickname" method="post">
-                    <input type="text" name="nickname" placeholder="Nazwa użytkownika" style="font-size: 1rem;">
-                    <input type="submit" value="Zatwierdź">
+                    <input type="text" name="nickname" placeholder="{{ t 'setup.Nickname' }}" style="font-size: 1rem;">
+                    <input type="submit" value="{{ t 'setup.Confirm' }}">
                 </form>
             </div>
         </div>

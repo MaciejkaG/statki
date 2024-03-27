@@ -1,13 +1,14 @@
 {
     "errors": {
-        "Reonnecting...": "Reconnecting...",
+        "Reconnecting": "Reconnecting...",
         "Reconnected": "Reconnected",
         "Reconnection error occured": "Reconnection error occured",
-        "Reconection failed": "Reconnection failed",
+        "Reconnection failed": "Reconnection failed",
         "Disconnected": "Disconnected",
         "Try to refresh the page if this error reoccurs": "Try to refresh the page if this error reoccurs",
         "Connection error": "Connection error"
     },
+
     "menu": {
         "navbar": {
             "Main menu": "Main menu",
@@ -17,7 +18,7 @@
             "Select game mode": "Select game mode",
             "PvP": "PvP",
             "Play against another player": "Play against another player",
-            "Vs. AI": "Vs. AI",
+            "Vs AI": "Vs. AI",
             "Play against the computer": "Play against the computer"
         },
         "PvP": {
@@ -38,28 +39,77 @@
             "Room code": "Room code",
             "Join": "Join"
         },
-        "PvP/Prepairing": {
+        "PvP/Loading": {
             "PvP / Loading": "PvP / Loading",
-            "Wait...": "Wait...",
+            "Wait": "Wait...",
             "You will be redirected soon": "You will be redirected soon",
             "Opponent:": "Opponent"
         },
         "Profile": {
-            "Loading...": "Loading...",
-            "Player since: ": "Player since: ",
+            "Loading": "Loading...",
+            "Player since:": "Player since:",
             "Victory": "Victory",
             "Defeat": "Defeat",
             "Click to view match statistics": "Click to view match statistics",
             "matches played this month": "matches played this month",
             "total matches played": "total matches played",
             "winrate": "winrate",
-
             "No matches played": "No matches played"
         },
-
         "General": {
             "Unknown error occured": "Unknown error occured",
             "Status:": "Status:"
         }
+    },
+
+    "login": {
+        "Login": "Login",
+        "E-mail address": "E-mail address",
+        "Proceed": "Proceed"
+    },
+
+    "auth": {
+        "Authorisation": "Authorisation",
+        "Enter the code sent to your e-mail box": "Enter the code sent to your e-mail box",
+        "Code": "Code",
+        "Login": "Login"
+    },
+
+    "setup": {
+        "Profile setup": "Profile setup",
+        "Your nickname will be visible to other players": "Your nickname will be visible to other players",
+        "Nickname": "Nickname",
+        "Confirm": "Confirm"
+    },
+
+    "error": {
+        "Error": "Erorr",
+        "Return": "Return"
+    },
+
+    "board": {
+        "Connecting": "Connecting...",
+        "Waiting for the server": "Waiting for the server...",
+        "Back to menu": "Back to menu",
+
+        "Selected ship": "Selected ship",
+        "Single-masted": "Single-masted",
+        "Two-masted": "Two-masted",
+        "Three-masted": "Three-masted",
+        "Four-masted": "Four-masted",
+        "Available:": "Available:",
+
+        "Controls": "Controls",
+        "Change ship": "Change ship",
+        "Rotate ship": "Rotate ship",
+        "Change boards": "Change boards",
+
+        "Preparation phase": "Preparation phase",
+        "Your turn": "Your turn",
+        "Opponents turn": "Opponent's turn",
+
+        "You cannot place a ship like this": "You cannot place a ship like this",
+        "You have ran out of ships of that type": "You have ran out of ships of that type",
+        "You have already shot at this field": "You have already shot at this field"
     }
 }

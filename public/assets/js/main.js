@@ -156,16 +156,16 @@ function switchShips() {
     setTimeout(() => {
         switch (selectedShip) {
             case 0:
-                $("#selectedShip").html("Jednomasztowiec");
+                $("#selectedShip").html(window.locale["Single-masted"]);
                 break;
             case 1:
-                $("#selectedShip").html("Dwumasztowiec");
+                $("#selectedShip").html(window.locale["Two-masted"]);
                 break;
             case 2:
-                $("#selectedShip").html("Trójmasztowiec");
+                $("#selectedShip").html(window.locale["Three-masted"]);
                 break;
             case 3:
-                $("#selectedShip").html("Czteromasztowiec");
+                $("#selectedShip").html(window.locale["Four-masted"]);
                 break;
         }
 

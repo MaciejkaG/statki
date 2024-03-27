@@ -144,14 +144,12 @@ socket.on("ship sunk", (victimIdx, ship) => {
     let l = !ship.type ? ship.type + 1 : ship.type + 2;
     if (victimIdx === playerIdx) {
         for (let i = 0; i < l; i++) {
-            console.log("ourship");
             setTimeout(() => {
                 bsc.setField(ship.posX + multips[0] * i, ship.posY + multips[1] * i, "sunken");
             }, i * 150);
         }
     } else {
         for (let i = 0; i < l; i++) {
-            console.log("theirship");
             setTimeout(() => {
                 bsc.setFieldEnemy(ship.posX + multips[0] * i, ship.posY + multips[1] * i, "sunken");
             }, i * 150);
@@ -174,8 +172,8 @@ var updateTimer = setInterval(() => {
             $("#timer").removeClass("active");
         }
 
-        const minutes = Math.floor(time / 60).toLocaleString('pl-PL', { minimumIntegerDigits: 2, useGrouping: false });
-        const seconds = (time - minutes * 60).toLocaleString('pl-PL', { minimumIntegerDigits: 2, useGrouping: false });
+        const minutes = Math.floor(time / 60).toLocaleString(undefined, { minimumIntegerDigits: 2, useGrouping: false });
+        const seconds = (time - minutes * 60).toLocaleString(undefined, { minimumIntegerDigits: 2, useGrouping: false });
 
         $("#timer").html(`${minutes}:${seconds}`);
     }
@@ -200,7 +198,7 @@ socket.on("game finished", (winnerIdx, oppName) => {
 });
 
 socket.on('connect', () => {
-    $(".cover .title").html("Oczekiwanie na serwer...");
+    $(".cover .title").html(window.locale["Waiting for the server"]);
 });
 
 socket.on("players ready", () => {
@@ -213,12 +211,12 @@ socket.on("player idx", (idx) => {
 
 socket.on('turn update', (turnData) => {
     if (turnData.phase === "preparation") {
-        $("#whosTurn").html("Faza przygotowań");
+        $("#whosTurn").html(window.locale["Preparation phase"]);
         $(".boardSwitch").css("opacity", 0.3);
     } else {
         postPrep = true;
         myTurn = turnData.turn === playerIdx;
-        turnData.turn === playerIdx ? $("#whosTurn").html("Twoja tura") : $("#whosTurn").html("Tura przeciwnika");
+        turnData.turn === playerIdx ? $("#whosTurn").html(window.locale["Your turn"]) : $("#whosTurn").html(window.locale["Opponents turn"]);
         $(".boardSwitch").css("opacity", 1);
     }
 
@@ -230,8 +228,3 @@ socket.on('turn update', (turnData) => {
 socket.on('player left', () => {
     window.location.replace("/");
 });
-
-// Profile stats: SELECT ROUND((AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.nickname = "MaciejkaG";
-// Match history: SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = "c231c4f7-e179-11ee-920b-fa163e32c013";
-// Profile: SELECT nickname, account_creation FROM accounts WHERE user_id = "c231c4f7-e179-11ee-920b-fa163e32c013";
-// Badges: SELECT badge, achievement_date FROM badges WHERE user_id = "c231c4f7-e179-11ee-920b-fa163e32c013";

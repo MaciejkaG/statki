@@ -1,9 +1,9 @@
 <div class="cover">
-    <h1 class="title">Łączenie...</h1>
+    <h1 class="title">{{ t 'board.Connecting' }}</h1>
     <div class="dialog">
         <h1 id="state"></h1>
         <h3 id="opponent"></h3>
-        <button onclick="window.location.href = '/'">Powróć do menu</button>
+        <button onclick="window.location.href = '/'">{{ t 'board.Back to menu' }}</button>
     </div>
 </div>
 
@@ -13,20 +13,20 @@
         <div class="panelContainer">
             <div class="shapes">
                 <div class="ownBoardInfo">
-                    <h3>Wybrany statek</h3>
-                    <h2 class="dynamic" id="selectedShip">Jednomasztowiec</h2>
-                    <h3>Dostępne: <span class="dynamic danger" id="shipsLeft">1</span></h3>
+                    <h3>{{ t 'board.Selected ship' }}</h3>
+                    <h2 class="dynamic" id="selectedShip">{{ t 'board.Single-masted' }}</h2>
+                    <h3>{{ t 'board.Available:' }} <span class="dynamic danger" id="shipsLeft">-</span></h3>
                 </div>
                 <span class="break"></span>
                 <div class="controls">
-                    <h2>Sterowanie</h2>
-                    <h3 class="controlsOwnBoard"><span class="important">S</span> Zmiana statku</h3>
-                    <h3 class="controlsOwnBoard"><span class="important">R</span> Obrót statku</h3>
-                    <h3 class="boardSwitch"><span class="important">B</span> Zamiana planszy</h3>
+                    <h2>{{ t 'board.Controls' }}</h2>
+                    <h3 class="controlsOwnBoard"><span class="important">S</span> {{ t 'board.Change ship' }}</h3>
+                    <h3 class="controlsOwnBoard"><span class="important">R</span> {{ t 'board.Rotate ship' }}</h3>
+                    <h3 class="boardSwitch"><span class="important">B</span> {{ t 'board.Change boards' }}</h3>
                 </div>
                 <div class="mobileControls">
-                    <button class="controlsOwnBoard" onclick="switchShips()">Zmiana statku</button>
-                    <button class="boardSwitch" onclick="switchBoards()">Zmiana planszy</button>
+                    <button class="controlsOwnBoard" onclick="switchShips()">{{ t 'board.Change ship' }}</button>
+                    <button class="boardSwitch" onclick="switchBoards()">{{ t 'board.Change boards' }}</button>
                 </div>
                 <span class="break"></span>
                 <h3><span class="dynamic" id="whosTurn"></span></h3>
@@ -49,6 +49,29 @@
 <div id="secondaryTippyTemplate" class="tippyTemplate">
     <button class="tippyBtn" style="background-color: var(--danger)" onclick="manualShoot([[FIELDPOS]])"><span class="material-symbols-outlined">ads_click</span></button>
 </div>
+
+<script>
+    window.locale = {
+        "Waiting for the server": "{{ t 'board.Waiting for the server' }}",
+
+        "Reconnecting": "{{ t 'errors.Reconnecting' }}",
+        "Reconnected": "{{ t 'errors.Reconnected' }}",
+        "Reconnection error occured": "{{ t 'errors.Reconnection error occured' }}",
+        "Reconnection failed": "{{ t 'errors.Reconnection failed' }}",
+        "Disconnected": "{{ t 'errors.Disconnected' }}",
+        "Try to refresh the page if this error reoccurs": "{{ t 'errors.Try to refresh the page if this error reoccurs' }}",
+        "Connection error": "{{ t 'errors.Connection error' }}",
+
+        "Single-masted": "{{ t 'board.Single-masted' }}",
+        "Two-masted": "{{ t 'board.Two-masted' }}",
+        "Three-masted": "{{ t 'board.Three-masted' }}",
+        "Four-masted": "{{ t 'board.Four-masted' }}",
+
+        "Preparation phase": "{{ t 'board.Preparation phase' }}",
+        "Your turn": "{{ t 'board.Your turn' }}",
+        "Opponents turn": "{{ t 'board.Opponents turn' }}",
+    };
+</script>
 
 <script src="/assets/js/battleships-lib.js"></script>
 <script src="/assets/js/main.js"></script>

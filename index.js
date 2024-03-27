@@ -6,16 +6,16 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { v4 as uuidv4, validate } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import session from "express-session";
 import { engine } from 'express-handlebars';
 import { createClient } from 'redis';
 import * as bships from './utils/battleships.js';
 import { MailAuth } from './utils/auth.js';
+import { Lang } from './utils/localisation.js';
 import { rateLimit } from 'express-rate-limit';
 import { RedisStore as LimiterRedisStore } from 'rate-limit-redis';
 import SessionRedisStore from 'connect-redis';
-import { I18n } from 'i18n';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,11 +36,6 @@ const io = new Server(server);
 const redis = createClient();
 redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
-
-const i18n = new I18n({
-    locales: ['en', 'pl'],
-    directory: path.join(__dirname, 'lang')
-});
 
 const limiter = rateLimit({
     windowMs: 40 * 1000,
@@ -93,26 +88,47 @@ io.engine.use(sessionMiddleware);
 app.get('/', async (req, res) => {
     let login = loginState(req);
 
+    const locale = new Lang(req.acceptsLanguages());
+
     if (login != 2) {
         res.redirect('/login');
     } else if (req.session.nickname == null) {
         auth.getNickname(req.session.userId).then(nickname => {
             if (nickname != null) {
+                req.session.langs = req.acceptsLanguages();
                 req.session.nickname = nickname;
-                res.render('index');
+
+                res.render('index', {
+                    helpers: {
+                        t: (key) => { return locale.t(key) }
+                    }
+                });
             } else {
                 res.redirect('/nickname');
             }
         });
     } else {
-        res.render('index');
+        req.session.langs = req.acceptsLanguages();
+
+        res.render('index', {
+            helpers: {
+                t: (key) => { return locale.t(key) }
+            }
+        });
     }
 });
 
 app.get('/login', (req, res) => {
     let login = loginState(req);
+
+    const locale = new Lang(req.acceptsLanguages());
+
     if (!login) {
-        res.render('login');
+        res.render('login', {
+            helpers: {
+                t: (key) => { return locale.t(key) }
+            }
+        });
     } else if (login == 1) {
         res.redirect('/auth');
     } else {
@@ -122,10 +138,17 @@ app.get('/login', (req, res) => {
 
 app.get('/auth', (req, res) => {
     let login = loginState(req);
+
+    const locale = new Lang(req.acceptsLanguages());
+
     if (!login) { // Niezalogowany
         res.redirect('/login');
     } else if (login == 1) { // W trakcie autoryzacji
-        res.render('auth');
+        res.render('auth', {
+            helpers: {
+                t: (key) => { return locale.t(key) }
+            }
+        });
     } else { // Zalogowany
         res.redirect('/auth');
     }
@@ -133,15 +156,23 @@ app.get('/auth', (req, res) => {
 
 app.get('/nickname', (req, res) => {
     let login = loginState(req);
+
+    const locale = new Lang(req.acceptsLanguages());
+
     if (!login) { // Niezalogowany
         res.redirect('/login');
     } else {
-        res.render('setup');
+        res.render('setup', {
+            helpers: {
+                t: (key) => { return locale.t(key) }
+            }
+        });
     }
 });
 
 app.post('/api/login', (req, res) => {
     let login = loginState(req);
+
     if (login == 2) {
         res.redirect('/');
     } else if (login == 0 && req.body.email != null && validateEmail(req.body.email)) {
@@ -164,19 +195,25 @@ app.post('/api/login', (req, res) => {
                 res.sendStatus(500);
             }
         }).catch((err) => {
+            const locale = new Lang(req.acceptsLanguages());
+
             res.render("error", {
                 helpers: {
                     error: "Wystąpił nieznany błąd logowania",
-                    fallback: "/login"
+                    fallback: "/login",
+                    t: (key) => { return locale.t(key) }
                 }
             });
             throw err;
         });
     } else {
+        const locale = new Lang(req.acceptsLanguages());
+
         res.render("error", {
             helpers: {
                 error: "Niepoprawny adres e-mail",
-                fallback: "/login"
+                fallback: "/login",
+
             }
         });
     }
@@ -192,18 +229,24 @@ app.post('/api/auth', async (req, res) => {
             req.session.loggedIn = 2;
             res.redirect('/');
         } else {
+            const locale = new Lang(req.acceptsLanguages());
+
             res.render("error", {
                 helpers: {
                     error: "Niepoprawny kod logowania",
-                    fallback: "/auth"
+                    fallback: "/auth",
+                    t: (key) => { return locale.t(key) }
                 }
             });
         }
     } else {
+        const locale = new Lang(req.acceptsLanguages());
+
         res.render("error", {
             helpers: {
                 error: "Niepoprawny kod logowania",
-                fallback: "/login"
+                fallback: "/login",
+                t: (key) => { return locale.t(key) }
             }
         });
     }
@@ -222,6 +265,9 @@ app.post('/api/nickname', (req, res) => {
 });
 
 app.get('/game', async (req, res) => {
+
+    const locale = new Lang(req.acceptsLanguages());
+
     const game = await redis.json.get(`game:${req.query.id}`);
     if (req.session.nickname == null) {
         res.redirect('/setup');
@@ -229,11 +275,16 @@ app.get('/game', async (req, res) => {
         res.render("error", {
             helpers: {
                 error: "Nie znaleziono wskazanej gry",
-                fallback: "/"
+                fallback: "/",
+                t: (key) => { return locale.t(key) }
             }
         });
     } else {
-        res.render('board');
+        res.render('board', {
+            helpers: {
+                t: (key) => { return locale.t(key) }
+            }
+        });
     }
 });
 
@@ -428,9 +479,13 @@ io.on('connection', async (socket) => {
                 let shipAvailable = bships.getShipsAvailable(playerShips)[type] > 0;
 
                 if (!canPlace) {
-                    socket.emit("toast", "Nie możesz postawić tak statku");
+                    const locale = new Lang(session.langs);
+
+                    socket.emit("toast", locale.t("board.You cannot place a ship like this"));
                 } else if (!shipAvailable) {
-                    socket.emit("toast", "Nie masz już statków tego typu");
+                    const locale = new Lang(session.langs);
+
+                    socket.emit("toast", locale.t("board.You have ran out of ships of that type"));
                 } else {
                     await GInfo.placeShip(socket, { type: type, posX: posX, posY: posY, rot: rot, hits: Array.from(new Array(type+1), () => false) });
                     socket.emit("placed ship", { type: type, posX: posX, posY: posY, rot: rot });
@@ -491,7 +546,9 @@ io.on('connection', async (socket) => {
                             return;
                         }
                     } else if (hit.status === -1) {
-                        socket.emit("toast", "Już strzeliłeś w to miejsce");
+                        const locale = new Lang(session.langs);
+
+                        socket.emit("toast", locale.t("You have already shot at this field"));
                         return;
                     }
 

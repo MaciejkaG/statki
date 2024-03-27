@@ -63,6 +63,7 @@ nav span:hover {
     background-color: black;
     border: solid 1px white;
     border-radius: 15px;
+    padding: 0.5rem 1rem;
     user-select: none;
     cursor: pointer;
     transition: all 0.3s;
@@ -87,6 +88,7 @@ nav span:hover {
     background-color: black;
     border: solid 1px white;
     border-radius: 15px;
+    padding: 0.5rem 1rem;
     user-select: none;
     cursor: pointer;
     transition: all 0.3s;
