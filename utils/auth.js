@@ -88,6 +88,21 @@ export class MailAuth {
         });
     }
 
+    getLanguage(userId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            conn.query(`SELECT language FROM accounts WHERE user_id = ${conn.escape(userId)}`, (error, response) => {
+                if (error) { reject(error); return; }
+
+                if (response.length !== 0) {
+                    resolve(response[0].language);
+                } else {
+                    resolve(null);
+                }
+            });
+        });
+    }
+
     startVerification(email, ip, agent) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);

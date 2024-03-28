@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-const flags = process.env.flags.split(",");
+const flags = process.env.flags ? process.env.flags.split(",") : null;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -88,32 +88,49 @@ io.engine.use(sessionMiddleware);
 app.get('/', async (req, res) => {
     let login = loginState(req);
 
-    const locale = new Lang(req.acceptsLanguages());
-
     if (login != 2) {
         res.redirect('/login');
     } else if (req.session.nickname == null) {
-        auth.getNickname(req.session.userId).then(nickname => {
-            if (nickname != null) {
-                req.session.langs = req.acceptsLanguages();
-                req.session.nickname = nickname;
-
-                res.render('index', {
-                    helpers: {
-                        t: (key) => { return locale.t(key) }
-                    }
-                });
+        auth.getLanguage(req.session.userId).then(language => {
+            var locale;
+            if (language) {
+                locale = new Lang([language]);
+                req.session.langs = [language];
             } else {
-                res.redirect('/nickname');
+                locale = new Lang(req.acceptsLanguages());
+                req.session.langs = req.acceptsLanguages();
             }
+
+            auth.getNickname(req.session.userId).then(nickname => {
+                if (nickname != null) {
+                    req.session.nickname = nickname;
+
+                    res.render('index', {
+                        helpers: {
+                            t: (key) => { return locale.t(key) }
+                        }
+                    });
+                } else {
+                    res.redirect('/nickname');
+                }
+            });
         });
     } else {
-        req.session.langs = req.acceptsLanguages();
-
-        res.render('index', {
-            helpers: {
-                t: (key) => { return locale.t(key) }
+        auth.getLanguage(req.session.userId).then(language => {
+            var locale;
+            if (language) {
+                locale = new Lang([language]);
+                req.session.langs = [language];
+            } else {
+                locale = new Lang(req.acceptsLanguages());
+                req.session.langs = req.acceptsLanguages();
             }
+
+            res.render('index', {
+                helpers: {
+                    t: (key) => { return locale.t(key) }
+                }
+            });
         });
     }
 });
@@ -637,5 +654,9 @@ function getIP(req) {
 }
 
 function checkFlag(key) {
-    return flags.includes(key);
+    if (flags) {
+        return flags.includes(key);
+    } else {
+        return false;
+    }
 }

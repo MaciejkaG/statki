@@ -12,7 +12,8 @@
     "menu": {
         "navbar": {
             "Main menu": "Main menu",
-            "Profile": "Profile"
+            "Profile": "Profile",
+            "Settings": "Settings"
         },
         "index": {
             "Select game mode": "Select game mode",
