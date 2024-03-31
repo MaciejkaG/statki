@@ -283,24 +283,44 @@ app.post('/api/nickname', (req, res) => {
 
 app.get('/game', async (req, res) => {
 
-    const locale = new Lang(req.acceptsLanguages());
-
     const game = await redis.json.get(`game:${req.query.id}`);
     if (req.session.nickname == null) {
         res.redirect('/setup');
     } else if (req.query.id == null || game == null || game.state == 'expired' || req.session.activeGame == null) {
-        res.render("error", {
-            helpers: {
-                error: "Nie znaleziono wskazanej gry",
-                fallback: "/",
-                t: (key) => { return locale.t(key) }
+        auth.getLanguage(req.session.userId).then(language => {
+            var locale;
+            if (language) {
+                locale = new Lang([language]);
+                req.session.langs = [language];
+            } else {
+                locale = new Lang(req.acceptsLanguages());
+                req.session.langs = req.acceptsLanguages();
             }
+
+            res.render("error", {
+                helpers: {
+                    error: "Nie znaleziono wskazanej gry",
+                    fallback: "/",
+                    t: (key) => { return locale.t(key) }
+                }
+            });
         });
     } else {
-        res.render('board', {
-            helpers: {
-                t: (key) => { return locale.t(key) }
+        auth.getLanguage(req.session.userId).then(language => {
+            var locale;
+            if (language) {
+                locale = new Lang([language]);
+                req.session.langs = [language];
+            } else {
+                locale = new Lang(req.acceptsLanguages());
+                req.session.langs = req.acceptsLanguages();
             }
+
+            res.render('board', {
+                helpers: {
+                    t: (key) => { return locale.t(key) }
+                }
+            });
         });
     }
 });

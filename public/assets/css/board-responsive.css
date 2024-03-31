@@ -36,5 +36,9 @@
     body {
         overflow-x: hidden;
     }
+
+    .secondary {
+        transform: scale(0);
+    }
 }
 

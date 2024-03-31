@@ -45,6 +45,8 @@ $('#board .field').on('click', function () {
 });
 
 function manualPlace(posX, posY) {
+    hoveredShip = null;
+    refreshBoardView();
     socket.emit("place ship", selectedShip, posX, posY, shipRotation);
 }
 
@@ -56,6 +58,10 @@ $('#secondaryBoard .field').on('click', function () {
         }
     }
 });
+
+function manualShoot(posX, posY) {
+    socket.emit("shoot", posX, posY);
+}
 
 $('.field').on('contextmenu', function () {
     if ($(this).hasClass('active') && new Date().getTime() / 1000 - lastTimeClick > 0.3) {

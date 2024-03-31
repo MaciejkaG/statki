@@ -136,12 +136,16 @@ export class MailAuth {
 
                         authCode = authCode.slice(0, 4) + " " + authCode.slice(4);
 
+                        const lookup = geoip.lookup(ip);
+
+                        const lookupData = `User-Agent: ${agent}\nAdres IP: ${ip}\nKraj: ${lookup.country}\nRegion: ${lookup.region}\nMiasto: ${lookup.city}`;
+
                         try {
                             await this.mail.sendMail({
                                 from: this.mailFrom,
                                 to: email,
                                 subject: `${authCode} to twój kod autoryzacji do Statków`,
-                                html: html.replace("{{ CODE }}", authCode),
+                                html: html.replace("{{ CODE }}", authCode).replace("{{ LOOKUP }}", lookupData),
                             });
                         } catch (e) {
                             reject(e);
@@ -168,14 +172,19 @@ export class MailAuth {
 
                 const lookup = geoip.lookup(ip);
 
-                const lookupData = `User-Agent: ${agent}\nAdres IP: ${ip}\nKraj: ${lookup.country}\nRegion: ${lookup.region}\nMiasto: ${lookup.city}`
+                const lookupData = `User-Agent: ${agent}\nAdres IP: ${ip}\nKraj: ${lookup.country}\nRegion: ${lookup.region}\nMiasto: ${lookup.city}`;
 
-                await this.mail.sendMail({
-                    from: this.mailFrom,
-                    to: email,
-                    subject: `${authCode} to twój kod logowania do Statków`,
-                    html: html.replace("{{ NICKNAME }}", row.nickname).replace("{{ CODE }}", authCode).replace("{{ LOOKUP }}", lookupData),
-                });
+                try {
+                    await this.mail.sendMail({
+                        from: this.mailFrom,
+                        to: email,
+                        subject: `${authCode} to twój kod logowania do Statków`,
+                        html: html.replace("{{ NICKNAME }}", row.nickname).replace("{{ CODE }}", authCode).replace("{{ LOOKUP }}", lookupData),
+                    });
+                } catch (e) {
+                    reject(e);
+                }
+                
 
                 resolve({ status: 1, uid: row.user_id });
             });
