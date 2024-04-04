@@ -7,16 +7,22 @@ socket.on("joined", (nick) => {
     $("#oppNameField").html(nick);
     switchView("preparingGame");
     lockUI(false);
+
+    console.log("Player joined the game:", nick);
 });
 
 socket.on("player left", () => {
     lockUI(true);
     switchView("mainMenuView");
     lockUI(false);
+
+    console.log("Player left the game");
 });
 
 socket.on("gameReady", (gameId) => {
+    console.log("Game is ready, redirecting in 2 seconds. Game ID:", gameId);
     setTimeout(() => {
+        console.log("Redirecting...");
         window.location.replace("/game?id=" + gameId);
     }, 2000);
 });
@@ -58,19 +64,22 @@ socket.emit("my profile", (profile) => {
     }
 
     $(".matchList").html(matchHistoryDOM);
+    console.log("Profile data fetched successfully");
 });
 
 socket.emit("whats my nick", (myNickname) => {
     nickname = myNickname;
     $("#profileButton").html(nickname);
-    console.log(nickname);
+    console.log("Received player nickname:", myNickname);
 });
 
 $("#createGameButton").on("click", function () {
     lockUI(true);
+    console.log("Creating a lobby...");
     socket.emit("create lobby", (response) => {
         switch (response.status) {
             case "ok":
+                console.log("Lobby created");
                 $("#createGameCode").val(response.gameCode);
                 switchView("pvpCreateView");
                 returnLock = true;
@@ -78,12 +87,14 @@ $("#createGameButton").on("click", function () {
                 break;
 
             case "alreadyInLobby":
+                console.log("Lobby creation failed (player is already in a lobby)");
                 $("#createGameCode").val(response.gameCode);
                 switchView("pvpCreateView");
                 lockUI(false);
                 break;
 
             default:
+                console.log("Lobby creation failed (unknown)");
                 alert(`${window.locale["Unknown error occured"]}\n${window.locale["Status:"]} ${response.status}`);
                 lockUI(false);
                 break;
@@ -107,9 +118,11 @@ form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (input.value && input.value.length === 6) {
         lockUI(true);
+        console.log("Joining a lobby with code:", input.value);
         socket.emit("join lobby", input.value, (response) => {
             switch (response.status) {
                 case "ok":
+                    console.log("Joined a lobby by:", response.oppNickname);
                     $("#oppNameField").html(response.oppNickname);
                     switchView("preparingGame");
                     lockUI(false);

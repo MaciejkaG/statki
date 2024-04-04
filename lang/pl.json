@@ -113,6 +113,9 @@
 
         "You cannot place a ship like this": "Nie możesz tak postawić statku",
         "You have ran out of ships of that type": "Skończyły ci się statki tego typu",
-        "You have already shot at this field": "Już strzelałeś w to pole"
+        "You have already shot at this field": "Już strzelałeś w to pole",
+    
+        "Victory": "Zwycięstwo",
+        "Defeat": "Porażka"
     }
 }

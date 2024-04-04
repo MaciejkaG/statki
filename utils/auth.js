@@ -84,6 +84,8 @@ export class MailAuth {
                 const row = response[0];
 
                 resolve({ status: 1, uid: row.user_id });
+
+                conn.end();
             });
         });
     }
@@ -99,6 +101,8 @@ export class MailAuth {
                 } else {
                     resolve(null);
                 }
+
+                conn.end();
             });
         });
     }
@@ -187,6 +191,8 @@ export class MailAuth {
                 
 
                 resolve({ status: 1, uid: row.user_id });
+
+                conn.end();
             });
         });
     }
@@ -199,6 +205,8 @@ export class MailAuth {
                 else conn.query(`INSERT INTO statistics(match_id, user_id, board, won) VALUES (${conn.escape(matchId)}, ${conn.escape(hostId)}, ${conn.escape(JSON.stringify(boards[0]))}, ${conn.escape(winnerIdx == 0 ? 1 : 0)}), (${conn.escape(matchId)}, ${conn.escape(guestId)}, ${conn.escape(JSON.stringify(boards[1]))}, ${conn.escape(winnerIdx == 1 ? 1 : 0)})`, async (error, response) => {
                     if (error) reject(error);
                     else resolve();
+
+                    conn.end();
                 });
             });
         });
@@ -207,7 +215,7 @@ export class MailAuth {
     getProfile(userId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            conn.query(`SELECT nickname, account_creation FROM accounts WHERE user_id = ${conn.escape(userId)}; SELECT ROUND((AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.user_id = ${conn.escape(userId)}; SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = ${conn.escape(userId)} LIMIT 10;`, async (error, response) => {
+            conn.query(`SELECT nickname, account_creation FROM accounts WHERE user_id = ${conn.escape(userId)}; SELECT ROUND((AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.user_id = ${conn.escape(userId)}; SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = ${conn.escape(userId)} ORDER BY matches.date DESC LIMIT 10;`, async (error, response) => {
                 if (error) reject(error);
                 else {
                     if (response[0].length === 0 || response[1].length === 0) {
@@ -219,6 +227,8 @@ export class MailAuth {
 
                     resolve({ profile, stats, matchHistory });
                 }
+
+                conn.end();
             });
         });
     }
@@ -241,6 +251,8 @@ export class MailAuth {
             conn.query(`UPDATE accounts SET nickname = ${conn.escape(nickname)} WHERE user_id = ${conn.escape(uid)}`, (error) => {
                 if (error) reject(error);
                 resolve();
+
+                conn.end();
             });
         });
     }
@@ -251,6 +263,8 @@ export class MailAuth {
             conn.query(`SELECT nickname FROM accounts WHERE user_id = ${conn.escape(uid)}`, (error, response) => {
                 if (error) reject(error);
                 resolve(response[0].nickname);
+
+                conn.end();
             });
         });
     }

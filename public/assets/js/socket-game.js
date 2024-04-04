@@ -15,7 +15,16 @@ if ($(window).width() <= 820) {
         animation: "shift-toward-subtle",
         interactive: true,
         content: (reference) => {
+            // Need to fix this
+
+            console.log("a");
             let fieldData = `${$(reference).data('pos-x')}, ${$(reference).data('pos-y')}`;
+
+            let pos = occupiedFields.find((elem) => elem.pos[0] == $(reference).data('pos-x') && elem.pos[1] == $(reference).data('pos-y'));
+
+            if (pos) {
+                return $('#removeTippyTemplate').html().replaceAll("[[FIELDPOS]]", fieldData);
+            }
 
             return $('#mainTippyTemplate').html().replaceAll("[[FIELDPOS]]", fieldData);
         },
@@ -39,6 +48,8 @@ $('#board .field').on('click', function () {
     if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {
         if ($(window).width() > 820) {
             socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
+
+            navigator.vibrate(200);
             lastTimeClick = new Date().getTime() / 1000;
         }
     }
@@ -48,12 +59,15 @@ function manualPlace(posX, posY) {
     hoveredShip = null;
     refreshBoardView();
     socket.emit("place ship", selectedShip, posX, posY, shipRotation);
+    lastTimeClick = new Date().getTime() / 1000;
 }
 
 $('#secondaryBoard .field').on('click', function () {
     if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {
         if ($(window).width() > 820) {
             socket.emit("shoot", $(this).data('pos-x'), $(this).data('pos-y'));
+            
+            navigator.vibrate(200);
             lastTimeClick = new Date().getTime() / 1000;
         }
     }
@@ -61,16 +75,28 @@ $('#secondaryBoard .field').on('click', function () {
 
 function manualShoot(posX, posY) {
     socket.emit("shoot", posX, posY);
+    lastTimeClick = new Date().getTime() / 1000;
 }
 
 $('.field').on('contextmenu', function () {
     if ($(this).hasClass('active') && new Date().getTime() / 1000 - lastTimeClick > 0.3) {
-        let originPos = occupiedFields.find((elem) => elem.pos[0] == $(this).data('pos-x') && elem.pos[1] == $(this).data('pos-y')).origin;
+        let pos = occupiedFields.find((elem) => elem.pos[0] == $(this).data('pos-x') && elem.pos[1] == $(this).data('pos-y'));
 
-        socket.emit("remove ship", originPos[0], originPos[1]);
-        lastTimeClick = new Date().getTime() / 1000;
+        if (pos) {
+            socket.emit("remove ship", pos.origin[0], pos.origin[1]);
+            lastTimeClick = new Date().getTime() / 1000;
+        }
     }
 });
+
+function manualRemove(posX, posY) {
+    let pos = occupiedFields.find((elem) => elem.pos[0] == posX && elem.pos[1] == posY);
+
+    if (pos) {
+        socket.emit("remove ship", pos.origin[0], pos.origin[1]);
+        lastTimeClick = new Date().getTime() / 1000;
+    }
+}
 
 socket.on('toast', (msg) => {
     Toastify({
@@ -170,7 +196,7 @@ var updateTimer = setInterval(() => {
     } else {
         const UTCNow = Math.floor((new Date()).getTime() / 1000);
 
-        const time = Math.abs(UTCNow - timerDestination);
+        const time = Math.max(timerDestination - UTCNow, 0);
 
         if (time < 10) {
             $("#timer").addClass("active");
@@ -190,10 +216,10 @@ socket.on("game finished", (winnerIdx, oppName) => {
     $("#opponent").html(`Vs. <span class="important">${oppName}</span>`);
 
     if (winnerIdx === playerIdx) {
-        $("#state").html("Zwycięstwo");
+        $("#state").html(locale["Victory"]);
         $("#state").addClass("dynamic");
     } else {
-        $("#state").html("Porażka");
+        $("#state").html(locale["Defeat"]);
         $("#state").addClass("danger");
     }
 
@@ -228,7 +254,6 @@ socket.on('turn update', (turnData) => {
 
     timerDestination = turnData.timerToUTC;
     gamePhase = turnData.phase;
-    refreshBoardView();
 });
 
 socket.on('player left', () => {

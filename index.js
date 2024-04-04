@@ -510,7 +510,7 @@ io.on('connection', async (socket) => {
         socket.on('place ship', async (type, posX, posY, rot) => {
             const playerGame = await GInfo.getPlayerGameData(socket);
 
-            if (playerGame.data.state === 'preparation') {
+            if (playerGame && playerGame.data.state === 'preparation') {
                 const playerShips = await GInfo.getPlayerShips(socket);
                 let canPlace = bships.validateShipPosition(playerShips, type, posX, posY, rot);
                 let shipAvailable = bships.getShipsAvailable(playerShips)[type] > 0;
@@ -534,7 +534,7 @@ io.on('connection', async (socket) => {
         socket.on('remove ship', async (posX, posY) => {
             const playerGame = await GInfo.getPlayerGameData(socket);
 
-            if (playerGame.data.state === 'preparation') {
+            if (playerGame && playerGame.data.state === 'preparation') {
                 const deletedShip = await GInfo.removeShip(socket, posX, posY);
                 socket.emit("removed ship", { posX: posX, posY: posY, type: deletedShip.type });
                 await GInfo.incrStat(socket, 'placedShips', -1);
@@ -544,7 +544,7 @@ io.on('connection', async (socket) => {
         socket.on('shoot', async (posX, posY) => {
             let playerGame = await GInfo.getPlayerGameData(socket);
 
-            if (playerGame.data.state === 'action') {
+            if (playerGame && playerGame.data.state === 'action') {
                 if (bships.checkTurn(playerGame.data, socket.session.id)) {
                     const enemyIdx = socket.session.id === playerGame.data.hostId ? 1 : 0;
 

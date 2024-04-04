@@ -46,6 +46,10 @@
     <button class="tippyBtn" style="background-color: var(--important)" onclick="switchRotation()"><span class="material-symbols-outlined">refresh</span></button>
 </div>
 
+<div id="removeTippyTemplate" class="tippyTemplate">
+    <button class="tippyBtn" style="background-color: var(--danger)" onclick="manualRemove([[FIELDPOS]])"><span class="material-symbols-outlined">delete</span></button>
+</div>
+
 <div id="secondaryTippyTemplate" class="tippyTemplate">
     <button class="tippyBtn" style="background-color: var(--danger)" onclick="manualShoot([[FIELDPOS]])"><span class="material-symbols-outlined">ads_click</span></button>
 </div>
@@ -66,6 +70,9 @@
         "Two-masted": "{{ t 'board.Two-masted' }}",
         "Three-masted": "{{ t 'board.Three-masted' }}",
         "Four-masted": "{{ t 'board.Four-masted' }}",
+
+        "Victory": "{{ t 'board.Victory' }}",
+        "Defeat": "{{ t 'board.Defeat' }}",
 
         "Preparation phase": "{{ t 'board.Preparation phase' }}",
         "Your turn": "{{ t 'board.Your turn' }}",
