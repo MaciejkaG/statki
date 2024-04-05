@@ -29,7 +29,38 @@ socket.on("gameReady", (gameId) => {
 
 var nickname;
 
+socket.emit('locale options', (langs) => {
+    console.log("Fetching available locale options");
+    let menu = "";
+    langs.forEach(lang => {
+        menu += `<option value="${lang.id}">${lang.name}</option>`;
+    });
+
+    $("#languages").html(menu);
+    console.log("Locale options fetched");
+});
+
+$("#languages").on("change", function() {
+    lockUI(true);
+    console.log("Switching language to", $(this).val());
+    socket.emit("change locale", $(this).val(), (response) => {
+        switch (response.status) {
+            case "ok":
+                console.log("Switched languages, refreshing");
+                window.location.reload();
+                break;
+
+            default:
+                alert(`${window.locale["Unknown error occured"]}\n${window.locale["Status:"]} ${response.status}`);
+                lockUI(false);
+                break;
+        }
+    });
+});
+
 socket.emit("my profile", (profile) => {
+    console.log("Received user data. UID:", profile.uid);
+
     // General profile data
     let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     $("#playerSince").html(new Date(profile.profile.account_creation).toLocaleDateString(undefined, options));
@@ -59,7 +90,7 @@ socket.emit("my profile", (profile) => {
         matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "AI"}</span></div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
     }
 
-    if (matchHistoryDOM === "") {
+    if (!matchHistoryDOM) {
         matchHistoryDOM = `<h2>${window.locale["No matches played"]}</h2>`;
     }
 

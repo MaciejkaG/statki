@@ -93,9 +93,14 @@
     </div>
 </div>
 
-<div class="container" id="settingsView" data-path="/match">
+<div class="container" id="settingsView" data-path="/settings">
     <div>
-        
+        <h1>{{ t 'menu.Settings.Settings' }}</h1>
+        <h2>{{ t 'menu.Settings.General' }}</h2>
+        <label for="language">Language: </label>
+        <select name="language" id="languages">
+            
+        </select>
     </div>
 </div>
 
@@ -106,6 +111,7 @@
         "Victory": "{{ t 'menu.Profile.Victory' }}",
         "Defeat": "{{ t 'menu.Profile.Defeat' }}",
         "Click to view match statistics": "{{ t 'menu.Profile.Click to view match statistics' }}",
+        "No matches played": "{{ t 'menu.Profile.No matches played' }}",
 
         "Reconnecting": "{{ t 'errors.Reconnecting' }}",
         "Reconnected": "{{ t 'errors.Reconnected' }}",

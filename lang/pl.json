@@ -43,7 +43,7 @@
         "PvP/Loading": {
             "PvP / Loading": "PvP / Wczytywanie",
             "Wait": "Czekaj...",
-            "You will be redirected soon": "Wkrótce zostaniesz przekierowany(-a)",
+            "You will be redirected soon": "Wkrótce nastąpi przekierowanie",
             "Opponent:": "Przeciwnik"
         },
         "Profile": {
@@ -56,9 +56,11 @@
             "total matches played": "meczy zagranych łącznie",
             "winrate": "winrate",
 
-            "No matches played": "Nie zagrano meczy"
+            "No matches played": "Nie zagrano żadnych meczy"
         },
-
+        "Settings": {
+            "General": "Ogólne"
+        },
         "General": {
             "Unknown error occured": "Wystąpił nieznany błąd",
             "Status:": "Status:"

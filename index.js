@@ -16,6 +16,7 @@ import { Lang } from './utils/localisation.js';
 import { rateLimit } from 'express-rate-limit';
 import { RedisStore as LimiterRedisStore } from 'rate-limit-redis';
 import SessionRedisStore from 'connect-redis';
+import mysql from 'mysql';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +24,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 const flags = process.env.flags ? process.env.flags.split(",") : null;
+
+const langs = [{ id: "en", name: "English" }, { id: "pl", name: "Polish" }];
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -93,6 +96,9 @@ app.get('/', async (req, res) => {
     } else if (req.session.nickname == null) {
         auth.getLanguage(req.session.userId).then(language => {
             var locale;
+
+            req.session.autoLang = language == null ? true : false;
+
             if (language) {
                 locale = new Lang([language]);
                 req.session.langs = [language];
@@ -351,8 +357,45 @@ io.on('connection', async (socket) => {
 
         socket.on('my profile', (callback) => {
             auth.getProfile(session.userId).then((profile) => {
+                profile.uid = session.userId;
                 callback(profile);
             });
+        });
+
+        socket.on('locale options', (callback) => {
+            const locale = new Lang(session.langs);
+
+            let userLanguage = langs.find((element) => element.id == locale.lang);
+            let userLangs = langs.filter((element) => element.id != locale.lang);
+
+            if (session.autoLang) {
+                userLangs.unshift(userLanguage);
+                userLangs.unshift({ id: "null", name: "Auto" });
+            } else {
+                userLangs.unshift({ id: "null", name: "Auto" });
+                userLangs.unshift(userLanguage);
+            }
+
+            callback(userLangs);
+        });
+
+        socket.on('change locale', (locale, callback) => {
+            if (locale === "null" || langs.find((element) => element.id == locale)) {
+                locale = locale === "null" ? null : locale;
+                const conn = mysql.createConnection({ host: process.env.db_host, user: process.env.db_user, password: process.env.db_pass, database: 'statki' });
+                conn.query(`UPDATE accounts SET language = ${conn.escape(locale)} WHERE user_id = ${conn.escape(session.userId)}`, (err) => {
+                    if (err) { callback({ status: 'dbErr' }); return; }
+                    else callback({ status: 'ok' });
+
+                    req.session.reload((err) => {
+                        if (err) return socket.disconnect();
+
+                        req.session.autoLang = locale ? false : true;
+                        req.session.save();
+                    });
+                });
+                conn.end();
+            }
         });
 
         socket.on('create lobby', (callback) => {

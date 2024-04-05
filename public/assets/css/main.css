@@ -246,8 +246,6 @@ nav span:hover {
     flex-direction: column;
     gap: 2rem;
     flex: 2;
-
-    overflow-y: scroll;
 }
 
 #profileView .matchList::-webkit-scrollbar {
@@ -323,4 +321,20 @@ nav span:hover {
 
 .tippyTemplate {
     display: none;
+}
+
+#settingsView label {
+    font-size: 1.2rem;
+}
+
+#settingsView select {
+    padding: 0.5rem 1rem;
+    padding: 0.5rem 2rem;
+    font-size: 1rem;
+    background-color: black;
+    border: solid 1px white;
+    color: white;
+    border-radius: 15px;
+    outline: none;
+    margin-left: 2rem;
 }

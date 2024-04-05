@@ -84,9 +84,9 @@ export class MailAuth {
                 const row = response[0];
 
                 resolve({ status: 1, uid: row.user_id });
-
-                conn.end();
             });
+
+            conn.end();
         });
     }
 
@@ -101,9 +101,9 @@ export class MailAuth {
                 } else {
                     resolve(null);
                 }
-
-                conn.end();
             });
+
+            conn.end();
         });
     }
 
@@ -191,9 +191,9 @@ export class MailAuth {
                 
 
                 resolve({ status: 1, uid: row.user_id });
-
-                conn.end();
             });
+
+            conn.end();
         });
     }
 
@@ -205,10 +205,10 @@ export class MailAuth {
                 else conn.query(`INSERT INTO statistics(match_id, user_id, board, won) VALUES (${conn.escape(matchId)}, ${conn.escape(hostId)}, ${conn.escape(JSON.stringify(boards[0]))}, ${conn.escape(!winnerIdx ? 1 : 0)}), (${conn.escape(matchId)}, ${conn.escape(guestId)}, ${conn.escape(JSON.stringify(boards[1]))}, ${conn.escape(winnerIdx ? 1 : 0)})`, async (error, response) => {
                     if (error) reject(error);
                     else resolve();
-
-                    conn.end();
                 });
             });
+
+            conn.end();
         });
     }
 
@@ -227,9 +227,9 @@ export class MailAuth {
 
                     resolve({ profile, stats, matchHistory });
                 }
-
-                conn.end();
             });
+
+            conn.end();
         });
     }
 
@@ -251,9 +251,9 @@ export class MailAuth {
             conn.query(`UPDATE accounts SET nickname = ${conn.escape(nickname)} WHERE user_id = ${conn.escape(uid)}`, (error) => {
                 if (error) reject(error);
                 resolve();
-
-                conn.end();
             });
+
+            conn.end();
         });
     }
 
@@ -263,9 +263,9 @@ export class MailAuth {
             conn.query(`SELECT nickname FROM accounts WHERE user_id = ${conn.escape(uid)}`, (error, response) => {
                 if (error) reject(error);
                 resolve(response[0].nickname);
-
-                conn.end();
             });
+
+            conn.end();
         });
     }
 }

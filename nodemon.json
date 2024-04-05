@@ -2,6 +2,7 @@
     "ignore": [
         "public/*",
         "views/*",
-        "utils/mail/*"
+        "utils/mail/*",
+        "lang/*"
     ]
 }
