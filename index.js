@@ -632,8 +632,8 @@ function endGame(gameId) {
         for (let i = 0; i < members.length; i++) {
             const sid = members[i][0];
             const socket = io.sockets.sockets.get(sid);
-            resetUserGame(socket.request);
             socket.leave(gameId);
+            resetUserGame(socket.request);
         }
     }
 
