@@ -46,7 +46,6 @@ export class GameInfo {
         const boards = await this.redis.json.get(`game:${socket.session.activeGame}`, { path: ".boards" });
         let stats = [];
 
-        console.log(boards);
         boards.forEach(board => {
             stats.push(board.stats);            
         });
@@ -98,6 +97,113 @@ export class GameInfo {
 
         const playerIdx = socket.request.session.id === hostId ? 0 : 1;
         await this.redis.json.arrAppend(key, `.boards[${playerIdx}].ships`, shipData);
+    }
+
+    async depleteShips(socket) {
+        const gameId = socket.session.activeGame;
+        const key = `game:${gameId}`;
+        const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
+
+        const playerIdx = socket.request.session.id === hostId ? 0 : 1;
+
+        var playerShips = (await this.redis.json.get(key, { path: `.boards[${playerIdx}].ships` }));
+
+        const availableShips = getShipsAvailable(playerShips);
+
+        const boardRender = [];
+        const subtrahents = [[0, 0], [0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [-1, -1], [1, -1], [-1, 1]];
+
+        for (let i = 0; i < 10; i++) {
+            var array = [];
+            for (let i = 0; i < 10; i++) {
+                array.push(false);
+            }
+            boardRender.push(array);
+        }
+
+        playerShips.forEach(ship => {
+            let multips;
+
+            switch (ship.rot) {
+                case 0:
+                    multips = [1, 0];
+                    break;
+
+                case 1:
+                    multips = [0, 1];
+                    break;
+
+                case 2:
+                    multips = [-1, 0];
+                    break;
+
+                case 3:
+                    multips = [0, -1];
+                    break;
+            }
+
+            for (let i = 0; i <= ship.type; i++) {
+                for (let l = 0; l < subtrahents.length; l++) {
+                    const idxX = ship.posX - subtrahents[l][0] + multips[0] * i;
+                    const idxY = ship.posY - subtrahents[l][1] + multips[1] * i;
+                    if (!(idxX < 0 || idxX > 9 || idxY < 0 || idxY > 9)) {
+                        boardRender[idxX][idxY] = true;
+                    }
+                }
+            }
+        });
+
+        const placedShips = [];
+
+        for (let i = 0; i < availableShips.length; i++) {
+            let availableShipsOfType = availableShips[i];
+            for (let j = 0; j < availableShipsOfType; j++) {
+                playerShips = (await this.redis.json.get(key, { path: `.boards[${playerIdx}].ships` }));
+                for (let y = 0; y < 10; y++) {
+                    let row = "";
+                    for (let x = 0; x < 10; x++) {
+                        row += `${boardRender[x][y] ? "\x1b[31m" : "\x1b[32m"}${boardRender[x][y]}\x1b[0m\t`;
+                    }
+                }
+                const search = findEmptyFields(boardRender, i+1);
+
+                const rPos = search[Math.floor(Math.random() * search.length)];
+
+                placedShips.push({ type: i, posX: rPos.posX, posY: rPos.posY, rot: rPos.rot });
+                await this.redis.json.arrAppend(key, `.boards[${playerIdx}].ships`, { type: i, posX: rPos.posX, posY: rPos.posY, rot: rPos.rot, hits: Array.from(new Array(i + 1), () => false) });
+                let multips;
+
+                switch (rPos.rot) {
+                    case 0:
+                        multips = [1, 0];
+                        break;
+
+                    case 1:
+                        multips = [0, 1];
+                        break;
+
+                    case 2:
+                        multips = [-1, 0];
+                        break;
+
+                    case 3:
+                        multips = [0, -1];
+                        break;
+                }
+
+                for (let k = 0; k <= i; k++) {
+                    for (let l = 0; l < subtrahents.length; l++) {
+                        const idxX = rPos.posX - subtrahents[l][0] + multips[0] * k;
+                        const idxY = rPos.posY - subtrahents[l][1] + multips[1] * k;
+                        if (!(idxX < 0 || idxX > 9 || idxY < 0 || idxY > 9)) {
+                            boardRender[idxX][idxY] = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return placedShips;
     }
 
     async removeShip(socket, posX, posY) {
@@ -174,30 +280,6 @@ export class GameInfo {
 export function isPlayerInRoom(socket) {
     return !socket.rooms.size === 1;
 }
-
-var lastTimeChange = new Date().getTime();
-
-// export function getShipsLeft(data, playerIdx) {
-//     let shipsLeft = [4, 3, 2, 1];
-
-//     const playerShips = shipsLeft.boards[playerIdx].ships;
-
-//     playerShips.forEach(ship => {
-//         var isSunk = true;
-//         ship.hits.every(isHit => {
-//             isSunk = isHit;
-//             return isHit;
-//         });
-//         switch (ship.type) {
-//             case 0:
-//                 shipsLeft[0]--;
-//                 break;
-        
-//             default:
-//                 break;
-//         }
-//     });
-// }
 
 export function getShipsAvailable(ships) {
     let shipsLeft = [4, 3, 2, 1];
@@ -338,6 +420,52 @@ export function checkTurn(data, playerId) {
     } else {
         return data.nextPlayer === 1;
     }
+}
+
+function findEmptyFields(grid, len) {
+    const rowPlacements = [];
+
+    // Helper function to check if a row can be placed horizontally at a given position
+    function canPlaceHorizontally(x, y) {
+        if (x + len >= grid[0].length) {
+            return false; // Ship exceeds board boundaries
+        }
+        for (let i = x; i <= x + len; i++) {
+            if (grid[i][y]) {
+                return false; // One of ship's fields is already occupied
+            }
+        }
+        return true;
+    }
+
+    // Helper function to check if a row can be placed vertically at a given position
+    function canPlaceVertically(x, y) {
+        if (y + len >= grid.length) {
+            return false; // Ship exceeds board boundaries
+        }
+        for (let i = y; i <= y + len; i++) {
+            if (grid[x][i]) {
+                return false; // One of ship's fields is already occupied
+            }
+        }
+        return true;
+    }
+
+    for (let i = 0; i < grid.length; i++) {
+        for (let j = 0; j < grid[0].length; j++) {
+            if (grid[j][i] === false) {
+                if (canPlaceHorizontally(j, i)) {
+                    rowPlacements.push({ posX: j, posY: i, rot: 0 });
+                }
+
+                if (canPlaceVertically(j, i)) {
+                    rowPlacements.push({ posX: j, posY: i, rot: 1 });
+                }
+            }
+        }
+    }
+
+    return rowPlacements;
 }
 
 function clamp(n, min, max) {

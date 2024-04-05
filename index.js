@@ -230,7 +230,7 @@ app.post('/api/login', (req, res) => {
             helpers: {
                 error: "Niepoprawny adres e-mail",
                 fallback: "/login",
-
+                t: (key) => { return locale.t(key) }
             }
         });
     }
@@ -277,7 +277,13 @@ app.post('/api/nickname', (req, res) => {
             res.redirect('/');
         });
     } else {
-        res.sendStatus(400);
+        res.render("error", {
+            helpers: {
+                error: "Nazwa nie spełnia wymogów: Od 3 do 16 znaków, nie może być pusta",
+                fallback: "/nickname",
+                t: (key) => { return locale.t(key) }
+            }
+        });
     }
 });
 
@@ -482,12 +488,19 @@ io.on('connection', async (socket) => {
                 let UTCTs = Math.floor((new Date()).getTime() / 1000 + 90);
                 io.to(playerGame.id).emit('turn update', { turn: 0, phase: "preparation", timerToUTC: UTCTs });
                 GInfo.timer(playerGame.id, 90, async () => {
-                    const playerGame = await GInfo.getPlayerGameData(socket);
-                    for (let i = 0; i < playerGame.data.boards.length; i++) {
-                        const ships = playerGame.data.boards[i].ships;
-                        if (!ships.length) {
-                            AFKEnd(playerGame.id);
-                            return;
+                    const members = [...roomMemberIterator(playerGame.id)];
+                    for (let i = 0; i < members.length; i++) {
+                        const sid = members[i][0];
+                        const socket = io.sockets.sockets.get(sid);
+
+                        let placedShips = await GInfo.depleteShips(socket);
+                        placedShips.forEach(shipData => {
+                            socket.emit("placed ship", shipData)
+                        });
+
+                        if (placedShips.length > 0) {
+                            const locale = new Lang(session.langs);
+                            socket.emit("toast", locale.t("board.Your remaining ships have been randomly placed"))
                         }
                     }
 
