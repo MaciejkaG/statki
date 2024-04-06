@@ -546,6 +546,9 @@ io.on('connection', async (socket) => {
         }
 
         socket.on('ready', async (callback) => {
+            if (!(callback && typeof callback === 'function')) {
+                return;
+            }
             const playerGame = await GInfo.getPlayerGameData(socket);
             let timeLeft = await GInfo.timerLeft(playerGame.id);
 
