@@ -5,8 +5,8 @@ export class GameInfo {
     }
 
     async timer(tId, time, callback) {
-        await this.redis.set(`timer:${tId}`, new Date().getTime() / 1000);
-        let localLastUpdate = await this.redis.get(`timer:${tId}`);
+        await this.redis.json.set(`timer:${tId}`, '$', { lastUpdate: new Date().getTime() / 1000, end: new Date().getTime() / 1000 + time });
+        let localLastUpdate = await this.redis.json.get(`timer:${tId}`, { path: ".lastUpdate" });
 
         let timeout = setTimeout(callback, time * 1000);
 
@@ -17,7 +17,7 @@ export class GameInfo {
                 return;
             }
 
-            let lastUpdate = await this.redis.get(`timer:${tId}`);
+            let lastUpdate = await this.redis.json.get(`timer:${tId}`, { path: ".lastUpdate" });
             if (localLastUpdate != lastUpdate) {
                 // timer has been reset
                 clearTimeout(timeout);
@@ -27,9 +27,15 @@ export class GameInfo {
         }, 200);
     }
 
+    async timerLeft(tId) {
+        let end = await this.redis.json.get(`timer:${tId}`, { path: ".end" });
+        let left = end - new Date().getTime() / 1000;
+        return left;
+    }
+
     async resetTimer(tId) {
-        let lastUpdate = await this.redis.get(`timer:${tId}`);
-        await this.redis.set(`timer:${tId}`, -lastUpdate);
+        let lastUpdate = await this.redis.json.get(`timer:${tId}`, { path: ".end" });
+        await this.redis.json.set(`timer:${tId}`, '.lastUpdate', -lastUpdate);
     }
 
     async isPlayerInGame(socket) {
@@ -159,13 +165,17 @@ export class GameInfo {
             let availableShipsOfType = availableShips[i];
             for (let j = 0; j < availableShipsOfType; j++) {
                 playerShips = (await this.redis.json.get(key, { path: `.boards[${playerIdx}].ships` }));
+
+                let print = "";
                 for (let y = 0; y < 10; y++) {
                     let row = "";
                     for (let x = 0; x < 10; x++) {
                         row += `${boardRender[x][y] ? "\x1b[31m" : "\x1b[32m"}${boardRender[x][y]}\x1b[0m\t`;
                     }
+                    print += row+"\n";
                 }
-                const search = findEmptyFields(boardRender, i+1);
+
+                const search = findEmptyFields(boardRender, i + 1);
 
                 const rPos = search[Math.floor(Math.random() * search.length)];
 
@@ -274,6 +284,16 @@ export class GameInfo {
 
         await this.redis.json.set(key, `.boards[${enemyIdx}]`, playerBoard);
         return { status: 1, ship: shotShip };
+    }
+
+    async setReady(socket) {
+        const gameId = socket.session.activeGame;
+        const key = `game:${gameId}`;
+        const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
+
+        const playerIdx = socket.request.session.id === hostId ? 0 : 1;
+
+        await this.redis.json.set(key, `.ready[${playerIdx}]`, true);
     }
 }
 
@@ -423,16 +443,18 @@ export function checkTurn(data, playerId) {
 }
 
 function findEmptyFields(grid, len) {
-    const rowPlacements = [];
+    const shipPlacements = [];
 
     // Helper function to check if a row can be placed horizontally at a given position
     function canPlaceHorizontally(x, y) {
-        if (x + len >= grid[0].length) {
-            return false; // Ship exceeds board boundaries
+        // Check if the ship exceeds the board boundaries horizontally
+        if (x + len > grid.length) {
+            return false;
         }
-        for (let i = x; i <= x + len; i++) {
+        // Check if any field within the ship's length is already occupied
+        for (let i = x; i < x + len; i++) {
             if (grid[i][y]) {
-                return false; // One of ship's fields is already occupied
+                return false;
             }
         }
         return true;
@@ -440,32 +462,35 @@ function findEmptyFields(grid, len) {
 
     // Helper function to check if a row can be placed vertically at a given position
     function canPlaceVertically(x, y) {
-        if (y + len >= grid.length) {
-            return false; // Ship exceeds board boundaries
+        // Check if the ship exceeds the board boundaries vertically
+        if (y + len > grid[0].length) {
+            return false;
         }
-        for (let i = y; i <= y + len; i++) {
+        // Check if any field within the ship's length is already occupied
+        for (let i = y; i < y + len; i++) {
             if (grid[x][i]) {
-                return false; // One of ship's fields is already occupied
+                return false;
             }
         }
         return true;
     }
 
+    // Loop through the grid to find empty places
     for (let i = 0; i < grid.length; i++) {
         for (let j = 0; j < grid[0].length; j++) {
-            if (grid[j][i] === false) {
-                if (canPlaceHorizontally(j, i)) {
-                    rowPlacements.push({ posX: j, posY: i, rot: 0 });
+            if (!grid[i][j]) { // Check if the current position is empty
+                if (canPlaceHorizontally(i, j)) {
+                    shipPlacements.push({ posX: i, posY: j, rot: 0 });
                 }
 
-                if (canPlaceVertically(j, i)) {
-                    rowPlacements.push({ posX: j, posY: i, rot: 1 });
+                if (canPlaceVertically(i, j)) {
+                    shipPlacements.push({ posX: i, posY: j, rot: 1 });
                 }
             }
         }
     }
 
-    return rowPlacements;
+    return shipPlacements;
 }
 
 function clamp(n, min, max) {

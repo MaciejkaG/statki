@@ -125,16 +125,12 @@ $(".controlsOwnBoard").css("opacity", 1);
 
 function switchBoards() {
     if (postPrep) {
-        if (ownBoardIsActive) { // Aktywna jest plansza użytkownika
+        if (ownBoardIsActive) { // Aktywna jest plansza przeciwnika
             $("#secondaryBoard").removeClass("secondary");
             $("#board").addClass("secondary");
-            $(".ownBoardInfo").css("opacity", 0);
-            $(".controlsOwnBoard").css("opacity", 0.3);
-        } else { // Aktywna jest plansza przeciwnika
+        } else { // Aktywna jest plansza gracza
             $("#board").removeClass("secondary");
             $("#secondaryBoard").addClass("secondary");
-            $(".ownBoardInfo").css("opacity", 1);
-            $(".controlsOwnBoard").css("opacity", 1);
         }
 
         ownBoardIsActive = !ownBoardIsActive;
@@ -152,7 +148,7 @@ function switchShips() {
     refreshBoardView();
 
     $("#selectedShip").addClass("changing");
-    
+
     setTimeout(() => {
         switch (selectedShip) {
             case 0:

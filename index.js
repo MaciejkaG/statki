@@ -447,6 +447,7 @@ io.on('connection', async (socket) => {
                         hostId: opp.request.session.id,
                         state: "pregame",
                         startTs: (new Date()).getTime() / 1000,
+                        ready: [false, false],
                         boards: [
                             { //          typ 2 to trójmasztowiec  pozycja i obrót na planszy  które pola zostały trafione
                                 ships: [], // zawiera np. {type: 2, posX: 3, posY: 4, rot: 2, hits: [false, false, true]}
@@ -528,29 +529,10 @@ io.on('connection', async (socket) => {
                     }
                 }
 
-                let UTCTs = Math.floor((new Date()).getTime() / 1000 + 90);
+                let UTCTs = Math.floor((new Date()).getTime() / 1000 + 180);
                 io.to(playerGame.id).emit('turn update', { turn: 0, phase: "preparation", timerToUTC: UTCTs });
-                GInfo.timer(playerGame.id, 90, async () => {
-                    const members = [...roomMemberIterator(playerGame.id)];
-                    for (let i = 0; i < members.length; i++) {
-                        const sid = members[i][0];
-                        const socket = io.sockets.sockets.get(sid);
-
-                        let placedShips = await GInfo.depleteShips(socket);
-                        placedShips.forEach(shipData => {
-                            socket.emit("placed ship", shipData)
-                        });
-
-                        if (placedShips.length > 0) {
-                            const locale = new Lang(session.langs);
-                            socket.emit("toast", locale.t("board.Your remaining ships have been randomly placed"))
-                        }
-                    }
-
-                    GInfo.endPrepPhase(socket);
-                    GInfo.timer(playerGame.id, 30, () => {
-                        AFKEnd(playerGame.id);
-                    });
+                GInfo.timer(playerGame.id, 180, async () => {
+                    finishPrepPhase(socket, playerGame);
                 });
 
                 await redis.json.set(`game:${playerGame.id}`, '$.state', "preparation");
@@ -562,6 +544,50 @@ io.on('connection', async (socket) => {
                 });
             }
         }
+
+        socket.on('ready', async (callback) => {
+            const playerGame = await GInfo.getPlayerGameData(socket);
+            let timeLeft = await GInfo.timerLeft(playerGame.id);
+
+            if (timeLeft > 170) {
+                const locale = new Lang(session.langs);
+                socket.emit('toast', locale.t("board.You cannot ready up so early"));
+                return;
+            }
+
+            if (playerGame && playerGame.data.state === 'preparation') {
+                await GInfo.setReady(socket);
+                const playerGame = await GInfo.getPlayerGameData(socket);
+
+                if (playerGame.data.ready[0] && playerGame.data.ready[1]) {
+                    // Both set ready
+                    await GInfo.resetTimer(playerGame.id);
+
+                    await finishPrepPhase(socket, playerGame);
+                } else if (playerGame.data.ready[0] || playerGame.data.ready[1]) {
+                    // One player set ready
+
+                    const members = [...roomMemberIterator(playerGame.id)];
+                    for (let i = 0; i < members.length; i++) {
+                        const sid = members[i][0];
+                        const pSocket = io.sockets.sockets.get(sid);
+                        if (pSocket.session.id !== socket.session.id) {
+                            const locale = new Lang(pSocket.session.langs);
+
+                            pSocket.emit("toast", locale.t("board.Your opponent is ready"))
+                        }
+                    }
+
+                    let UTCTs = Math.floor((new Date()).getTime() / 1000 + Math.max(timeLeft / 2.5, 15));
+                    io.to(playerGame.id).emit('turn update', { turn: 0, phase: "preparation", timerToUTC: UTCTs });
+                    await GInfo.timer(playerGame.id, Math.max(timeLeft / 2.5, 15), async () => {
+                        await finishPrepPhase(socket, playerGame);
+                    });
+                } // else if (playerGame.data.ready[1]) {
+                //     // Guest set ready
+                // }
+            }
+        });
 
         socket.on('place ship', async (type, posX, posY, rot) => {
             const playerGame = await GInfo.getPlayerGameData(socket);
@@ -735,4 +761,28 @@ function checkFlag(key) {
     } else {
         return false;
     }
+}
+
+async function finishPrepPhase(socket, playerGame) {
+    await GInfo.endPrepPhase(socket);
+
+    const members = [...roomMemberIterator(playerGame.id)];
+    for (let i = 0; i < members.length; i++) {
+        const sid = members[i][0];
+        const socket = io.sockets.sockets.get(sid);
+
+        let placedShips = await GInfo.depleteShips(socket);
+        placedShips.forEach(shipData => {
+            socket.emit("placed ship", shipData)
+        });
+
+        if (placedShips.length > 0) {
+            const locale = new Lang(socket.session.langs);
+            socket.emit("toast", locale.t("board.Your remaining ships have been randomly placed"))
+        }
+    }
+
+    GInfo.timer(playerGame.id, 30, () => {
+        AFKEnd(playerGame.id);
+    });
 }

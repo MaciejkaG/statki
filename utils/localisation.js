@@ -9,16 +9,19 @@ export class Lang {
     constructor(langs) {
         const languagesPath = path.join(__dirname, '../lang');
         this.allText = null;
-        for (let i = 0; i < langs.length; i++) {
-            const lang = langs[i];
 
-            if (fs.readdirSync(languagesPath).includes(`${lang}.json`)) {
-                try {
-                    this.allText = JSON.parse(fs.readFileSync(path.join(languagesPath, `${lang}.json`), 'utf8'));
-                    this.lang = lang;
-                    return;
-                } catch (e) {
-                    console.log(e);
+        if (langs && langs.length > 0) {
+            for (let i = 0; i < langs.length; i++) {
+                const lang = langs[i];
+
+                if (fs.readdirSync(languagesPath).includes(`${lang}.json`)) {
+                    try {
+                        this.allText = JSON.parse(fs.readFileSync(path.join(languagesPath, `${lang}.json`), 'utf8'));
+                        this.lang = lang;
+                        return;
+                    } catch (e) {
+                        console.log(e);
+                    }
                 }
             }
         }

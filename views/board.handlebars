@@ -17,6 +17,17 @@
                     <h2 class="dynamic" id="selectedShip">{{ t 'board.Single-masted' }}</h2>
                     <h3>{{ t 'board.Available:' }} <span class="dynamic danger" id="shipsLeft">-</span></h3>
                 </div>
+                <div class="lateBoardInfo">
+                    <h3>{{ t 'board.Sunk ships' }}</h3>
+                    <p>
+                        {{ t 'board.Single-mastedPlu' }} <span class="dynamic shipnote" id="singlemasted">0</span><br>
+                        {{ t 'board.Two-mastedPlu' }} <span class="dynamic shipnote" id="twomasted">0</span><br>
+                        {{ t 'board.Three-mastedPlu' }} <span class="dynamic shipnote" id="threemasted">0</span><br>
+                        {{ t 'board.Four-mastedPlu' }} <span class="dynamic shipnote" id="fourmasted">0</span><br>
+                    </p>
+                    <h3>{{ t 'board.Your accuracy' }}</h3>
+                    <h2 id="accuracy">-</h2>
+                </div>
                 <span class="break"></span>
                 <div class="controls">
                     <h2>{{ t 'board.Controls' }}</h2>
@@ -29,6 +40,7 @@
                     <button class="boardSwitch" onclick="switchBoards()">{{ t 'board.Change boards' }}</button>
                 </div>
                 <span class="break"></span>
+                <button class="readyButton" onclick="readyUp()">{{ t 'board.Ready up' }}</button>
                 <h3><span class="dynamic" id="whosTurn"></span></h3>
                 <h2 class="important" id="timer">∞</h2>
             </div>

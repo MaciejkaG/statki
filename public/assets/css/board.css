@@ -176,6 +176,7 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .ownBoardInfo {
+    height: 11rem;
     transition: opacity 0.3s;
 }
 
@@ -208,7 +209,7 @@ h1,h2,h3,h4,h5,h6 {
     to {transform: translateX(0);opacity:1;}
 }
 
-#selectedShip.changing {
+#selectedShip.changing, .ownBoardInfo.changing {
     opacity: 0;
     animation: changingOut 1 0.2s ease;
 }
@@ -309,7 +310,7 @@ h1,h2,h3,h4,h5,h6 {
     display: none;
 }
 
-.mobileControls button {
+.mobileControls button, .readyButton {
     padding: 0.5rem 2rem;
     font-size: 1rem;
     background-color: black;
@@ -321,4 +322,31 @@ h1,h2,h3,h4,h5,h6 {
     transition: all 0.3s;
 
     margin-bottom: 1.5rem;
+}
+
+.readyButton:hover {
+    color: black;
+    background-color: white;
+}
+
+.lateBoardInfo {
+    display: none;
+}
+
+.ownBoardInfo #accuracy {
+    transition: all 0.3s;
+}
+
+.ownBoardInfo #accuracy.animatingDown {
+    color: var(--ship-invalid);
+    transform: scale(1.2);
+}
+
+.ownBoardInfo #accuracy.animatingUp {
+    color: var(--ship-valid);
+    transform: scale(1.2);
+}
+
+.shipnote {
+    font-weight: bold;
 }

@@ -5,6 +5,11 @@ var timerDestination = null;
 var gamePhase = 'pregame';
 var occupiedFields = [];
 
+var shipsSunk = [0, 0, 0, 0];
+
+var hits = 0;
+var misses = 0;
+
 var lastTimeClick = 0;
 
 if ($(window).width() <= 820) {
@@ -48,8 +53,6 @@ $('#board .field').on('click', function () {
     if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {
         if ($(window).width() > 820) {
             socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
-
-            navigator.vibrate(200);
             lastTimeClick = new Date().getTime() / 1000;
         }
     }
@@ -66,8 +69,6 @@ $('#secondaryBoard .field').on('click', function () {
     if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {
         if ($(window).width() > 820) {
             socket.emit("shoot", $(this).data('pos-x'), $(this).data('pos-y'));
-            
-            navigator.vibrate(200);
             lastTimeClick = new Date().getTime() / 1000;
         }
     }
@@ -143,6 +144,8 @@ socket.on("shot hit", (victimIdx, posX, posY) => {
         bsc.setField(posX, posY, "hit");
     } else {
         bsc.setFieldEnemy(posX, posY, "hit");
+        hits++;
+        updateAccuracy(getAccuracy());
     }
 });
 
@@ -151,6 +154,8 @@ socket.on("shot missed", (victimIdx, posX, posY) => {
         bsc.setField(posX, posY, "miss");
     } else {
         bsc.setFieldEnemy(posX, posY, "miss");
+        misses++;
+        updateAccuracy(getAccuracy());
     }
 });
 
@@ -186,6 +191,9 @@ socket.on("ship sunk", (victimIdx, ship) => {
                 bsc.setFieldEnemy(ship.posX + multips[0] * i, ship.posY + multips[1] * i, "sunken");
             }, i * 150);
         }
+
+        shipsSunk[ship.type]++;
+        updateShipsSunk();
     }
 });
 
@@ -246,6 +254,17 @@ socket.on('turn update', (turnData) => {
         $("#whosTurn").html(window.locale["Preparation phase"]);
         $(".boardSwitch").css("opacity", 0.3);
     } else {
+        if (!postPrep) {
+            $(".controlsOwnBoard").css("opacity", 0.3);
+
+            $(".ownBoardInfo").addClass("changing");
+            setTimeout(() => {
+                $(".ownBoardInfo").html($(".lateBoardInfo").html());
+
+                $(".ownBoardInfo").removeClass("changing");
+            }, 200);
+        }
+
         postPrep = true;
         myTurn = turnData.turn === playerIdx;
         turnData.turn === playerIdx ? $("#whosTurn").html(window.locale["Your turn"]) : $("#whosTurn").html(window.locale["Opponents turn"]);
@@ -255,6 +274,71 @@ socket.on('turn update', (turnData) => {
     timerDestination = turnData.timerToUTC;
     gamePhase = turnData.phase;
 });
+
+function updateLateInfo() {
+    if (postPrep) {
+
+    }
+}
+
+var currentAccuracy = 0;
+
+function updateAccuracy(val) {
+    var obj = $(".ownBoardInfo #accuracy").get(0);
+
+    const start = currentAccuracy !== null ? currentAccuracy : val;
+
+    const range = val - start;
+    var minTimer = 50;
+    var stepTime = Math.abs(Math.floor(1000 / range));
+
+    stepTime = Math.max(stepTime, minTimer);
+
+    var startTime = new Date().getTime();
+    var endTime = startTime + 1000;
+    var timer;
+
+    if (val < currentAccuracy) {
+        $(".ownBoardInfo #accuracy").addClass("animatingDown");
+    } else {
+        $(".ownBoardInfo #accuracy").addClass("animatingUp");
+    }
+
+    currentAccuracy = val;
+
+    const run = () => {
+        var now = new Date().getTime();
+        var remaining = Math.max((endTime - now) / 1000, 0);
+        var value = Math.round(val - (remaining * range));
+        obj.innerHTML = value + "%";
+        if (value == val) {
+            obj.innerHTML = Math.round(value) + "%";
+            $(".ownBoardInfo #accuracy").removeClass("animatingDown animatingUp");
+
+            clearInterval(timer);
+        }
+    };
+
+    timer = setInterval(run, stepTime);
+    run();
+}
+
+function getAccuracy() {
+    return hits / (misses + hits) * 100;
+}
+
+function updateShipsSunk() {
+    $("#singlemasted").html(shipsSunk[0]);
+    $("#twomasted").html(shipsSunk[1]);
+    $("#threemasted").html(shipsSunk[2]);
+    $("#fourmasted").html(shipsSunk[3]);
+}
+
+function readyUp() {
+    socket.emit("ready", () => {
+        $(".readyButton").css({ pointerEvents: 'none', opacity: 0.3 });
+    });
+}
 
 socket.on('player left', () => {
     window.location.replace("/");

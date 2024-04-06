@@ -104,6 +104,15 @@
         "Four-masted": "Czteromasztowiec",
         "Available:": "Dostępne:",
 
+        "Sunk ships": "Zatopione statki",
+        "Single-mastedPlu": "Jednomasztowce:",
+        "Two-mastedPlu": "Dwumasztowce:",
+        "Three-mastedPlu": "Trójmasztowce:",
+        "Four-mastedPlu": "Czteromasztowce:",
+        "Your accuracy": "Twoja celność",
+
+        "Ready up": "Gotowy",
+
         "Controls": "Sterowanie",
         "Change ship": "Zmień statek",
         "Rotate ship": "Obróć statek",
@@ -117,7 +126,9 @@
         "You have ran out of ships of that type": "Skończyły ci się statki tego typu",
         "You have already shot at this field": "Już strzelałeś w to pole",
         "Your remaining ships have been randomly placed": "Twoje pozostałe statki zostały automatycznie rozstawione",
-    
+        "Your opponent is ready": "Twój przeciwnik jest gotowy.\nCzas na przygotowania został skrócony",
+        "You cannot ready up so early": "Nie możesz zgłosić gotowości tak wcześnie!",
+
         "Victory": "Zwycięstwo",
         "Defeat": "Porażka"
     }

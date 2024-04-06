@@ -103,6 +103,15 @@
         "Four-masted": "Four-masted",
         "Available:": "Available:",
 
+        "Sunk ships": "Sunk ships",
+        "Single-mastedPlu": "Single-masted:",
+        "Two-mastedPlu": "Two-masted:",
+        "Three-mastedPlu": "Three-masted:",
+        "Four-mastedPlu": "Four-masted:",
+        "Your accuracy": "Your accuracy",
+
+        "Ready up": "Ready up",
+
         "Controls": "Controls",
         "Change ship": "Change ship",
         "Rotate ship": "Rotate ship",
@@ -116,7 +125,9 @@
         "You have ran out of ships of that type": "You have ran out of ships of that type",
         "You have already shot at this field": "You have already shot at this field",
         "Your remaining ships have been randomly placed": "Your remaining ships have been automatically placed",
-    
+        "Your opponent is ready": "Your opponent is ready.\nTime for preparation has been reduced",
+        "You cannot ready up so early": "You cannot ready up so early!",
+
         "Victory": "Victory",
         "Defeat": "Defeat"
     }
