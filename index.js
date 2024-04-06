@@ -549,6 +549,7 @@ io.on('connection', async (socket) => {
             if (!(callback && typeof callback === 'function')) {
                 return;
             }
+
             const playerGame = await GInfo.getPlayerGameData(socket);
             let timeLeft = await GInfo.timerLeft(playerGame.id);
 
@@ -593,9 +594,7 @@ io.on('connection', async (socket) => {
                     await GInfo.timer(playerGame.id, Math.max(timeLeft / 2.5, 15), async () => {
                         await finishPrepPhase(socket, playerGame);
                     });
-                } // else if (playerGame.data.ready[1]) {
-                //     // Guest set ready
-                // }
+                }
             }
         });
 
@@ -637,7 +636,7 @@ io.on('connection', async (socket) => {
             let playerGame = await GInfo.getPlayerGameData(socket);
 
             if (playerGame && playerGame.data.state === 'action') {
-                if (bships.checkTurn(playerGame.data, socket.session.id)) {
+                if (bships.checkTurn(playerGame.data, session.userId)) {
                     const enemyIdx = session.userId === playerGame.data.hostId ? 1 : 0;
 
                     let hit = await GInfo.shootShip(socket, posX, posY);

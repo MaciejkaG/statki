@@ -61,14 +61,14 @@ export class GameInfo {
 
     async incrStat(socket, statKey, by = 1) {
         const game = await this.redis.json.get(`game:${socket.session.activeGame}`);
-        const idx = socket.request.session.id === game.hostId ? 0 : 1;
+        const idx = socket.request.session.userId === game.hostId ? 0 : 1;
 
         this.redis.json.numIncrBy(`game:${socket.session.activeGame}`, `.boards[${idx}].stats.${statKey}`, by);
     }
 
     async getPlayerShips(socket) {
         const game = await this.redis.json.get(`game:${socket.session.activeGame}`);
-        const idx = socket.request.session.id === game.hostId ? 0 : 1;
+        const idx = socket.request.session.userId === game.hostId ? 0 : 1;
         return game.boards[idx].ships;
     }
 
@@ -101,7 +101,7 @@ export class GameInfo {
         const key = `game:${gameId}`;
         const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
 
-        const playerIdx = socket.request.session.id === hostId ? 0 : 1;
+        const playerIdx = socket.request.session.userId === hostId ? 0 : 1;
         await this.redis.json.arrAppend(key, `.boards[${playerIdx}].ships`, shipData);
     }
 
@@ -110,7 +110,7 @@ export class GameInfo {
         const key = `game:${gameId}`;
         const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
 
-        const playerIdx = socket.request.session.id === hostId ? 0 : 1;
+        const playerIdx = socket.request.session.userId === hostId ? 0 : 1;
 
         var playerShips = (await this.redis.json.get(key, { path: `.boards[${playerIdx}].ships` }));
 
@@ -221,7 +221,7 @@ export class GameInfo {
         const key = `game:${gameId}`;
         const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
 
-        const playerIdx = socket.request.session.id === hostId ? 0 : 1;
+        const playerIdx = socket.request.session.userId === hostId ? 0 : 1;
         let playerShips = await this.redis.json.get(key, {path: `.boards[${playerIdx}].ships`});
 
         var deletedShip;
@@ -242,7 +242,7 @@ export class GameInfo {
         const key = `game:${gameId}`;
         const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
 
-        const enemyIdx = socket.request.session.id === hostId ? 1 : 0;
+        const enemyIdx = socket.request.session.userId === hostId ? 1 : 0;
         // const playerIdx = enemyIdx ? 0 : 1;
 
         let playerBoard = await this.redis.json.get(key, { path: `.boards[${enemyIdx}]` });
@@ -291,7 +291,7 @@ export class GameInfo {
         const key = `game:${gameId}`;
         const hostId = (await this.redis.json.get(key, { path: '.hostId' }));
 
-        const playerIdx = socket.request.session.id === hostId ? 0 : 1;
+        const playerIdx = socket.request.session.userId === hostId ? 0 : 1;
 
         await this.redis.json.set(key, `.ready[${playerIdx}]`, true);
     }
