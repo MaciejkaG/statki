@@ -638,7 +638,7 @@ io.on('connection', async (socket) => {
 
             if (playerGame && playerGame.data.state === 'action') {
                 if (bships.checkTurn(playerGame.data, socket.session.id)) {
-                    const enemyIdx = socket.session.id === playerGame.data.hostId ? 1 : 0;
+                    const enemyIdx = session.userId === playerGame.data.hostId ? 1 : 0;
 
                     let hit = await GInfo.shootShip(socket, posX, posY);
 
@@ -668,10 +668,10 @@ io.on('connection', async (socket) => {
                             guestSocket.emit("game finished", !enemyIdx ? 1 : 0, hostNickname);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
-                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostSocket.session.userId, guestSocket.session.userId, playerGame.data.boards, !enemyIdx ? 1 : 0);
+                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostSocket.session.userId, guestSocket.session.userId, playerGame.data.boards, enemyIdx ? 0 : 1);
 
                             GInfo.resetTimer(playerGame.id);
-                            endGame(playerGame.id, !enemyIdx ? 1 : 0);
+                            endGame(playerGame.id);
                             return;
                         }
                     } else if (hit.status === -1) {

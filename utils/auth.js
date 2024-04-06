@@ -7,11 +7,6 @@ import geoip from 'geoip-lite';
 import mysql from 'mysql';
 import readline from "node:readline";
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -203,7 +198,7 @@ export class MailAuth {
             const conn = mysql.createConnection(this.mysqlOptions);
             conn.query(`INSERT INTO matches(match_id, match_type, host_id, guest_id, duration) VALUES (${conn.escape(matchId)}, ${conn.escape(type)}, ${conn.escape(hostId)}, ${conn.escape(guestId)}, ${conn.escape(duration)})`, async (error) => {
                 if (error) reject(error);
-                else conn.query(`INSERT INTO statistics(match_id, user_id, board, won) VALUES (${conn.escape(matchId)}, ${conn.escape(hostId)}, ${conn.escape(JSON.stringify(boards[0]))}, ${conn.escape(!winnerIdx ? 1 : 0)}), (${conn.escape(matchId)}, ${conn.escape(guestId)}, ${conn.escape(JSON.stringify(boards[1]))}, ${conn.escape(winnerIdx ? 1 : 0)})`, async (error, response) => {
+                else conn.query(`INSERT INTO statistics(match_id, user_id, board, won) VALUES (${conn.escape(matchId)}, ${conn.escape(hostId)}, ${conn.escape(JSON.stringify(boards[0]))}, ${conn.escape(winnerIdx ? 0 : 1)}), (${conn.escape(matchId)}, ${conn.escape(guestId)}, ${conn.escape(JSON.stringify(boards[1]))}, ${conn.escape(winnerIdx ? 1 : 0)})`, async (error, response) => {
                     if (error) reject(error);
                     else resolve();
                 });
