@@ -284,6 +284,8 @@ function updateLateInfo() {
 var currentAccuracy = 0;
 
 function updateAccuracy(val) {
+    val = Math.round(val);
+
     var obj = $(".ownBoardInfo #accuracy").get(0);
 
     const start = currentAccuracy !== null ? currentAccuracy : val;
