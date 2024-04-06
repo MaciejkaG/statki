@@ -255,6 +255,8 @@ socket.on('turn update', (turnData) => {
         $(".boardSwitch").css("opacity", 0.3);
     } else {
         if (!postPrep) {
+            $(".readyButton").css({ pointerEvents: 'none', opacity: 0.3 });
+
             $(".controlsOwnBoard").css("opacity", 0.3);
 
             $(".ownBoardInfo").addClass("changing");

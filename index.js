@@ -555,7 +555,10 @@ io.on('connection', async (socket) => {
                 return;
             }
 
-            if (playerGame && playerGame.data.state === 'preparation') {
+            const playerIdx = playerGame.data.hostId === session.userId ? 0 : 1;
+            const userNotReady = !playerGame.data.ready[playerIdx];
+
+            if (playerGame && playerGame.data.state === 'preparation' && userNotReady) {
                 await GInfo.setReady(socket);
                 const playerGame = await GInfo.getPlayerGameData(socket);
 
@@ -563,9 +566,13 @@ io.on('connection', async (socket) => {
                     // Both set ready
                     await GInfo.resetTimer(playerGame.id);
 
+                    callback();
+
                     await finishPrepPhase(socket, playerGame);
                 } else if (playerGame.data.ready[0] || playerGame.data.ready[1]) {
                     // One player set ready
+
+                    callback();
 
                     const members = [...roomMemberIterator(playerGame.id)];
                     for (let i = 0; i < members.length; i++) {
