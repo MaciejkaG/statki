@@ -8,6 +8,10 @@
         justify-content: center;
         text-align: center;
     }
+
+    #profileView .matchList .match {
+        height: 7rem;
+    }
 }
 
 @media only screen and (max-width: 820px) {
@@ -29,10 +33,6 @@
 
     #profileView .stats {
         width: 90vw;
-    }
-
-    #profileView .matchList .match {
-        height: 7rem;
     }
 
     #profileView .match div {
