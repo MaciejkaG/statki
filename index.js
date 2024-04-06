@@ -444,7 +444,7 @@ io.on('connection', async (socket) => {
                     // Teraz utwórz objekt partii w trakcie w bazie Redis
                     const gameId = uuidv4();
                     redis.json.set(`game:${gameId}`, '$', {
-                        hostId: opp.request.session.id,
+                        hostId: opp.request.session.userId,
                         state: "pregame",
                         startTs: (new Date()).getTime() / 1000,
                         ready: [false, false],
@@ -522,7 +522,7 @@ io.on('connection', async (socket) => {
                 for (let i = 0; i < members.length; i++) {
                     const sid = members[i][0];
                     const socket = io.sockets.sockets.get(sid);
-                    if (socket.session.id === playerGame.data.hostId) {
+                    if (socket.request.session.userId === playerGame.data.hostId) {
                         io.to(sid).emit('player idx', 0);
                     } else {
                         io.to(sid).emit('player idx', 1);
