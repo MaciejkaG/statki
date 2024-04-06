@@ -75,6 +75,7 @@ export class MailAuth {
                         if (error) reject(error);
                         const row = response[0];
 
+                        conn.end();
                         resolve({ status: 1, uid: row.user_id });
                     });
 
@@ -83,10 +84,9 @@ export class MailAuth {
 
                 const row = response[0];
 
+                conn.end();
                 resolve({ status: 1, uid: row.user_id });
             });
-
-            conn.end();
         });
     }
 
@@ -101,9 +101,9 @@ export class MailAuth {
                 } else {
                     resolve(null);
                 }
-            });
 
-            conn.end();
+                conn.end();
+            });
         });
     }
 
@@ -111,10 +111,11 @@ export class MailAuth {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
-                if (error) { reject(error); return; }
+                if (error) { reject(error); conn.end(); return; }
                 if (response.length !== 0) {
                     let timer = await this.redis.get(`loginTimer:${response[0].user_id}`);
                     if (timer && timer > 0) {
+                        conn.end();
                         resolve({ status: -1, uid: response[0].user_id, });
                         return;
                     }
@@ -155,6 +156,7 @@ export class MailAuth {
                             reject(e);
                         }
 
+                        conn.end();
                         resolve({ status: 1, uid: row.user_id, code: authCode });
                     });
 
@@ -190,10 +192,9 @@ export class MailAuth {
                 }
                 
 
+                conn.end();
                 resolve({ status: 1, uid: row.user_id });
             });
-
-            conn.end();
         });
     }
 
@@ -206,9 +207,9 @@ export class MailAuth {
                     if (error) reject(error);
                     else resolve();
                 });
-            });
 
-            conn.end();
+                conn.end();
+            });
         });
     }
 
@@ -227,9 +228,9 @@ export class MailAuth {
 
                     resolve({ profile, stats, matchHistory });
                 }
-            });
 
-            conn.end();
+                conn.end();
+            });
         });
     }
 
@@ -251,9 +252,9 @@ export class MailAuth {
             conn.query(`UPDATE accounts SET nickname = ${conn.escape(nickname)} WHERE user_id = ${conn.escape(uid)}`, (error) => {
                 if (error) reject(error);
                 resolve();
-            });
 
-            conn.end();
+                conn.end();
+            });
         });
     }
 
