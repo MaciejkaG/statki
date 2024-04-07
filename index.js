@@ -208,7 +208,10 @@ app.post('/api/login', (req, res) => {
 
             return;
         }
-        auth.startVerification(req.body.email, getIP(req), req.get('user-agent')).then(async result => {
+
+        const locale = new Lang(req.acceptsLanguages());
+
+        auth.startVerification(req.body.email, getIP(req), req.get('user-agent'), locale.lang).then(async result => {
             if (result.status === 1 || result.status === -1) {
                 req.session.userId = result.uid;
 

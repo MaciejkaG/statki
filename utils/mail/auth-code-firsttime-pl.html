@@ -11,8 +11,8 @@
 
 <body style="background: rgb(0, 0, 0);color: white;;font-family: 'Lato', sans-serif;padding: 30px;">
     <div style="margin:30px;text-align: center;font-size:1.3em;margin: auto;width: 35%;min-width:25em;padding:20px;">
-        <h2 style="font-family: 'Poppins', sans-serif;">Hej, {{ NICKNAME }}!</h2>
-        <p>Ktoś próbował się zalogować na twoje konto w Statkach, jeśli to nie byłeś ty - zignoruj tę
+        <h2 style="font-family: 'Poppins', sans-serif;">Cześć!</h2>
+        <p>Ktoś próbował utworzyć konto w Statkach przy użyciu Twojego adresu e-mail. Jeśli to nie byłeś ty, zignoruj tą
             wiadomość.<br>Poniżej znajduje się kod autoryzacyjny, pamiętaj by nie udostępniać go nikomu.</p>
         <div
             style="border: solid white 1px; border-radius: 15px;font-family: 'Roboto Mono', monospace;padding:15px;font-size: 1.5em;">
@@ -21,13 +21,14 @@
         <p>Powyższy kod wygasa po 10 minutach</p>
         <p>Poniżej znajdują się informacje o logującym się urządzeniu*</p>
         <pre style="text-align: left;">{{ LOOKUP }}</pre>
-        <p style="font-size: 12px;">* Dane lokalizacyjne mogą mijać się z prawdą. Traktuj je z dystansem</p>
+        <p style="font-size: 12px;">* Dane lokalizacyjne mogą nie być dokładne.</p>
     </div>
     <p style="color:white;margin-bottom: 20px;margin-top: 20px;text-align: center;"><a href="https://maciejka.xyz/"
             style="text-decoration: none;color:white;">Copyright © 2024 MCJK</a> | <a
             href="https://statki.maciejka.xyz/"
             style="text-decoration: none;color: rgb(85, 111, 255);">statki.maciejka.xyz</a><br>Ta wiadomość została
-        wysłana automatycznie, nie odpowiadaj na nią.</p>
+        wysłana automatycznie, nie odpowiadaj na nią.<br>Jeżeli szukasz wsparcia, napisz na <a
+            href="mailto:biz@maciejka.xyz">biz@maciejka.xyz</a></p>
 </body>
 
 </html>

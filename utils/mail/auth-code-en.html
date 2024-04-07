@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,600;1,600&family=Roboto+Mono:ital@0;1&display=swap"
+        rel="stylesheet">
+</head>
+
+<body style="background: rgb(0, 0, 0);color: white;;font-family: 'Lato', sans-serif;padding: 30px;">
+    <div style="margin:30px;text-align: center;font-size:1.3em;margin: auto;width: 35%;min-width:25em;padding:20px;">
+        <h2 style="font-family: 'Poppins', sans-serif;">Hey, {{ NICKNAME }}!</h2>
+        <p>Someone tried to log in to Statki using your account, if it wasn't you, ignore this
+            message.<br>The authorisation code is below, remember to not share it with anyone.</p>
+        <div
+            style="border: solid white 1px; border-radius: 15px;font-family: 'Roboto Mono', monospace;padding:15px;font-size: 1.5em;">
+            {{ CODE }}
+        </div>
+        <p>Following code expires after 10 minutes</p>
+        <p>Below is some information about a logging in device*</p>
+        <pre style="text-align: left;">{{ LOOKUP }}</pre>
+        <p style="font-size: 12px;">* Geolocation data may not be accurate.</p>
+    </div>
+    <p style="color:white;margin-bottom: 20px;margin-top: 20px;text-align: center;"><a href="https://maciejka.xyz/"
+            style="text-decoration: none;color:white;">Copyright © 2024 MCJK</a> | <a
+            href="https://statki.maciejka.xyz/"
+            style="text-decoration: none;color: rgb(85, 111, 255);">statki.maciejka.xyz</a><br>This message has been
+        sent automatically, do not reply to it.<br>For support, message <a
+            href="mailto:biz@maciejka.xyz">biz@maciejka.xyz</a></p>
+</body>
+
+</html>

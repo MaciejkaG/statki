@@ -102,7 +102,7 @@ export class MailAuth {
         });
     }
 
-    startVerification(email, ip, agent) {
+    startVerification(email, ip, agent, langId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
@@ -125,7 +125,7 @@ export class MailAuth {
                         if (error) reject(error);
                         const row = response[0];
 
-                        const html = fs.readFileSync(path.join(__dirname, 'mail/auth-code-firsttime.html'), 'utf8');
+                        const html = fs.readFileSync(path.join(__dirname, `mail/auth-code-firsttime-${langId}.html`), 'utf8');
                         let authCode = genCode();
 
                         await this.redis.set(`codeAuth:${authCode}`, row.user_id);
@@ -160,7 +160,7 @@ export class MailAuth {
 
                 const row = response[0];
 
-                const html = fs.readFileSync(path.join(__dirname, 'mail/auth-code.html'), 'utf8');
+                const html = fs.readFileSync(path.join(__dirname, `mail/auth-code-${langId}.html`), 'utf8');
                 let authCode = genCode();
 
                 await this.redis.set(`codeAuth:${authCode}`, row.user_id);
@@ -173,7 +173,7 @@ export class MailAuth {
 
                 const lookup = geoip.lookup(ip);
 
-                const lookupData = `User-Agent: ${agent}\nAdres IP: ${ip}\nKraj: ${lookup.country}\nRegion: ${lookup.region}\nMiasto: ${lookup.city}`;
+                const lookupData = `User-Agent: ${agent}\nIP address: ${ip}\nCountry: ${lookup.country}\nRegion: ${lookup.region}\nCity: ${lookup.city}`;
 
                 try {
                     await this.mail.sendMail({
