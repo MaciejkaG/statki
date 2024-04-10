@@ -92,7 +92,14 @@ app.get('/', async (req, res) => {
     let login = loginState(req);
 
     if (login != 2) {
-        res.redirect('/login');
+        const locale = new Lang(req.acceptsLanguages());
+
+        res.render('landing', {
+            helpers: {
+                t: (key) => { return locale.t(key) }
+            }
+        });
+        // res.redirect('/login');
     } else if (req.session.nickname == null) {
         auth.getLanguage(req.session.userId).then(language => {
             var locale;
@@ -348,12 +355,18 @@ io.on('connection', async (socket) => {
     const req = socket.request;
     const session = req.session;
     socket.session = session;
-    if (session.nickname==null) {
-        socket.disconnect();
-        return;
+    if (session.loginState != 2) {
+        socket.on('email login', (email, callback) => {
+            callback(session.nickname);
+        });
     }
 
     if (!await GInfo.isPlayerInGame(socket)) {
+        if (session.nickname == null) {
+            socket.disconnect();
+            return;
+        }
+
         socket.on('whats my nick', (callback) => {
             callback(session.nickname);
         });

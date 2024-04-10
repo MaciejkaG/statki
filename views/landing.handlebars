@@ -1,0 +1,62 @@
+<link rel="stylesheet" href="/assets/css/landing.css">
+
+<div class="loginContainer">
+    <div class="background">
+        <div class="bgShip small ally" id="bgs1">
+            <div class="field" id="f1"></div>
+            <div class="field" id="f2"></div>
+            <div class="field" id="f3"></div>
+            <div class="field" id="f4"></div>
+        </div>
+        <div class="bgShip big ally" id="bgs2">
+            <div class="field" id="f8"></div>
+        </div>
+        <div class="bgShip big enemy" id="bgs3">
+            <div class="field" id="f5"></div>
+            <div class="field" id="f6"></div>
+            <div class="field" id="f7"></div>
+        </div>
+        <div class="bgShip small enemy" id="bgs4">
+            <div class="field" id="f9"></div>
+            <div class="field" id="f10"></div>
+        </div>
+    </div>
+
+    <div class="container" id="pvpJoinView">
+        <div class="outer">
+            <h2>{{ t 'login.Login' }}</h2>
+            <div class="modes">
+                <div>
+                    <form action="/api/login" method="post">
+                        <input type="email" name="email" placeholder="{{ t 'login.E-mail address' }}"
+                            style="font-size: 1rem;">
+                        <input type="submit" value="{{ t 'login.Proceed' }}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="pvpJoinView">
+        <div class="outer">
+            <h2>{{ t 'login.Login' }}</h2>
+            <div class="modes">
+                <div>
+                    <form action="/api/login" method="post">
+                        <input type="email" name="email" placeholder="{{ t 'login.E-mail address' }}"
+                            style="font-size: 1rem;">
+                        <input type="submit" value="{{ t 'login.Proceed' }}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="landing">
+    <h1>Statki</h1>
+    <p>The #1 online multiplayer battleships game</p>
+    <span id="scrolldowntext">SCROLL DOWN</span>
+</div>
+
+<script src="/assets/js/landing.js"></script>

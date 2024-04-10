@@ -2,7 +2,7 @@ var activeView;
 var returnLock = false;
 
 function switchView(viewContainerId, useReplaceState=false) {
-    if (!returnLock) {
+    if (!returnLock && viewContainerId !== activeView) {
         $(`.container`).css({ opacity: 0, animation: "OutAnim 0.2s 1 ease" });
         setTimeout(() => {
             $(`.container`).css("display", "none");
