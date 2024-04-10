@@ -9,6 +9,13 @@
         "Connection error": "Błąd połączenia"
     },
 
+    "landing": {
+        "The #1 online multiplayer battleships game": "Najlepsza wielosobowa gra w statki",
+        "SCROLL DOWN": "SCROLLUJ W DÓŁ",
+
+        "Privacy policy": "Polityka prywatności"
+    },
+
     "menu": {
         "navbar": {
             "Main menu": "Menu główne",

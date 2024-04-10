@@ -88,6 +88,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 io.engine.use(sessionMiddleware);
 
+app.get('/privacy', (req, res) => {
+    res.render("privacy");
+});
+
 app.get('/', async (req, res) => {
     let login = loginState(req);
 
@@ -355,11 +359,11 @@ io.on('connection', async (socket) => {
     const req = socket.request;
     const session = req.session;
     socket.session = session;
-    if (session.loginState != 2) {
-        socket.on('email login', (email, callback) => {
-            callback(session.nickname);
-        });
-    }
+    // if (session.loginState != 2) {
+    //     socket.on('email login', (email, callback) => {
+    //         callback(session.nickname);
+    //     });
+    // }
 
     if (!await GInfo.isPlayerInGame(socket)) {
         if (session.nickname == null) {

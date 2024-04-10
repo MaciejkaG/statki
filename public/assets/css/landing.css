@@ -38,10 +38,14 @@
     position: absolute;
     display: flex;
     gap: 0.4rem;
+
+    z-index: 1;
+
+    transition: translate 1.5s ease-in-out;
 }
 
 .bgShip#bgs1 {
-    left: 15vw;
+    left: 25vw;
     rotate: -15deg;
     top: 15vh;
 }
@@ -53,7 +57,7 @@
 }
 
 .bgShip#bgs3 {
-    left: 20vw;
+    left: 30vw;
     rotate: 65deg;
     bottom: 25vh;
 }
@@ -64,8 +68,19 @@
     bottom: 25vh;
 }
 
+.bgShip#bgs5 {
+    right: -15vw;
+    rotate: 20deg;
+    top: 25vh;
+}
+
+.bgShip#bgs6 {
+    right: -15vw;
+    rotate: 70deg;
+    bottom: 25vh;
+}
+
 .bgShip .field {
-    /* background-color: var(--field); */
     width: 2rem;
     aspect-ratio: 1;
     border-radius: 20%;
@@ -112,9 +127,9 @@
 }
 
 .container {
-    display: flex;
     height: 100%;
-    opacity: 1;
+    z-index: 10;
+    /* opacity: 1; */
 }
 
 .container div.outer {
@@ -123,5 +138,128 @@
     align-items: center;
     justify-content: center;
 
+    z-index: 10;
+
     transform: translateY(-3rem);
+}
+
+@keyframes OutAnim {
+    from {transform: translateX(0)}
+    to {transform: translateX(-5%);}
+}
+
+@keyframes InAnim {
+    from {transform: translateX(5%)}
+    to {transform: translateX(0%);}
+}
+
+#loginView .modes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+}
+
+#loginView .modes div {
+    height: 7rem;
+    width: 15rem;
+    background-color: black;
+    border: solid 1px white;
+    border-radius: 15px;
+    user-select: none;
+    padding: 2rem 3rem;
+}
+
+#loginView form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+#loginView form input {
+    background-color: black;
+    color: white;
+    border-radius: 15px;
+    border: 1px solid white;
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 0.5rem 2rem;
+    outline: none;
+}
+
+#loginView form input[type=submit] {
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+#loginView form input[type=submit]:hover {
+    background-color: white;
+    color: black;
+}
+
+#authView .modes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+}
+
+#authView .modes div {
+    height: 13rem;
+    width: 15rem;
+    background-color: black;
+    border: solid 1px white;
+    border-radius: 15px;
+    user-select: none;
+    padding: 2rem 3rem;
+}
+
+#authView form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+#authView form input {
+    background-color: black;
+    color: white;
+    border-radius: 15px;
+    border: 1px solid white;
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 0.5rem 2rem;
+    outline: none;
+}
+
+#authView form input[type=submit] {
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+#authView form input[type=submit]:hover {
+    background-color: white;
+    color: black;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0px;
+    /* margin: 0; */
+    left: 50vw;
+    transform: translateX(-50%);
+    z-index: 50;
+    font-size: 16px;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.footer a {
+    color: white;
+    margin: 0 1rem;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
 }

@@ -9,6 +9,13 @@
         "Connection error": "Connection error"
     },
 
+    "landing": {
+        "The #1 online multiplayer battleships game": "The #1 online multiplayer battleships game",
+        "SCROLL DOWN": "SCROLL DOWN",
+
+        "Privacy policy": "Privacy policy"
+    },
+
     "menu": {
         "navbar": {
             "Main menu": "Main menu",

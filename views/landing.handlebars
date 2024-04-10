@@ -20,14 +20,26 @@
             <div class="field" id="f9"></div>
             <div class="field" id="f10"></div>
         </div>
+
+        <div class="bgShip small ally" id="bgs5">
+            <div class="field"></div>
+            <div class="field"></div>
+            <div class="field"></div>
+        </div>
+        <div class="bgShip big enemy" id="bgs6">
+            <div class="field"></div>
+            <div class="field"></div>
+            <div class="field"></div>
+            <div class="field"></div>
+        </div>
     </div>
 
-    <div class="container" id="pvpJoinView">
+    <div class="container" id="loginView">
         <div class="outer">
             <h2>{{ t 'login.Login' }}</h2>
             <div class="modes">
                 <div>
-                    <form action="/api/login" method="post">
+                    <form action="#" method="post" id="loginForm">
                         <input type="email" name="email" placeholder="{{ t 'login.E-mail address' }}"
                             style="font-size: 1rem;">
                         <input type="submit" value="{{ t 'login.Proceed' }}">
@@ -37,26 +49,42 @@
         </div>
     </div>
 
-    <div class="container" id="pvpJoinView">
+    <div class="container" id="authView">
         <div class="outer">
-            <h2>{{ t 'login.Login' }}</h2>
+            <h2>{{ t 'auth.Authorisation' }}</h2>
             <div class="modes">
                 <div>
-                    <form action="/api/login" method="post">
-                        <input type="email" name="email" placeholder="{{ t 'login.E-mail address' }}"
-                            style="font-size: 1rem;">
-                        <input type="submit" value="{{ t 'login.Proceed' }}">
+                    <p>{{ t 'auth.Enter the code sent to your e-mail box' }}</p>
+                    <form action="/api/auth" method="post">
+                        <input type="text" name="code" placeholder="{{ t 'auth.Code' }}" style="font-size: 1rem;"
+                            minlength="8" maxlength="10" autocomplete="off">
+                        <input type="submit" value="{{ t 'auth.Login' }}">
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <p class="footer">© 2024 MCJK <a href="/privacy">{{ t 'landing.Privacy policy' }}</a></p>
 </div>
 
 <div class="landing">
     <h1>Statki</h1>
-    <p>The #1 online multiplayer battleships game</p>
-    <span id="scrolldowntext">SCROLL DOWN</span>
+    <p>{{ t 'landing.The #1 online multiplayer battleships game' }}</p>
+    <span id="scrolldowntext">{{ t 'landing.SCROLL DOWN' }}</span>
 </div>
 
+<script>
+    window.locale = {
+        "Reconnecting": "{{ t 'errors.Reconnecting' }}",
+        "Reconnected": "{{ t 'errors.Reconnected' }}",
+        "Reconnection error occured": "{{ t 'errors.Reconnection error occured' }}",
+        "Reconnection failed": "{{ t 'errors.Reconnection failed' }}",
+        "Disconnected": "{{ t 'errors.Disconnected' }}",
+        "Try to refresh the page if this error reoccurs": "{{ t 'errors.Try to refresh the page if this error reoccurs' }}",
+        "Connection error": "{{ t 'errors.Connection error' }}",
+    };
+</script>
+<script src="/assets/js/spa_lib.js"></script>
 <script src="/assets/js/landing.js"></script>
+<script src="/assets/js/socket-err-handler.js"></script>
