@@ -9,11 +9,23 @@
         "Connection error": "Connection error"
     },
 
+    "email": {
+        "This is your Statki authorisation code": "%s is your Statki authorisation code"
+    },
+
     "landing": {
         "The #1 online multiplayer battleships game": "The #1 online multiplayer battleships game",
         "SCROLL DOWN": "SCROLL DOWN",
 
-        "Privacy policy": "Privacy policy"
+        "Privacy policy": "Privacy policy",
+
+        "Server error": "Server error",
+        "Unkown error": "Unknown error",
+        "Wrong email address": "Wrong e-mail address",
+        "Wrong authorisation code": "Wrong authorisation code",
+
+        "E-mail address is required": "E-mail address is required!",
+        "Auth code is required": "Auth code is required"
     },
 
     "menu": {

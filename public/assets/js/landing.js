@@ -2,7 +2,11 @@ String.prototype.replaceAt = function (index, replacement) {
     return this.substring(0, index) + replacement + this.substring(index + replacement.length);
 }
 
+const socket = io();
+
 const charset = ["0", "1", "!", "@", "#", "$", "%", "&"];
+
+const initialContent = $("#scrolldowntext").html();
 
 setInterval(() => {
     var content = $("#scrolldowntext").html();
@@ -22,6 +26,11 @@ setInterval(() => {
             setTimeout(() => {
                 content = content.replaceAt(i, previousChar);
                 $("#scrolldowntext").html(content);
+
+                if (i == len - 1) {
+                    content = initialContent;
+                    $("#scrolldowntext").html(initialContent);
+                }
             }, duration * len + duration * i);
         }, duration * i);
     }
@@ -30,33 +39,155 @@ setInterval(() => {
 document.addEventListener("wheel", (event) => {
     if (event.deltaY > 0) {
         $(".loginContainer").addClass("active");
-        setTimeout(() => {
-            for (let i = 1; i <= 10; i++) {
-                setTimeout(() => {
-                    $(`#f${i}`).css("scale", "1");
-                }, 100 * (i - 1));
-            }
-        }, 400);
-        const fields = document.querySelectorAll(".field");
-        fields.forEach(field => {
-            if (!field.id) {
-                $(field).css("scale", "1");
-            }
-        });
+        animateShips();
     } else if (event.deltaY < 0) {
         $(".loginContainer").removeClass("active");
     }
 });
 
+let touchStart = 0;
+
+window.addEventListener("touchstart", function (event) {
+    touchStart = event.touches[0].clientY;
+});
+
+window.addEventListener("touchend", function (event) {
+    touchEnd = event.changedTouches[0].clientY;
+
+    if (touchStart - touchEnd > 50) {
+        $(".loginContainer").addClass("active");
+        animateShips();
+    } else if (touchStart - touchEnd < -50) {
+        $(".loginContainer").removeClass("active");
+    }
+});
+
+function animateShips() {
+    setTimeout(() => {
+        for (let i = 1; i <= 10; i++) {
+            setTimeout(() => {
+                $(`#f${i}`).css("scale", "1");
+            }, 100 * (i - 1));
+        }
+    }, 400);
+    const fields = document.querySelectorAll(".field");
+    fields.forEach(field => {
+        if (!field.id) {
+            $(field).css("scale", "1");
+        }
+    });
+}
+
 switchView("loginView");
 
-const form = document.getElementById('loginForm');
-form.addEventListener('submit', (e) => {
+const loginForm = document.getElementById('loginForm');
+const emailInput = document.getElementById('email');
+
+loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    console.log("a");
-    switchView("authView");
-    progressParalax();
+    if (emailInput.value) {
+        lockUI(true);
+        console.log("Logging in with e-mail:", emailInput.value);
+        socket.emit("email login", emailInput.value, (response) => {
+            console.log(response);
+            switch (response.status) {
+                case "ok":
+                    console.log("Logged in.");
+
+                    console.log(response);
+
+                    if (response.next === "done") {
+                        console.log("No authorisation required.");
+                        window.location.reload();
+                        return;
+                    }
+
+                    switchView("authView");
+                    progressParalax();
+                    lockUI(false);
+                    break;
+
+                default:
+                    Toastify({
+                        text: response.error,
+                        duration: 5000,
+                        newWindow: true,
+                        gravity: "bottom",
+                        position: "right",
+                        stopOnFocus: true,
+                        className: "bshipstoast",
+                    }).showToast();
+
+                    lockUI(false);
+                    break;
+            }
+        });
+
+        emailInput.value = '';
+    } else {
+        Toastify({
+            text: window.locale["E-mail address is required"],
+            duration: 5000,
+            newWindow: true,
+            gravity: "bottom",
+            position: "right",
+            stopOnFocus: true,
+            className: "bshipstoast",
+        }).showToast();
+    }
+});
+
+const authForm = document.getElementById('authForm');
+const codeInput = document.getElementById('authcode');
+
+authForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    if (codeInput.value) {
+        lockUI(true);
+        console.log("Logging in with e-mail:", codeInput.value);
+        socket.emit("email auth", codeInput.value, (response) => {
+            switch (response.status) {
+                case "ok":
+                    console.log("Authorised.");
+                    lockUI(false);
+
+                    $("body").addClass("closed");
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 700);
+                    break;
+
+                default:
+                    Toastify({
+                        text: response.error,
+                        duration: 5000,
+                        newWindow: true,
+                        gravity: "bottom",
+                        position: "right",
+                        stopOnFocus: true,
+                        className: "bshipstoast",
+                    }).showToast();
+
+                    lockUI(false);
+                    break;
+            }
+        });
+
+        emailInput.value = '';
+    } else {
+        Toastify({
+            text: window.locale["Auth code is required"],
+            duration: 5000,
+            newWindow: true,
+            gravity: "bottom",
+            position: "right",
+            stopOnFocus: true,
+            className: "bshipstoast",
+        }).showToast();
+    }
 });
 
 var parallaxTranslateX = 0;

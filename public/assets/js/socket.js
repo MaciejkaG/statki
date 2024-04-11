@@ -1,3 +1,5 @@
+switchView("mainMenuView");
+
 const socket = io();
 
 // Handling server-sent events

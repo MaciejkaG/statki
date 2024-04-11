@@ -9,11 +9,23 @@
         "Connection error": "Błąd połączenia"
     },
 
+    "email": {
+        "This is your Statki authorisation code": "%s to twój kod autoryzacyjny do statków"
+    },
+
     "landing": {
         "The #1 online multiplayer battleships game": "Najlepsza wielosobowa gra w statki",
         "SCROLL DOWN": "SCROLLUJ W DÓŁ",
 
-        "Privacy policy": "Polityka prywatności"
+        "Privacy policy": "Polityka prywatności",
+
+        "Server error": "Bład serwera",
+        "Unkown error": "Nieznany błąd",
+        "Wrong email address": "Niepoprawny adres e-mail",
+        "Wrong authorisation code": "Niepoprawny kod autoryzacji",
+
+        "E-mail address is required": "Adres e-mail jest wymagany!",
+        "Auth code is required": "Kod autoryzacji jest wymagany!"
     },
 
     "menu": {

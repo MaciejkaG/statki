@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import geoip from 'geoip-lite';
 
 import mysql from 'mysql';
-import readline from "node:readline";
+import { Lang } from './localisation.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -105,6 +105,8 @@ export class MailAuth {
     startVerification(email, ip, agent, langId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
+            const lang = new Lang([langId]);
+
             conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
                 if (error) { reject(error); conn.end(); return; }
                 if (response.length !== 0) {
@@ -138,13 +140,18 @@ export class MailAuth {
 
                         const lookup = geoip.lookup(ip);
 
-                        const lookupData = `User-Agent: ${agent}\nAdres IP: ${ip}\nKraj: ${lookup.country}\nRegion: ${lookup.region}\nMiasto: ${lookup.city}`;
+                        var lookupData;
+                        if (lookup) {
+                            lookupData = `User-Agent: ${agent}\nAdres IP: ${ip}\nKraj: ${lookup.country}\nRegion: ${lookup.region}\nMiasto: ${lookup.city}`;
+                        } else {
+                            lookupData = `IP lookup failed`;
+                        }
 
                         try {
                             await this.mail.sendMail({
                                 from: this.mailFrom,
                                 to: email,
-                                subject: `${authCode} to twój kod autoryzacji do Statków`,
+                                subject: lang.t('email.This is your Statki authorisation code').replace("%s", authCode),
                                 html: html.replace("{{ CODE }}", authCode).replace("{{ LOOKUP }}", lookupData),
                             });
                         } catch (e) {
@@ -173,13 +180,18 @@ export class MailAuth {
 
                 const lookup = geoip.lookup(ip);
 
-                const lookupData = `User-Agent: ${agent}\nIP address: ${ip}\nCountry: ${lookup.country}\nRegion: ${lookup.region}\nCity: ${lookup.city}`;
+                var lookupData;
+                if (lookup) {
+                    lookupData = `User-Agent: ${agent}\nAdres IP: ${ip}\nKraj: ${lookup.country}\nRegion: ${lookup.region}\nMiasto: ${lookup.city}`;
+                } else {
+                    lookupData = `IP lookup failed`;
+                }
 
                 try {
                     await this.mail.sendMail({
                         from: this.mailFrom,
                         to: email,
-                        subject: `${authCode} to twój kod logowania do Statków`,
+                        subject: lang.t('email.This is your Statki authorisation code').replace("%s", authCode),
                         html: html.replace("{{ NICKNAME }}", row.nickname).replace("{{ CODE }}", authCode).replace("{{ LOOKUP }}", lookupData),
                     });
                 } catch (e) {

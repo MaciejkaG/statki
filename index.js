@@ -95,7 +95,10 @@ app.get('/privacy', (req, res) => {
 app.get('/', async (req, res) => {
     let login = loginState(req);
 
-    if (login != 2) {
+    if (login == 0) {
+        req.session.userAgent = req.get('user-agent');
+        req.session.loggedIn = 0;
+
         const locale = new Lang(req.acceptsLanguages());
 
         res.render('landing', {
@@ -104,6 +107,8 @@ app.get('/', async (req, res) => {
             }
         });
         // res.redirect('/login');
+    } else if (login != 2) {
+        res.redirect("/login");
     } else if (req.session.nickname == null) {
         auth.getLanguage(req.session.userId).then(language => {
             var locale;
@@ -359,17 +364,110 @@ io.on('connection', async (socket) => {
     const req = socket.request;
     const session = req.session;
     socket.session = session;
-    // if (session.loginState != 2) {
-    //     socket.on('email login', (email, callback) => {
-    //         callback(session.nickname);
-    //     });
-    // }
 
-    if (!await GInfo.isPlayerInGame(socket)) {
-        if (session.nickname == null) {
-            socket.disconnect();
-            return;
-        }
+    if (!session.loggedIn) {
+        socket.on('email login', (email, callback) => {
+            let login = socket.request.session.loggedIn;
+
+            if (login == 0 && email != null && validateEmail(email)) {
+                if (checkFlag('authless')) {
+                    auth.loginAuthless(email).then(async result => {
+                        req.session.reload((err) => {
+                            if (err) return socket.disconnect();
+
+                            req.session.userId = result.uid;
+                            req.session.loggedIn = 2;
+                            req.session.save();
+                        });
+
+                        callback({ status: "ok", next: "done" });
+                    });
+
+                    return;
+                }
+
+                const locale = new Lang(session.langs);
+
+                auth.startVerification(email, getIPSocket(socket), socket.client.request.headers["user-agent"], locale.lang).then(async result => {
+                    if (result.status === 1 || result.status === -1) {
+                        req.session.reload((err) => {
+                            if (err) return socket.disconnect();
+
+                            req.session.userId = result.uid;
+                            req.session.loggedIn = 1;
+                            req.session.save();
+                        });
+
+                        callback({ status: "ok", next: "auth" });
+                    } else {
+                        callback({ status: "SrvErr", error: locale.t("landing.Server error") });
+                    }
+                }).catch((err) => {
+                    const locale = new Lang(session.langs);
+
+                    callback({ success: false, error: locale.t("landing.Unknown error") });
+                    throw err;
+                });
+            } else {
+                const locale = new Lang(session.langs);
+
+                auth.loginAuthless(email).then(async result => {
+                    req.session.reload((err) => {
+                        if (err) return socket.disconnect();
+
+                        req.session.userId = result.uid;
+                        req.session.loggedIn = 2;
+                        req.session.save();
+                    });
+
+                    callback({ success: false, error: locale.t("landing.Wrong email address") });
+                });
+            }
+        });
+
+        socket.on('email auth', async (code, callback) => {
+            let login = socket.request.session.loggedIn;
+
+            if (login == 1 && code != null && code.length <= 10 && code.length >= 8) {
+                let finishResult = await auth.finishVerification(req.session.userId, code);
+                if (finishResult) {
+                    req.session.reload((err) => {
+                        if (err) return socket.disconnect();
+
+                        req.session.loggedIn = 2;
+                        req.session.save();
+                    });
+
+                    callback({ status: "ok", next: "done" });
+                } else {
+                    const locale = new Lang(session.langs);
+
+                    callback({ success: false, error: locale.t("landing.Wrong authorisation code") });
+                }
+            } else {
+                const locale = new Lang(session.langs);
+
+                callback({ success: false, error: locale.t("landing.Wrong authorisation code") });
+            }
+        });
+
+        socket.on('disconnecting', () => {
+            if (socket.request.session.loggedIn == 1) {
+                req.session.reload((err) => {
+                    if (err) return socket.disconnect();
+
+                    req.session.loggedIn = 0;
+                    req.session.save();
+                });
+            }
+        });
+    }
+
+    if (!await GInfo.isPlayerInGame(socket) || session.nickname != null) {
+        // if (session.nickname == null) {
+        //     socket.disconnect();
+        //     return;
+        // }
 
         socket.on('whats my nick', (callback) => {
             callback(session.nickname);
@@ -529,7 +627,7 @@ io.on('connection', async (socket) => {
                 io.to(socket.rooms[1]).emit("player left");
             }
         });
-    } else {
+    } else if (session.nickname != null) {
         const playerGame = await GInfo.getPlayerGameData(socket);
 
         if (playerGame.data.state === 'pregame') {
@@ -781,6 +879,14 @@ function getIP(req) {
         return req.headers['cf-connecting-ip'];
     } else {
         return req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    }
+}
+
+function getIPSocket(socket) {
+    if (checkFlag("cloudflare_mode")) {
+        return socket.client.request.headers['cf-connecting-ip'];
+    } else {
+        return socket.client.request.headers['x-forwarded-for'] || socket.handshake.address;
     }
 }
 
