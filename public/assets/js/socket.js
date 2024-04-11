@@ -144,6 +144,12 @@ $("#pvpMenuButton").on("click", function () {
     switchView('pvpMenuView');
 });
 
+$("#logout").on("click", function() {
+    lockUI(true);
+    socket.emit("logout");
+    window.location.reload();
+});
+
 const form = document.getElementById('pvpJoinForm');
 const input = document.getElementById('pvpJoinCode');
 

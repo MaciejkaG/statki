@@ -23,10 +23,10 @@ function switchView(viewContainerId, useReplaceState=false) {
 function lockUI(doLock) {
     if (doLock) {
         $("body").css("pointer-events", "none");
-        $("body").css("opacity", "0.4");
+        $(".container").css("opacity", "0.4");
     } else {
         $("body").css("pointer-events", "inherit");
-        $("body").css("opacity", "1");
+        $(".container").css("opacity", "1");
     }
 }
 

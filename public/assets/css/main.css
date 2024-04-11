@@ -338,3 +338,26 @@ nav span:hover {
     outline: none;
     margin-left: 2rem;
 }
+
+#settingsView a {
+    text-decoration: none;
+    color: var(--dynamic);
+    
+    transition: opacity 0.3s;
+}
+
+#settingsView a:hover {
+    opacity: 0.6;
+    text-decoration: underline;
+}
+
+#logout {
+    color: var(--danger);
+    cursor: pointer;
+
+    transition: opacity 0.3s;
+}
+
+#logout:hover {
+    opacity: 0.6;
+}

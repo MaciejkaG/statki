@@ -99,7 +99,11 @@ loginForm.addEventListener('submit', (e) => {
 
                     if (response.next === "done") {
                         console.log("No authorisation required.");
-                        window.location.reload();
+                        $("body").addClass("closed");
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 700);
                         return;
                     }
 

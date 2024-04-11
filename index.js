@@ -622,6 +622,10 @@ io.on('connection', async (socket) => {
             }
         });
 
+        socket.on('logout', () => {
+            session.destroy();
+        });
+
         socket.on('disconnecting', () => {
             if (bships.isPlayerInRoom(socket)) {
                 io.to(socket.rooms[1]).emit("player left");
