@@ -78,7 +78,8 @@
             "No matches played": "Nie zagrano żadnych meczy"
         },
         "Settings": {
-            "General": "Ogólne"
+            "General": "Ogólne",
+            "Log out": "Wyloguj się"
         },
         "General": {
             "Unknown error occured": "Wystąpił nieznany błąd",

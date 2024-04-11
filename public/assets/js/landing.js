@@ -107,9 +107,9 @@ loginForm.addEventListener('submit', (e) => {
                         return;
                     }
 
+                    lockUI(false);
                     switchView("authView");
                     progressParalax();
-                    lockUI(false);
                     break;
 
                 default:

@@ -77,7 +77,8 @@
             "No matches played": "No matches played"
         },
         "Settings": {
-            "General": "General"
+            "General": "General",
+            "Log out": "Log out"
         },
         "General": {
             "Unknown error occured": "Unknown error occured",
