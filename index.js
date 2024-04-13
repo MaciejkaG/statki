@@ -6,6 +6,7 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
 import { v4 as uuidv4 } from 'uuid';
 import session from "express-session";
 import { engine } from 'express-handlebars';
@@ -71,15 +72,28 @@ let sessionStore = new SessionRedisStore({
     prefix: "statkiSession:",
 });
 
+var sessionSecret = uuidv4();
+let secretPath = path.join(__dirname, '.session.secret');
+
+if (fs.existsSync(secretPath)) {
+    sessionSecret = fs.readFileSync(secretPath);
+} else {
+    fs.writeFile(secretPath, sessionSecret, function (err) {
+        if (err) {
+            console.log("An error occured while saving a freshly generated session secret.\nSessions may not persist after a restart of the server.");
+        }
+    });
+}
+
 const sessionMiddleware = session({
     store: sessionStore,
-    secret: uuidv4(),
+    secret: sessionSecret,
     resave: true,
     saveUninitialized: true,
     rolling: true,
     cookie: {
         secure: checkFlag("cookie_secure"),
-        maxAge: 3 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
     },
 });
 
