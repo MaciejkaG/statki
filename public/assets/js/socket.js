@@ -114,16 +114,16 @@ $("#createGameButton").on("click", function () {
             case "ok":
                 console.log("Lobby created");
                 $("#createGameCode").val(response.gameCode);
+                lockUI(false);
                 switchView("pvpCreateView");
                 returnLock = true;
-                lockUI(false);
                 break;
 
             case "alreadyInLobby":
                 console.log("Lobby creation failed (player is already in a lobby)");
                 $("#createGameCode").val(response.gameCode);
-                switchView("pvpCreateView");
                 lockUI(false);
+                switchView("pvpCreateView");
                 break;
 
             default:
@@ -163,15 +163,9 @@ form.addEventListener('submit', (e) => {
                 case "ok":
                     console.log("Joined a lobby by:", response.oppNickname);
                     $("#oppNameField").html(response.oppNickname);
-                    switchView("preparingGame");
                     lockUI(false);
+                    switchView("preparingGame");
                     break;
-
-                //case "alreadyInLobby":
-                //    $("#createGameCode").val(response.gameCode);
-                //    switchView("pvpCreateView");
-                //    lockUI(false);
-                //    break;
 
                 default:
                     alert(`${window.locale["Unknown error occured"]}\n${window.locale["Status:"]} ${response.status}`);
