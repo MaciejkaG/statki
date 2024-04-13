@@ -1,5 +1,6 @@
 {
     "name": "Statki",
+    "description": "The #1 online multiplayer battleships game\nModern, simple UI, PvP and PvE modes, advanced statistics and more.",
     "start_url": "/",
     "background_color": "black",
     "theme_color": "black",
@@ -7,8 +8,48 @@
     "icons": [
         {
             "src": "/assets/img/statki-logo-crop.png",
-            "sizes": "1080x1080",
-            "type": "image/png"
+            "sizes": "1080x1080"
+        },
+        {
+            "src": "/assets/img/statki-logo-crop-144.png",
+            "sizes": "144x144"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/assets/img/screenshot_game2.png",
+            "sizes": "1920x911",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Middle of the round"
+        },
+        {
+            "src": "/assets/img/screenshot_mainmenu.png",
+            "sizes": "1920x911",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Main menu"
+        },
+        {
+            "src": "/assets/img/screenshot_create.png",
+            "sizes": "1920x911",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Create game screen"
+        },
+        {
+            "src": "/assets/img/screenshot_profile.png",
+            "sizes": "1920x911",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Main menu"
+        },
+        {
+            "src": "/assets/img/screenshot_game1.png",
+            "sizes": "1920x911",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Preparation phase"
         }
     ],
     "display": "standalone"

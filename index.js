@@ -917,21 +917,21 @@ function checkFlag(key) {
 async function finishPrepPhase(socket, playerGame) {
     await GInfo.endPrepPhase(socket);
 
-    // const members = [...roomMemberIterator(playerGame.id)];
-    // for (let i = 0; i < members.length; i++) {
-    //     const sid = members[i][0];
-    //     const socket = io.sockets.sockets.get(sid);
+    const members = [...roomMemberIterator(playerGame.id)];
+    for (let i = 0; i < members.length; i++) {
+        const sid = members[i][0];
+        const socket = io.sockets.sockets.get(sid);
 
-    //     let placedShips = await GInfo.depleteShips(socket);
-    //     placedShips.forEach(shipData => {
-    //         socket.emit("placed ship", shipData)
-    //     });
+        let placedShips = await GInfo.depleteShips(socket);
+        placedShips.forEach(shipData => {
+            socket.emit("placed ship", shipData)
+        });
 
-    //     if (placedShips.length > 0) {
-    //         const locale = new Lang(socket.session.langs);
-    //         socket.emit("toast", locale.t("board.Your remaining ships have been randomly placed"))
-    //     }
-    // }
+        if (placedShips.length > 0) {
+            const locale = new Lang(socket.session.langs);
+            socket.emit("toast", locale.t("board.Your remaining ships have been randomly placed"))
+        }
+    }
 
     GInfo.timer(playerGame.id, 30, () => {
         AFKEnd(playerGame.id);
