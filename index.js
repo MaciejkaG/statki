@@ -463,7 +463,7 @@ io.on('connection', async (socket) => {
         });
     }
 
-    if (!await GInfo.isPlayerInGame(socket) || session.nickname != null) {
+    if (!await GInfo.isPlayerInGame(socket) && session.nickname != null) {
         // if (session.nickname == null) {
         //     socket.disconnect();
         //     return;
@@ -780,16 +780,28 @@ io.on('connection', async (socket) => {
                         if (hit.gameFinished) {
                             const members = [...roomMemberIterator(playerGame.id)];
 
-                            let hostSocket = io.sockets.sockets.get(members[0][0]);
+                            let hostSocket;
+                            let guestSocket;
+
+                            members.forEach(player => {
+                                player = player[0];
+                                const playerSocket = io.sockets.sockets.get(player);
+
+                                if (playerSocket.session.userId === playerGame.data.hostId) {
+                                    hostSocket = playerSocket;
+                                } else {
+                                    guestSocket = playerSocket;
+                                }
+                            });
+
                             let hostNickname = hostSocket.session.nickname;
-                            let guestSocket = io.sockets.sockets.get(members[1][0]);
                             let guestNickname = guestSocket.session.nickname;
 
                             hostSocket.emit("game finished", !enemyIdx ? 1 : 0, guestNickname);
                             guestSocket.emit("game finished", !enemyIdx ? 1 : 0, hostNickname);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
-                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostSocket.session.userId, guestSocket.session.userId, playerGame.data.boards, enemyIdx ? 0 : 1);
+                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostSocket.session.userId, guestSocket.session.userId, playerGame.data.boards, enemyIdx ? 1 : 0);
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);
@@ -905,21 +917,21 @@ function checkFlag(key) {
 async function finishPrepPhase(socket, playerGame) {
     await GInfo.endPrepPhase(socket);
 
-    const members = [...roomMemberIterator(playerGame.id)];
-    for (let i = 0; i < members.length; i++) {
-        const sid = members[i][0];
-        const socket = io.sockets.sockets.get(sid);
+    // const members = [...roomMemberIterator(playerGame.id)];
+    // for (let i = 0; i < members.length; i++) {
+    //     const sid = members[i][0];
+    //     const socket = io.sockets.sockets.get(sid);
 
-        let placedShips = await GInfo.depleteShips(socket);
-        placedShips.forEach(shipData => {
-            socket.emit("placed ship", shipData)
-        });
+    //     let placedShips = await GInfo.depleteShips(socket);
+    //     placedShips.forEach(shipData => {
+    //         socket.emit("placed ship", shipData)
+    //     });
 
-        if (placedShips.length > 0) {
-            const locale = new Lang(socket.session.langs);
-            socket.emit("toast", locale.t("board.Your remaining ships have been randomly placed"))
-        }
-    }
+    //     if (placedShips.length > 0) {
+    //         const locale = new Lang(socket.session.langs);
+    //         socket.emit("toast", locale.t("board.Your remaining ships have been randomly placed"))
+    //     }
+    // }
 
     GInfo.timer(playerGame.id, 30, () => {
         AFKEnd(playerGame.id);
