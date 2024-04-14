@@ -65,6 +65,22 @@
             "You will be redirected soon": "You will be redirected soon",
             "Opponent:": "Opponent"
         },
+        "PvE": {
+            "Create": "PvE / Create",
+            "Choose the difficulty mode": "Choose the difficulty mode",
+            "difficulty": {
+                "Simple": {
+                    "description": "In this mode, the bot is just randomly shooting at fields, without any intelligence."
+                },
+                "Smart": {
+                    "description": "In this mode, the bot understands the rules of the game and will try to predict where your ships could be and knows where they couldn't."
+                },
+                "Overkill": {
+                    "description": "This mode is an absolute overkill - the bot knows exact positions of all your ships and will shoot at them in random order with 100% accuracy. To win in this mode, you need to have 100% accuracy for the entire game."
+                }
+            },
+            "Begin": "Begin"
+        },
         "Profile": {
             "Loading": "Loading...",
             "Player since:": "Player since:",
@@ -78,7 +94,12 @@
         },
         "Settings": {
             "General": "General",
-            "Log out": "Log out"
+            "Account": "Account",
+
+            "Log out": "Log out",
+
+            "Current nickname:": "Current nickname:",
+            "Change nickname": "Change nickname"
         },
         "General": {
             "Unknown error occured": "Unknown error occured",
@@ -123,7 +144,7 @@
         "Four-masted": "Four-masted",
         "Available:": "Available:",
 
-        "Sunk ships": "Sunk ships",
+        "To sunk": "To sunk",
         "Single-mastedPlu": "Single-masted:",
         "Two-mastedPlu": "Two-masted:",
         "Three-mastedPlu": "Three-masted:",

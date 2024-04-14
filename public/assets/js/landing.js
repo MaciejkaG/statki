@@ -4,37 +4,39 @@ String.prototype.replaceAt = function (index, replacement) {
 
 const socket = io();
 
-const charset = ["0", "1", "!", "@", "#", "$", "%", "&"];
+// Temporarily commented out, as it causes huge graphical glitches
 
-const initialContent = $("#scrolldowntext").html();
+// const charset = ["0", "1", "!", "@", "#", "$", "%", "&"];
 
-setInterval(() => {
-    var content = $("#scrolldowntext").html();
-    const len = content.length;
+// const initialContent = $("#scrolldowntext").html();
 
-    for (let i = 0; i < len; i++) {
-        const duration = Math.random() * 20 + 40;
+// setInterval(() => {
+//     var content = $("#scrolldowntext").html();
+//     const len = content.length;
 
-        setTimeout(() => {
-            let previousChar = content.charAt(i);
+//     for (let i = 0; i < len; i++) {
+//         const duration = Math.random() * 20 + 40;
 
-            let randomChar = charset[Math.floor(Math.random() * charset.length)];
-            content = content.replaceAt(i, randomChar);
+//         setTimeout(() => {
+//             let previousChar = content.charAt(i);
 
-            $("#scrolldowntext").html(content);
+//             let randomChar = charset[Math.floor(Math.random() * charset.length)];
+//             content = content.replaceAt(i, randomChar);
 
-            setTimeout(() => {
-                content = content.replaceAt(i, previousChar);
-                $("#scrolldowntext").html(content);
+//             $("#scrolldowntext").html(content);
 
-                if (i == len - 1) {
-                    content = initialContent;
-                    $("#scrolldowntext").html(initialContent);
-                }
-            }, duration * len + duration * i);
-        }, duration * i);
-    }
-}, 5000);
+//             setTimeout(() => {
+//                 content = content.replaceAt(i, previousChar);
+//                 $("#scrolldowntext").html(content);
+
+//                 if (i == len - 1) {
+//                     content = initialContent;
+//                     $("#scrolldowntext").html(initialContent);
+//                 }
+//             }, duration * len + duration * i);
+//         }, duration * i);
+//     }
+// }, 5000);
 
 document.addEventListener("wheel", (event) => {
     if (event.deltaY > 0) {

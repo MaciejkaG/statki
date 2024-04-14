@@ -65,6 +65,22 @@
             "You will be redirected soon": "Wkrótce nastąpi przekierowanie",
             "Opponent:": "Przeciwnik"
         },
+        "PvE": {
+            "Create": "PvE / Stwórz",
+            "Choose the difficulty mode": "Wybierz tryb trudności",
+            "difficulty": {
+                "Simple": {
+                    "description": "W tym trybie, bot po prostu losowo strzela w pola, bez żadnej inteligencji."
+                },
+                "Smart": {
+                    "description": "W tym trybie, bot rozumie zasady gry i próbuje przewidywać gdzie Twoje statki mogą być oraz wie gdzie ich na pewno nie ma. Jest to tryb najbardziej zbliżony to przeciętnego gracza."
+                },
+                "Overkill": {
+                    "description": "Ten tryb to kompletna przesada - bot zna dokładne pozycje wszystkich Twoich statków i będzie strzelał do nich w losowej kolejności ze 100% celnością. By wygrać na tym trybie, musisz mieć 100% celność przez całą grę."
+                }
+            },
+            "Begin": "Rozpocznij"
+        },
         "Profile": {
             "Loading": "Wczytywanie...",
             "Player since:": "Gracz od:",
@@ -79,7 +95,12 @@
         },
         "Settings": {
             "General": "Ogólne",
-            "Log out": "Wyloguj się"
+            "Account": "Konto",
+
+            "Log out": "Wyloguj się",
+
+            "Current nickname:": "Aktualny nickname:",
+            "Change nickname": "Zmień nickname"
         },
         "General": {
             "Unknown error occured": "Wystąpił nieznany błąd",
@@ -124,7 +145,7 @@
         "Four-masted": "Czteromasztowiec",
         "Available:": "Dostępne:",
 
-        "Sunk ships": "Zatopione statki",
+        "To sunk": "Do zatopienia",
         "Single-mastedPlu": "Jednomasztowce:",
         "Two-mastedPlu": "Dwumasztowce:",
         "Three-mastedPlu": "Trójmasztowce:",

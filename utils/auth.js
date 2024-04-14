@@ -30,24 +30,40 @@ export class MailAuth {
     }
 
     async timer(tId, time, callback) {
-        await this.redis.set(`loginTimer:${tId}`, new Date().getTime() / 1000);
-        let localLastUpdate = await this.redis.get(`loginTimer:${tId}`);
+        let timerEnd = new Date().getTime() / 1000 + time;
 
-        let timeout = setTimeout(callback, time * 1000);
+        await this.redis.set(`loginTimer:${tId}`, timerEnd);
 
         let interval = setInterval(async () => {
-            if (timeout._destroyed) {
+            if (new Date().getTime() < timerEnd) {
                 clearInterval(interval);
+                
+                callback();
                 return;
             }
 
             let lastUpdate = await this.redis.get(`loginTimer:${tId}`);
-            if (localLastUpdate != lastUpdate) {
-                clearTimeout(timeout);
+            if (timerEnd != lastUpdate) {
                 clearInterval(interval);
                 return;
             }
-        }, 200);
+        }, 1000);
+
+        // let timeout = setTimeout(callback, time * 1000);
+
+        // let interval = setInterval(async () => {
+        //     if (timeout._destroyed) {
+        //         clearInterval(interval);
+        //         return;
+        //     }
+
+        //     let lastUpdate = await this.redis.get(`loginTimer:${tId}`);
+        //     if (localLastUpdate != lastUpdate) {
+        //         clearTimeout(timeout);
+        //         clearInterval(interval);
+        //         return;
+        //     }
+        // }, 200);
     }
 
     async resetTimer(tId) {
@@ -133,7 +149,7 @@ export class MailAuth {
                         await this.redis.set(`codeAuth:${authCode}`, row.user_id);
 
                         await this.timer(row.user_id, 600, async () => {
-                            await this.redis.json.del(`codeAuth:${authCode}`);
+                            await this.redis.unlink(`codeAuth:${authCode}`);
                         });
 
                         authCode = authCode.slice(0, 4) + " " + authCode.slice(4);
@@ -173,7 +189,7 @@ export class MailAuth {
                 await this.redis.set(`codeAuth:${authCode}`, row.user_id);
 
                 await this.timer(row.user_id, 600, async () => {
-                    await this.redis.json.del(`codeAuth:${authCode}`);
+                    await this.redis.unlink(`codeAuth:${authCode}`);
                 });
 
                 authCode = authCode.slice(0, 4) + " " + authCode.slice(4);
@@ -205,10 +221,10 @@ export class MailAuth {
         });
     }
 
-    saveMatch(matchId, duration, type, hostId, guestId, boards, winnerIdx) {
+    saveMatch(matchId, duration, type, hostId, guestId, boards, winnerIdx, aitype = null) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            conn.query(`INSERT INTO matches(match_id, match_type, host_id, guest_id, duration) VALUES (${conn.escape(matchId)}, ${conn.escape(type)}, ${conn.escape(hostId)}, ${conn.escape(guestId)}, ${conn.escape(duration)})`, async (error) => {
+            conn.query(`INSERT INTO matches(match_id, match_type, host_id, guest_id, duration${aitype == null ? "" : ", ai_type"}) VALUES (${conn.escape(matchId)}, ${conn.escape(type)}, ${conn.escape(hostId)}, ${conn.escape(guestId)}, ${conn.escape(duration)}${aitype == null ? "" : ", " + conn.escape(aitype)})`, async (error) => {
                 if (error) reject(error);
                 else conn.query(`INSERT INTO statistics(match_id, user_id, board, won) VALUES (${conn.escape(matchId)}, ${conn.escape(hostId)}, ${conn.escape(JSON.stringify(boards[0]))}, ${conn.escape(winnerIdx ? 1 : 0)}), (${conn.escape(matchId)}, ${conn.escape(guestId)}, ${conn.escape(JSON.stringify(boards[1]))}, ${conn.escape(winnerIdx ? 0 : 1)})`, async (error, response) => {
                     if (error) reject(error);
@@ -223,7 +239,7 @@ export class MailAuth {
     getProfile(userId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            conn.query(`SELECT nickname, account_creation FROM accounts WHERE user_id = ${conn.escape(userId)}; SELECT ROUND((AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.user_id = ${conn.escape(userId)}; SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = ${conn.escape(userId)} ORDER BY matches.date DESC LIMIT 10;`, async (error, response) => {
+            conn.query(`SELECT nickname, account_creation FROM accounts WHERE user_id = ${conn.escape(userId)}; SELECT ROUND((AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.user_id = ${conn.escape(userId)}; SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.ai_type, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = ${conn.escape(userId)} ORDER BY matches.date DESC LIMIT 10;`, async (error, response) => {
                 if (error) reject(error);
                 else {
                     if (response[0].length === 0 || response[1].length === 0) {
@@ -246,7 +262,7 @@ export class MailAuth {
         const rUid = await this.redis.get(`codeAuth:${authCode}`);
         if (rUid != null && rUid === uid) {
             this.resetTimer(rUid);
-            await this.redis.del(`codeAuth:${authCode}`);
+            await this.redis.unlink(`codeAuth:${authCode}`);
             return true;
         } else {
             return false;

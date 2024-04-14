@@ -4,7 +4,7 @@
     "start_url": "/",
     "background_color": "black",
     "theme_color": "black",
-    "orientation": "landscape",
+    "orientation": "any",
     "icons": [
         {
             "src": "/assets/img/statki-logo-crop.png",
@@ -50,6 +50,27 @@
             "type": "image/png",
             "form_factor": "wide",
             "label": "Preparation phase"
+        },
+        {
+            "src": "/assets/img/screenshot_mainmenu_mobile.png",
+            "sizes": "1082x2402",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Main menu screen"
+        },
+        {
+            "src": "/assets/img/screenshot_profile_mobile.png",
+            "sizes": "1082x2402",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Profile view"
+        },
+        {
+            "src": "/assets/img/screenshot_create_mobile.png",
+            "sizes": "1082x2402",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Create game screen"
         }
     ],
     "display": "standalone"

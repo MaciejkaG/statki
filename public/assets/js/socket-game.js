@@ -50,11 +50,9 @@ if ($(window).width() <= 820) {
 }
 
 $('#board .field').on('click', function () {
-    if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {
-        if ($(window).width() > 820) {
-            socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
-            lastTimeClick = new Date().getTime() / 1000;
-        }
+    if (new Date().getTime() / 1000 - lastTimeClick > 0.3 && $(window).width() > 820 && !postPrep) {
+        socket.emit("place ship", selectedShip, $(this).data('pos-x'), $(this).data('pos-y'), shipRotation);
+        lastTimeClick = new Date().getTime() / 1000;
     }
 });
 
@@ -66,11 +64,9 @@ function manualPlace(posX, posY) {
 }
 
 $('#secondaryBoard .field').on('click', function () {
-    if (new Date().getTime() / 1000 - lastTimeClick > 0.3) {
-        if ($(window).width() > 820) {
-            socket.emit("shoot", $(this).data('pos-x'), $(this).data('pos-y'));
-            lastTimeClick = new Date().getTime() / 1000;
-        }
+    if (new Date().getTime() / 1000 - lastTimeClick > 0.3 && $(window).width() > 820 && myTurn) {
+        socket.emit("shoot", $(this).data('pos-x'), $(this).data('pos-y'));
+        lastTimeClick = new Date().getTime() / 1000;
     }
 });
 
@@ -178,7 +174,7 @@ socket.on("ship sunk", (victimIdx, ship) => {
             break;
     }
 
-    let l = !ship.type ? ship.type + 1 : ship.type + 2;
+    let l = ship.type + 1;
     if (victimIdx === playerIdx) {
         for (let i = 0; i < l; i++) {
             setTimeout(() => {
@@ -332,10 +328,10 @@ function getAccuracy() {
 }
 
 function updateShipsSunk() {
-    $("#singlemasted").html(shipsSunk[0]);
-    $("#twomasted").html(shipsSunk[1]);
-    $("#threemasted").html(shipsSunk[2]);
-    $("#fourmasted").html(shipsSunk[3]);
+    $("#singlemasted").html(4 - shipsSunk[0]);
+    $("#twomasted").html(3 - shipsSunk[1]);
+    $("#threemasted").html(2 - shipsSunk[2]);
+    $("#fourmasted").html(1 - shipsSunk[3]);
 }
 
 function readyUp() {

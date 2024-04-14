@@ -108,13 +108,12 @@ nav span:hover {
 }
 
 #pvpCreateView .modes div {
-    height: 17rem;
     width: 15rem;
     background-color: black;
     border: solid 1px white;
     border-radius: 15px;
     user-select: none;
-    padding: 1rem 3rem;
+    padding: 2rem 3rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -351,6 +350,30 @@ nav span:hover {
     text-decoration: underline;
 }
 
+#settingsView .versionInfo {
+    margin-top: 3rem;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 15px;
+}
+
+#settingsView button {
+    background-color: black;
+    color: white;
+    border-radius: 15px;
+    border: 1px solid white;
+    text-align: center;
+    padding: 0.5rem 2rem;
+    outline: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+#settingsView button:hover {
+    background-color: white;
+    color: black;
+}
+
 #logout {
     color: var(--danger);
     cursor: pointer;
@@ -360,4 +383,61 @@ nav span:hover {
 
 #logout:hover {
     opacity: 0.6;
+}
+
+/* PvE */
+#vsAiView .modes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+}
+
+#vsAiView .modes div {
+    /* height: 7rem; */
+    width: 15rem;
+    background-color: black;
+    border: solid 1px white;
+    border-radius: 15px;
+    user-select: none;
+    padding: 2rem 3rem;
+}
+
+#vsAiView form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+#vsAiView form input {
+    background-color: black;
+    color: white;
+    border-radius: 15px;
+    border: 1px solid white;
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 0.5rem 2rem;
+    outline: none;
+}
+
+#vsAiView form input[type=submit] {
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+#vsAiView form input[type=submit]:hover {
+    background-color: white;
+    color: black;
+}
+
+#vsAiView select {
+    padding: 0.5rem 1rem;
+    padding: 0.5rem 2rem;
+    font-size: 1rem;
+    background-color: black;
+    border: solid 1px white;
+    color: white;
+    border-radius: 15px;
+    outline: none;
 }

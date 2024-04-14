@@ -34,15 +34,13 @@ const initialURLParams = new URLSearchParams(window.location.search);
 const initialPath = initialURLParams.get('path');
 
 window.addEventListener("load", () => {
-    // if (initialPath != null) {
-    //     let elem = document.querySelector(`.container[data-path="${initialPath}"]`);
+    if (initialPath != null) {
+        let elem = document.querySelector(`.container[data-path="${initialPath}"]:not(.container[data-pathlock])`);
 
-    //     if (elem != null) {
-    //         switchView(elem.id, true);
-    //     }
-    // } else {
-        // switchView("mainMenuView");
-    //}
+        if (elem != null) {
+            switchView(elem.id, true);
+        }
+    }
 });
 
 addEventListener("popstate", (event) => {
