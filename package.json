@@ -1,6 +1,6 @@
 {
-  "name": "statki-backend",
-  "version": "0.7.4",
+  "name": "statki",
+  "version": "0.7.5",
   "description": "Backend do gry w statki",
   "main": "index.js",
   "type": "module",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MaciejkaG/statki-backend.git"
+    "url": "git+https://github.com/MaciejkaG/statki.git"
   },
   "author": "Maciejka",
   "license": "ISC",

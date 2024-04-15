@@ -29,7 +29,6 @@ fs.readFile(path.join(__dirname, 'package.json'), function (err, data) {
     packageJSON = JSON.parse(data);
 });
 
-
 const app = express();
 
 const flags = process.env.flags ? process.env.flags.split(",") : null;
@@ -1122,7 +1121,7 @@ io.on('connection', async (socket) => {
 
                     await GInfo.passTurn(socket);
 
-                    [posX, posY] = await GInfo.makeAIMove(socket, playerGame.difficulty);
+                    [posX, posY] = await GInfo.makeAIMove(socket, playerGame.data.difficulty);
 
                     hit = await GInfo.shootShip(socket, 0, posX, posY);
 
@@ -1236,6 +1235,12 @@ async function finishPrepPhase(socket, playerGame) {
         const socket = io.sockets.sockets.get(sid);
 
         let placedShips = await GInfo.depleteShips(socket);
+        if (!placedShips) {
+            io.to(playerGame.id).emit('toast', "An error occured while autoplacing player's ships");
+            endGame(playerGame.id);
+            return;
+        }
+
         placedShips.forEach(shipData => {
             socket.emit("placed ship", shipData)
         });
@@ -1249,6 +1254,8 @@ async function finishPrepPhase(socket, playerGame) {
     GInfo.timer(playerGame.id, 30, () => {
         AFKEnd(playerGame.id);
     });
+
+    return true;
 }
 
 async function placeAIShips(socket, playerGame) {

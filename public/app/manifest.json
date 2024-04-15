@@ -5,6 +5,7 @@
     "background_color": "black",
     "theme_color": "black",
     "orientation": "any",
+    "display": "minimal-ui",
     "icons": [
         {
             "src": "/assets/img/statki-logo-crop.png",
@@ -72,6 +73,5 @@
             "form_factor": "narrow",
             "label": "Create game screen"
         }
-    ],
-    "display": "standalone"
+    ]
 }

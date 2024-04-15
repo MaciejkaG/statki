@@ -183,6 +183,10 @@ export class GameInfo {
 
                 const rPos = search[Math.floor(Math.random() * search.length)];
 
+                if (rPos == null) {
+                    return false;
+                }
+
                 placedShips.push({ type: i, posX: rPos.posX, posY: rPos.posY, rot: rPos.rot });
                 await this.redis.json.arrAppend(key, `.boards[${playerIdx}].ships`, { type: i, posX: rPos.posX, posY: rPos.posY, rot: rPos.rot, hits: Array.from(new Array(i + 1), () => false) });
                 let multips;
@@ -287,15 +291,87 @@ export class GameInfo {
     }
 
     async makeAIMove(socket, difficulty) {
-        difficulty = 0;
-
+        if (difficulty === 2) {
+            difficulty = 1;
+        }
         const gameId = socket.session.activeGame;
         const key = `game:${gameId}`;
 
         const boards = await this.redis.json.get(key, { path: `.boards` });
 
         if (difficulty == 1) { // If difficulty mode is set to smart, check if there are any shot but not sunk ships
+            // Iterate through player's ships
+            for (let i = 0; i < boards[0].ships.length; i++) {
+                const ship = boards[0].ships[i];
+                // If the ship has at least one hit field and at least one not hit field
+                if (ship.hits.includes(false) && ship.hits.includes(true)) {
+                    // Iterate through ships
+                    for (let fieldIdx = 0; fieldIdx < ship.hits.length; fieldIdx++) {
+                        // If the ship we're currently iterating has been hit...
+                        if (ship.hits[fieldIdx]) {
+                            let multips;
 
+                            switch (ship.rot) { // Set up proper multipliers for each possible rotation
+                                case 0:
+                                    multips = [1, 0];
+                                    break;
+
+                                case 1:
+                                    multips = [0, 1];
+                                    break;
+
+                                case 2:
+                                    multips = [-1, 0];
+                                    break;
+
+                                case 3:
+                                    multips = [0, -1];
+                                    break;
+                            }
+
+                            // hitFieldX and hitFieldY simply contain the exact coordinates of the hit field of the ship on the board
+                            let hitFieldX = clamp(ship.posX + multips[0] * fieldIdx, 0, 9);
+                            let hitFieldY = clamp(ship.posY + multips[1] * fieldIdx, 0, 9);
+
+                            // subtrahents array contains sets of difference factors from the hit field.
+                            // We will use them to target fields around the field that was already hit
+                            // They are similarto the ones used in validateShipPosition(), but shorter
+                            // This is because we do not want to target fields that touch corners with our hit field, but the ones that touch with sides
+                            let subtrahents = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+
+                            // Shuffle them, so they are later iterated in random order
+                            shuffle(subtrahents);
+
+                            // Iterate through all subtrahents
+                            for (let j = 0; j < subtrahents.length; j++) {
+                                const subs = subtrahents[j];
+
+                                // Calculate the target field based on the current set of subtrahents, then clamp it so it doesn't exceed board's boundaries
+                                let targetX = clamp(hitFieldX - subs[0], 0, 9);
+                                let targetY = clamp(hitFieldY - subs[1], 0, 9);
+
+                                // If the bot has hit two fields of the ship already, lock axises depending on the rotation of the ship
+                                // This makes it so if the bot has hit two out of four fields of a ship that's placed horizontally, it won't shoot above the ship as the ships are always a straight line
+                                if (ship.hits.filter(value => value === true).length >= 2) {
+                                    if (!ship.rot % 2) {
+                                        targetY = hitFieldY;
+                                    } else {    
+                                        targetX = hitFieldX;
+                                    }
+                                }
+
+                                let shot = boards[0].shots.find((shot) => shot.posX === targetX && shot.posY === targetY);
+                                // If shot == null then the field with coordinates posX and posY was not shot at yet
+
+                                if (!shot) {
+                                    // If the field has not been shot yet and it seems possible, try it!
+                                    return [targetX, targetY];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         if (difficulty != 2) { // If difficulty mode is not set to Overkill
@@ -306,12 +382,11 @@ export class GameInfo {
             while (!foundAppropriateTarget) { // As long as no appropriate target was found
                 [posX, posY] = [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)]; // Randomise another set of coordinates
 
-                // let check = checkHit(boards[0].ships, posX, posY);
                 let shot = boards[0].shots.find((shot) => shot.posX === posX && shot.posY === posY);
                 // If shot == null then the field with coordinates posX and posY was not shot at yet
 
                 if (!shot) {
-                    if (difficulty == 1) { // If difficulty mode is set to smart, check if the shot wasn't near any sunk ship
+                    if (difficulty == 1) { // If difficulty mode is set to smart, check if the shot wasn't near any sunk ship (not done yet)
                         foundAppropriateTarget = true;
                     } else { // If difficulty mode is set to simple, just accept that field
                         foundAppropriateTarget = true;
@@ -564,6 +639,18 @@ function findEmptyFields(grid, len) { // Find all empty fields in the board
     }
 
     return shipPlacements;
+}
+
+function shuffle(array) {
+    let currentIndex = array.length;
+
+    while (currentIndex != 0) {
+        let randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
 }
 
 function clamp(n, min, max) {

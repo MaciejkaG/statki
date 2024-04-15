@@ -1,4 +1,4 @@
-const statki = "statki-by-maciejka-0.7.4";
+const statki = "statki-by-maciejka-0.7.5";
 const assets = [
     "/favicon.ico",
     "/assets/css/landing.css",

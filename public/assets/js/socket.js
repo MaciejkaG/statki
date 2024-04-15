@@ -196,9 +196,10 @@ joinForm.addEventListener('submit', (e) => {
 });
 
 const pveForm = document.getElementById('pveCreateForm');
-const pveDifficulty = document.getElementById('pveDifficulty').value;
+const pveDifficultyElem = document.getElementById('pveDifficulty');
 
 pveForm.addEventListener('submit', (e) => {
+    const pveDifficulty = pveDifficultyElem.value;
     e.preventDefault();
     if (pveDifficulty) {
         lockUI(true);
