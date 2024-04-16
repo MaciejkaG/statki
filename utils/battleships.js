@@ -387,7 +387,24 @@ export class GameInfo {
 
                 if (!shot) {
                     if (difficulty == 1) { // If difficulty mode is set to smart, check if the shot wasn't near any sunk ship (not done yet)
-                        foundAppropriateTarget = true;
+                        var sunkShips = [];
+
+                        // Iterate through player's ships
+                        for (let i = 0; i < boards[0].ships.length; i++) {
+                            const ship = boards[0].ships[i];
+
+                            // If ship is sunk (all fields are hit)
+                            if (!ship.hits.includes(false)) {
+                                // Add the ship to the sunkShips array
+                                sunkShips.push(ship);
+                            }
+                        }
+
+                        // We will use the validateShipPosition() function
+                        // it was originally designed for verifying if a ship is going to be placed correctly, but it will fit the purpose perfectly
+                        // We are checking if a single masted ship with 0 rotation could be placed in the position of the picked shot
+                        // We are also going to use the sunkShips array instead of all ships, because we WANT to shoot around unsunk but DON'T WANT to shoot around sunk ships
+                        foundAppropriateTarget = validateShipPosition(sunkShips, 0, posX, posY, 0);
                     } else { // If difficulty mode is set to simple, just accept that field
                         foundAppropriateTarget = true;
                     }
@@ -395,8 +412,16 @@ export class GameInfo {
             }
 
             return [posX, posY];
-        } else {
+        } else { // If the difficulty mode is set to Overkill
+            // Iterate through player's ships
+            for (let i = 0; i < boards[0].ships.length; i++) {
+                const ship = boards[0].ships[i];
 
+                // If ship is not sunk
+                if (ship.hits.includes(false)) {
+                    
+                }
+            }
         }
     }
 
