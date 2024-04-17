@@ -1,3 +1,5 @@
+switchView("mainMenuView");
+
 const socket = io();
 
 // Handling server-sent events
@@ -5,16 +7,15 @@ socket.on("joined", (nick) => {
     returnLock = false;
     lockUI(true);
     $("#oppNameField").html(nick);
-    switchView("preparingGame");
     lockUI(false);
+    switchView("preparingGame");
 
     console.log("Player joined the game:", nick);
 });
 
 socket.on("player left", () => {
-    lockUI(true);
-    switchView("mainMenuView");
     lockUI(false);
+    switchView("mainMenuView");
 
     console.log("Player left the game");
 });
@@ -60,11 +61,12 @@ $("#languages").on("change", function() {
 
 socket.emit("my profile", (profile) => {
     console.log("Received user data. UID:", profile.uid);
+    console.log("Profile data:", profile);
 
     // General profile data
     let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     $("#playerSince").html(new Date(profile.profile.account_creation).toLocaleDateString(undefined, options));
-    $("#nickname").html(profile.profile.nickname);
+    $(".nickname").html(profile.profile.nickname);
 
     // Profile stats
     $("#monthlyPlayed").html(profile.stats.monthly_matches);
@@ -87,7 +89,8 @@ socket.emit("my profile", (profile) => {
         
         const duration = `${minutes}:${seconds}`;
 
-        matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "AI"}</span></div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
+        console.log(match);
+        matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "<span class=\"important\">AI ("+match.ai_type+")</span>"}</span></div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
     }
 
     if (!matchHistoryDOM) {
@@ -112,16 +115,16 @@ $("#createGameButton").on("click", function () {
             case "ok":
                 console.log("Lobby created");
                 $("#createGameCode").val(response.gameCode);
+                lockUI(false);
                 switchView("pvpCreateView");
                 returnLock = true;
-                lockUI(false);
                 break;
 
             case "alreadyInLobby":
                 console.log("Lobby creation failed (player is already in a lobby)");
                 $("#createGameCode").val(response.gameCode);
-                switchView("pvpCreateView");
                 lockUI(false);
+                switchView("pvpCreateView");
                 break;
 
             default:
@@ -138,32 +141,48 @@ $("#leaveGameButton").on("click", function () {
     window.location.reload();
 });
 
-$("#pvpMenuButton").on("click", function () {
-    switchView('pvpMenuView');
+$("#logout").on("click", function() {
+    lockUI(true);
+    socket.emit("logout");
+    window.location.reload();
 });
 
-const form = document.getElementById('pvpJoinForm');
-const input = document.getElementById('pvpJoinCode');
+$("#pveDifficulty").on("change", function() {
+    switch (this.value) {
+        case 'simple':
+            $('#difficultyDescription').html(locale["Simple description"]);
+            break;
 
-form.addEventListener('submit', (e) => {
+        case 'smart':
+            $('#difficultyDescription').html(locale["Smart description"]);
+            break;
+    
+        case 'overkill':
+            $('#difficultyDescription').html(locale["Overkill description"]);
+            break;
+
+        default:
+            $('#difficultyDescription').html('');
+            break;
+    }
+});
+
+const joinForm = document.getElementById('pvpJoinForm');
+const joinCodeInput = document.getElementById('pvpJoinCode');
+
+joinForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (input.value && input.value.length === 6) {
+    if (joinCodeInput.value && joinCodeInput.value.length === 6) {
         lockUI(true);
-        console.log("Joining a lobby with code:", input.value);
-        socket.emit("join lobby", input.value, (response) => {
+        console.log("Joining a lobby with code:", joinCodeInput.value);
+        socket.emit("join lobby", joinCodeInput.value, (response) => {
             switch (response.status) {
                 case "ok":
                     console.log("Joined a lobby by:", response.oppNickname);
                     $("#oppNameField").html(response.oppNickname);
-                    switchView("preparingGame");
                     lockUI(false);
+                    switchView("preparingGame");
                     break;
-
-                //case "alreadyInLobby":
-                //    $("#createGameCode").val(response.gameCode);
-                //    switchView("pvpCreateView");
-                //    lockUI(false);
-                //    break;
 
                 default:
                     alert(`${window.locale["Unknown error occured"]}\n${window.locale["Status:"]} ${response.status}`);
@@ -172,6 +191,42 @@ form.addEventListener('submit', (e) => {
                     break;
             }
         });
-        input.value = '';
+        joinCodeInput.value = '';
     }
 });
+
+const pveForm = document.getElementById('pveCreateForm');
+const pveDifficultyElem = document.getElementById('pveDifficulty');
+
+pveForm.addEventListener('submit', (e) => {
+    const pveDifficulty = pveDifficultyElem.value;
+    e.preventDefault();
+    if (pveDifficulty) {
+        lockUI(true);
+        console.log("Creating a PvE game with difficulty:", pveDifficulty);
+        socket.emit("create pve", pveDifficulty, (response) => {
+            switch (response.status) {
+                case "ok":
+                    console.log("Joined a PvE lobby: ", response.oppNickname);
+                    $("#oppNameField").html(`AI (${pveDifficulty})`);
+                    lockUI(false);
+                    switchView("preparingGame");
+                    break;
+
+                default:
+                    alert(`${window.locale["Unknown error occured"]}\n${window.locale["Status:"]} ${response.status}`);
+                    lockUI(false);
+                    switchView("mainMenuView");
+                    break;
+            }
+        });
+        joinCodeInput.value = '';
+    }
+});
+
+// const isInStandaloneMode = () =>
+//     (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
+
+// if (isInStandaloneMode()) {
+//     alert("Thanks for using the PWA!");
+// }

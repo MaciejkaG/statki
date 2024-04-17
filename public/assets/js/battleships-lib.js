@@ -22,20 +22,18 @@ class Battleships {
     }
 
     getField(x, y) {
-        if (0 <= x && x < this.boardSize && 0 <= y && y < this.boardSize) {
-            x++;
-            y++;
-            return $(`#board .row:nth-child(${y}) .field:nth-child(${x})`);
+        console.log(x, y);
+        if (0 <= x && x < this.boardSize && 0 <= y && y <= this.boardSize) {
+            return $(`#board .row:nth-child(${y + 1}) .field:nth-child(${x + 1})`);
         } else {
             throw new RangeError("getField position out of range.");
         }
     }
 
     getFieldSecondary(x, y) {
-        if (0 <= x && x < this.boardSize && 0 <= y && y < this.boardSize) {
-            x++;
-            y++;
-            return $(`#secondaryBoard .row:nth-child(${y}) .field:nth-child(${x})`);
+        console.log(x, y);
+        if (0 <= x && x < this.boardSize && 0 <= y && y <= this.boardSize) {
+            return $(`#secondaryBoard .row:nth-child(${y + 1}) .field:nth-child(${x + 1})`);
         } else {
             throw new RangeError("getField position out of range.");
         }

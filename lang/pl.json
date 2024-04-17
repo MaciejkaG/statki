@@ -9,6 +9,25 @@
         "Connection error": "Błąd połączenia"
     },
 
+    "email": {
+        "This is your Statki authorisation code": "%s to twój kod autoryzacyjny do statków"
+    },
+
+    "landing": {
+        "The #1 online multiplayer battleships game": "Najlepsza wielosobowa gra w statki",
+        "SCROLL DOWN": "SCROLLUJ W DÓŁ",
+
+        "Privacy policy": "Polityka prywatności",
+
+        "Server error": "Bład serwera",
+        "Unkown error": "Nieznany błąd",
+        "Wrong email address": "Niepoprawny adres e-mail",
+        "Wrong authorisation code": "Niepoprawny kod autoryzacji",
+
+        "E-mail address is required": "Adres e-mail jest wymagany!",
+        "Auth code is required": "Kod autoryzacji jest wymagany!"
+    },
+
     "menu": {
         "navbar": {
             "Main menu": "Menu główne",
@@ -46,6 +65,22 @@
             "You will be redirected soon": "Wkrótce nastąpi przekierowanie",
             "Opponent:": "Przeciwnik"
         },
+        "PvE": {
+            "Create": "PvE / Stwórz",
+            "Choose the difficulty mode": "Wybierz tryb trudności",
+            "difficulty": {
+                "Simple": {
+                    "description": "W tym trybie, bot po prostu losowo strzela w pola, bez żadnej inteligencji."
+                },
+                "Smart": {
+                    "description": "W tym trybie, bot rozumie zasady gry i próbuje przewidywać gdzie Twoje statki mogą być oraz wie gdzie ich na pewno nie ma. Jest to tryb najbardziej zbliżony to przeciętnego gracza."
+                },
+                "Overkill": {
+                    "description": "Ten tryb to kompletna przesada - bot zna dokładne pozycje wszystkich Twoich statków i będzie strzelał do nich w losowej kolejności ze 100% celnością. By wygrać na tym trybie, musisz mieć 100% celność przez całą grę."
+                }
+            },
+            "Begin": "Rozpocznij"
+        },
         "Profile": {
             "Loading": "Wczytywanie...",
             "Player since:": "Gracz od:",
@@ -59,7 +94,13 @@
             "No matches played": "Nie zagrano żadnych meczy"
         },
         "Settings": {
-            "General": "Ogólne"
+            "General": "Ogólne",
+            "Account": "Konto",
+
+            "Log out": "Wyloguj się",
+
+            "Current nickname:": "Aktualny nickname:",
+            "Change nickname": "Zmień nickname"
         },
         "General": {
             "Unknown error occured": "Wystąpił nieznany błąd",
@@ -104,7 +145,7 @@
         "Four-masted": "Czteromasztowiec",
         "Available:": "Dostępne:",
 
-        "Sunk ships": "Zatopione statki",
+        "To sunk": "Do zatopienia",
         "Single-mastedPlu": "Jednomasztowce:",
         "Two-mastedPlu": "Dwumasztowce:",
         "Three-mastedPlu": "Trójmasztowce:",

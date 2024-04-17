@@ -9,6 +9,25 @@
         "Connection error": "Connection error"
     },
 
+    "email": {
+        "This is your Statki authorisation code": "%s is your Statki authorisation code"
+    },
+
+    "landing": {
+        "The #1 online multiplayer battleships game": "The #1 online multiplayer battleships game",
+        "SCROLL DOWN": "SCROLL DOWN",
+
+        "Privacy policy": "Privacy policy",
+
+        "Server error": "Server error",
+        "Unkown error": "Unknown error",
+        "Wrong email address": "Wrong e-mail address",
+        "Wrong authorisation code": "Wrong authorisation code",
+
+        "E-mail address is required": "E-mail address is required!",
+        "Auth code is required": "Auth code is required"
+    },
+
     "menu": {
         "navbar": {
             "Main menu": "Main menu",
@@ -46,6 +65,22 @@
             "You will be redirected soon": "You will be redirected soon",
             "Opponent:": "Opponent"
         },
+        "PvE": {
+            "Create": "PvE / Create",
+            "Choose the difficulty mode": "Choose the difficulty mode",
+            "difficulty": {
+                "Simple": {
+                    "description": "In this mode, the bot is just randomly shooting at fields, without any intelligence."
+                },
+                "Smart": {
+                    "description": "In this mode, the bot understands the rules of the game and will try to predict where your ships could be and knows where they couldn't."
+                },
+                "Overkill": {
+                    "description": "This mode is an absolute overkill - the bot knows exact positions of all your ships and will shoot at them in random order with 100% accuracy. To win in this mode, you need to have 100% accuracy for the entire game."
+                }
+            },
+            "Begin": "Begin"
+        },
         "Profile": {
             "Loading": "Loading...",
             "Player since:": "Player since:",
@@ -58,7 +93,13 @@
             "No matches played": "No matches played"
         },
         "Settings": {
-            "General": "General"
+            "General": "General",
+            "Account": "Account",
+
+            "Log out": "Log out",
+
+            "Current nickname:": "Current nickname:",
+            "Change nickname": "Change nickname"
         },
         "General": {
             "Unknown error occured": "Unknown error occured",
@@ -103,7 +144,7 @@
         "Four-masted": "Four-masted",
         "Available:": "Available:",
 
-        "Sunk ships": "Sunk ships",
+        "To sunk": "To sunk",
         "Single-mastedPlu": "Single-masted:",
         "Two-mastedPlu": "Two-masted:",
         "Three-mastedPlu": "Three-masted:",

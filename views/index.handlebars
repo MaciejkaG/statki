@@ -1,17 +1,38 @@
 <nav><span onclick="switchView('settingsView')">{{ t 'menu.navbar.Settings' }}</span><span onclick="switchView('mainMenuView')">{{ t 'menu.navbar.Main menu' }}</span> <span id="profileButton" onclick="switchView('profileView')">{{ t 'menu.navbar.Profile' }}</span></nav>
-{{!-- <h1 class="header">Statki</h1> --}}
 <div class="container" id="mainMenuView" data-path="/">
     <div>
         
         <h2>{{ t 'menu.index.Select game mode' }}</h2>
         <div class="modes">
-            <div id="pvpMenuButton">
+            <div onclick="switchView('pvpMenuView')">
                 <h2>{{ t 'menu.index.PvP' }}</h2>
                 <p>{{ t 'menu.index.Play against another player' }}</p>
             </div>
-            <div>
-                <h2 id="ai">{{ t 'menu.index.Vs AI' }}</h2>
+            <div onclick="switchView('vsAiView')">
+                <h2>{{ t 'menu.index.Vs AI' }}</h2>
                 <p>{{ t 'menu.index.Play against the computer' }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="vsAiView" data-path="/pve">
+    <div>
+        <h2>{{ t 'menu.PvE.Create' }}</h2>
+        <h3>{{ t 'menu.PvE.Choose the difficulty mode' }}</h3>
+        <div class="modes">
+            <div>
+                <form action="#" id="pveCreateForm">
+                    <select name="difficulty" id="pveDifficulty">
+                        <option value="simple">Simple</option>
+                        <option value="smart">Smart</option>
+                        <option value="overkill">Overkill</option>
+                    </select>
+                    <p id="difficultyDescription">
+                        {{ t 'menu.PvE.difficulty.Simple.description' }}
+                    </p>
+                    <input type="submit" value="{{ t 'menu.PvE.Begin' }}">
+                </form>
             </div>
         </div>
     </div>
@@ -33,12 +54,12 @@
     </div>
 </div>
 
-<div class="container" id="pvpCreateView" data-path="/pvp/create">
+<div class="container" id="pvpCreateView" data-path="/pvp/create" data-pathlock>
     <div>
         <h2>{{ t 'menu.PvP/Create.PvP / Create' }}</h2>
         <div class="modes">
             <div>
-                <h2>{{ t 'menu.PvP/Create.Room code' }}</h2>
+                <h2>{{ t 'menu.PvP/Create.Room code:' }}</h2>
                 <input type="text" maxlength="6" readonly value="-" id="createGameCode">
                 <h3>{{ t 'menu.PvP/Create.Waiting for an opponent' }}</h3>
                 <button id="leaveGameButton">{{ t 'menu.PvP/Create.Leave the room' }}</button>
@@ -52,7 +73,7 @@
         <h2>{{ t 'menu.PvP/Join.PvP / Join' }}</h2>
         <div class="modes">
             <div>
-                <form action="/api/joinme" id="pvpJoinForm">
+                <form action="#" id="pvpJoinForm">
                     <input type="text" maxlength="6" id="pvpJoinCode" placeholder="{{ t 'menu.PvP/Join.Room code' }}" autocomplete="off">
                     <input type="submit" value="{{ t 'menu.PvP/Join.Join' }}">
                 </form>
@@ -61,7 +82,7 @@
     </div>
 </div>
 
-<div class="container" id="preparingGame" data-path="/pvp/prepairing">
+<div class="container" id="preparingGame" data-path="/pvp/prepairing" data-pathlock>
     <div>
         <h2>{{ t 'menu.PvP/Loading.PvP / Loading' }}</h2>
         <div class="modes">
@@ -77,7 +98,7 @@
 
 <div class="container" id="profileView" data-path="/profile">
     <div class="profile">
-        <h1 id="nickname">{{ t 'menu.Profile.Loading' }}</h1>
+        <h1 class="nickname">{{ t 'menu.Profile.Loading' }}</h1>
         <div>
             <span>{{ t 'menu.Profile.Player since:' }} </span>
             <span id="playerSince">-</span>
@@ -101,6 +122,12 @@
         <select name="language" id="languages">
             
         </select>
+
+        <h2>{{ t 'menu.Settings.Account' }}</h2>
+        <h3>{{ t 'menu.Settings.Current nickname:' }} <span class="nickname dynamic">{{ t 'menu.Profile.Loading' }}</span></h3>
+        <button onclick="window.location.href = '/nickname'">{{ t 'menu.Settings.Change nickname' }}</button>
+        <h3 id="logout">{{ t 'menu.Settings.Log out' }}</h3>
+        <p class="versionInfo">statki ver. {{ ver }}<br>© 2024 MCJK <a href="/privacy" target="_blank">{{ t 'landing.Privacy policy' }}</a></p>
     </div>
 </div>
 
@@ -120,6 +147,9 @@
         "Disconnected": "{{ t 'errors.Disconnected' }}",
         "Try to refresh the page if this error reoccurs": "{{ t 'errors.Try to refresh the page if this error reoccurs' }}",
         "Connection error": "{{ t 'errors.Connection error' }}",
+        "Simple description": "{{ t 'menu.PvE.difficulty.Simple.description' }}",
+        "Smart description": "{{ t 'menu.PvE.difficulty.Smart.description' }}",
+        "Overkill description": "{{ t 'menu.PvE.difficulty.Overkill.description' }}"
     };
 </script>
 <script src="/assets/js/spa_lib.js"></script>

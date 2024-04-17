@@ -2,7 +2,7 @@ var activeView;
 var returnLock = false;
 
 function switchView(viewContainerId, useReplaceState=false) {
-    if (!returnLock) {
+    if (!returnLock && viewContainerId !== activeView) {
         $(`.container`).css({ opacity: 0, animation: "OutAnim 0.2s 1 ease" });
         setTimeout(() => {
             $(`.container`).css("display", "none");
@@ -23,10 +23,10 @@ function switchView(viewContainerId, useReplaceState=false) {
 function lockUI(doLock) {
     if (doLock) {
         $("body").css("pointer-events", "none");
-        $("body").css("opacity", "0.4");
+        $(".container").css("opacity", "0.4");
     } else {
         $("body").css("pointer-events", "inherit");
-        $("body").css("opacity", "1");
+        $(".container").css("opacity", "1");
     }
 }
 
@@ -34,17 +34,13 @@ const initialURLParams = new URLSearchParams(window.location.search);
 const initialPath = initialURLParams.get('path');
 
 window.addEventListener("load", () => {
-    // if (initialPath != null) {
-    //     let elem = document.querySelector(`.container[data-path="${initialPath}"]`);
+    if (initialPath != null) {
+        let elem = document.querySelector(`.container[data-path="${initialPath}"]:not(.container[data-pathlock])`);
 
-    //     if (elem != null) {
-    //         switchView(elem.id, true);
-    //         activeView = elem.id;
-    //     }
-    // } else {
-        switchView("mainMenuView");
-        activeView = "mainMenuView";
-    //}
+        if (elem != null) {
+            switchView(elem.id, true);
+        }
+    }
 });
 
 addEventListener("popstate", (event) => {
