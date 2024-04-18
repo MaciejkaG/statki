@@ -49,12 +49,13 @@ h1,h2,h3,h4,h5,h6 {
     position: fixed;
     bottom: 5px;
     left: 5px;
-    color: rgb(0, 255, 0);
+    color: rgb(255, 80, 80);
     font-size: 9px;
     pointer-events: none;
     user-select: none;
     z-index: 999;
-    font-family: 'Roboto Mono', monospace;
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 400;
 }
 
 .board {
