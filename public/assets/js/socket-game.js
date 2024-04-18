@@ -106,7 +106,7 @@ socket.on("ship sunk", (victimIdx, ship) => {
             break;
     }
 
-    let l = !ship.type ? ship.type + 1 : ship.type + 2;
+    let l = ship.type + 1;
     if (victimIdx === playerIdx) {
         for (let i = 0; i < l; i++) {
             console.log("ourship");
