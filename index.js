@@ -18,6 +18,8 @@ import { rateLimit } from 'express-rate-limit';
 import { RedisStore as LimiterRedisStore } from 'rate-limit-redis';
 import SessionRedisStore from 'connect-redis';
 import mysql from 'mysql';
+import pkg from 'express-openid-connect';
+const { auth, requiresAuth } = pkg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -66,7 +68,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 const GInfo = new bships.GameInfo(redis, io);
-const auth = new MailAuth(redis, {
+const mailAuth = new MailAuth(redis, {
     host: process.env.mail_host,
     user: process.env.mail_user,
     pass: process.env.mail_pass
@@ -86,17 +88,46 @@ let sessionStore = new SessionRedisStore({
 });
 
 var sessionSecret = uuidv4();
-let secretPath = path.join(__dirname, '.session.secret');
+var clientSecret = uuidv4();
+let secretPath = (name) => path.join(__dirname, `.${name}.secret`);
 
 if (fs.existsSync(secretPath)) {
-    sessionSecret = fs.readFileSync(secretPath);
+    sessionSecret = fs.readFileSync(secretPath('session'));
+    clientSecret = fs.readFileSync(secretPath('client'));
 } else {
-    fs.writeFile(secretPath, sessionSecret, function (err) {
+    fs.writeFile(secretPath('session'), sessionSecret, function (err) {
         if (err) {
             console.log("An error occured while saving a freshly generated session secret.\nSessions may not persist after a restart of the server.");
         }
     });
+
+    fs.writeFile(secretPath('client'), clientSecret, function (err) {
+        if (err) {
+            console.log("An error occured while saving a freshly generated client secret.\nThere may be problems with authentication.");
+        }
+    });
 }
+
+const config = {
+    authRequired: false,
+    auth0Logout: true,
+    secret: sessionSecret,
+    clientSecret: process.env.AUTH_CLIENT_SECRET,
+    baseURL: 'http://localhost:8777',
+    clientID: '1vFgHBuUA2FGeepqAHYA1tfo93AlF1ET',
+    issuerBaseURL: 'https://mcjk.eu.auth0.com',
+    authorizationParams: {
+        response_type: 'code',
+        scope: 'openid profile',
+    },
+    routes: {
+        callback: '/id/callback',
+        login: '/id/login',
+        logout: '/logout',
+    },
+};
+
+app.use(auth(config));
 
 const sessionMiddleware = session({
     store: sessionStore,
@@ -106,7 +137,7 @@ const sessionMiddleware = session({
     rolling: true,
     cookie: {
         secure: checkFlag("cookie_secure"),
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge: 28 * 24 * 60 * 60 * 1000,
     },
 });
 
@@ -120,6 +151,8 @@ app.get('/privacy', (req, res) => {
 });
 
 app.get('/', async (req, res) => {
+    console.log(req.oidc.isAuthenticated());
+
     const locale = new Lang(req.acceptsLanguages());
 
     if (req.session.activeGame && await redis.json.get(req.session.activeGame)) {
@@ -150,7 +183,7 @@ app.get('/', async (req, res) => {
     } else if (login != 2) {
         res.redirect("/login");
     } else if (req.session.nickname == null) {
-        auth.getLanguage(req.session.userId).then(language => {
+        mailAuth.getLanguage(req.session.userId).then(language => {
             var locale;
 
             req.session.autoLang = language == null ? true : false;
@@ -163,7 +196,7 @@ app.get('/', async (req, res) => {
                 req.session.langs = req.acceptsLanguages();
             }
 
-            auth.getNickname(req.session.userId).then(nickname => {
+            mailAuth.getNickname(req.session.userId).then(nickname => {
                 if (nickname != null) {
                     req.session.nickname = nickname;
 
@@ -179,7 +212,7 @@ app.get('/', async (req, res) => {
             });
         });
     } else {
-        auth.getLanguage(req.session.userId).then(language => {
+        mailAuth.getLanguage(req.session.userId).then(language => {
             var locale;
             if (language) {
                 locale = new Lang([language]);
@@ -197,6 +230,11 @@ app.get('/', async (req, res) => {
             });
         });
     }
+});
+
+app.get('/profile', requiresAuth(), async (req, res) => {
+    const user = await req.oidc.fetchUserInfo();
+    console.log(user);
 });
 
 app.get('/login', (req, res) => {
@@ -258,7 +296,7 @@ app.post('/api/login', (req, res) => {
         res.redirect('/');
     } else if (login == 0 && req.body.email != null && validateEmail(req.body.email)) {
         if (checkFlag('authless')) {
-            auth.loginAuthless(req.body.email).then(async result => {
+            mailAuth.loginAuthless(req.body.email).then(async result => {
                 req.session.userId = result.uid;
                 req.session.loggedIn = 2;
                 res.redirect('/');
@@ -269,7 +307,7 @@ app.post('/api/login', (req, res) => {
 
         const locale = new Lang(req.acceptsLanguages());
 
-        auth.startVerification(req.body.email, getIP(req), req.get('user-agent'), locale.lang).then(async result => {
+        mailAuth.startVerification(req.body.email, getIP(req), req.get('user-agent'), locale.lang).then(async result => {
             if (result.status === 1 || result.status === -1) {
                 req.session.userId = result.uid;
 
@@ -308,7 +346,7 @@ app.post('/api/auth', async (req, res) => {
     if (login == 2) {
         res.redirect('/');
     } else if (login == 1 && req.body.code != null && req.body.code.length <= 10 && req.body.code.length >= 8) {
-        let finishResult = await auth.finishVerification(req.session.userId, req.body.code);
+        let finishResult = await mailAuth.finishVerification(req.session.userId, req.body.code);
         if (finishResult) {
             req.session.loggedIn = 2;
             res.redirect('/');
@@ -340,7 +378,7 @@ app.post('/api/nickname', (req, res) => {
     if (loginState(req) == 2 && req.body.nickname != null && 3 <= req.body.nickname.length && req.body.nickname.length <= 16) {
         req.session.nickname = req.body.nickname;
         req.session.activeGame = null;
-        auth.setNickname(req.session.userId, req.body.nickname).then(() => {
+        mailAuth.setNickname(req.session.userId, req.body.nickname).then(() => {
             res.redirect('/');
         });
     } else {
@@ -373,7 +411,7 @@ app.get('/game', async (req, res) => {
     if (req.session.nickname == null) {
         res.redirect('/setup');
     } else if (!req.query.id || !game || !req.session.activeGame || req.session.activeGame !== req.query.id) {
-        auth.getLanguage(req.session.userId).then(language => {
+        mailAuth.getLanguage(req.session.userId).then(language => {
             var locale;
             if (language) {
                 locale = new Lang([language]);
@@ -392,7 +430,7 @@ app.get('/game', async (req, res) => {
             });
         });
     } else {
-        auth.getLanguage(req.session.userId).then(language => {
+        mailAuth.getLanguage(req.session.userId).then(language => {
             var locale;
             if (language) {
                 locale = new Lang([language]);
@@ -412,6 +450,8 @@ app.get('/game', async (req, res) => {
 });
 
 app.get("/*", (req, res) => {
+    console.log(req.originalUrl);
+
     res.redirect("/?path=" + req.originalUrl);
 });
 
@@ -426,7 +466,7 @@ io.on('connection', async (socket) => {
 
             if (login == 0 && email != null && validateEmail(email)) {
                 if (checkFlag('authless')) {
-                    auth.loginAuthless(email).then(async result => {
+                    mailAuth.loginAuthless(email).then(async result => {
                         req.session.reload((err) => {
                             if (err) return socket.disconnect();
 
@@ -443,7 +483,7 @@ io.on('connection', async (socket) => {
 
                 const locale = new Lang(session.langs);
 
-                auth.startVerification(email, getIPSocket(socket), socket.client.request.headers["user-agent"], locale.lang).then(async result => {
+                mailAuth.startVerification(email, getIPSocket(socket), socket.client.request.headers["user-agent"], locale.lang).then(async result => {
                     if (result.status === 1 || result.status === -1) {
                         req.session.reload((err) => {
                             if (err) return socket.disconnect();
@@ -466,7 +506,7 @@ io.on('connection', async (socket) => {
             } else {
                 const locale = new Lang(session.langs);
 
-                auth.loginAuthless(email).then(async result => {
+                mailAuth.loginAuthless(email).then(async result => {
                     req.session.reload((err) => {
                         if (err) return socket.disconnect();
 
@@ -484,7 +524,7 @@ io.on('connection', async (socket) => {
             let login = socket.request.session.loggedIn;
 
             if (login == 1 && code != null && code.length <= 10 && code.length >= 8) {
-                let finishResult = await auth.finishVerification(req.session.userId, code);
+                let finishResult = await mailAuth.finishVerification(req.session.userId, code);
                 if (finishResult) {
                     req.session.reload((err) => {
                         if (err) return socket.disconnect();
@@ -529,7 +569,7 @@ io.on('connection', async (socket) => {
         });
 
         socket.on('my profile', (callback) => {
-            auth.getProfile(session.userId).then((profile) => {
+            mailAuth.getProfile(session.userId).then((profile) => {
                 profile.uid = session.userId;
                 callback(profile);
             });
@@ -940,7 +980,7 @@ io.on('connection', async (socket) => {
                             guestSocket.emit("game finished", !enemyIdx ? 1 : 0, hostNickname);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
-                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostSocket.session.userId, guestSocket.session.userId, playerGame.data.boards, enemyIdx ? 1 : 0);
+                            mailAuth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostSocket.session.userId, guestSocket.session.userId, playerGame.data.boards, enemyIdx ? 1 : 0);
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);
@@ -1106,7 +1146,7 @@ io.on('connection', async (socket) => {
                             socket.emit("game finished", 0, guestNickname);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
-                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 1, difficulty);
+                            mailAuth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 1, difficulty);
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);
@@ -1161,7 +1201,7 @@ io.on('connection', async (socket) => {
                             socket.emit("game finished", 1, guestNickname);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
-                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 0, difficulty);
+                            mailAuth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 0, difficulty);
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);
