@@ -429,6 +429,8 @@ io.on('connection', async (socket) => {
     const session = req.session;
     socket.session = session;
 
+    const playerGameData = await GInfo.getPlayerGameData(socket);
+
     if (!session.loggedIn) {
         socket.on('email login', (email, callback) => {
             let login = socket.request.session.loggedIn;
@@ -525,9 +527,7 @@ io.on('connection', async (socket) => {
                 });
             }
         });
-    }
-
-    if (!await GInfo.isPlayerInGame(socket) && session.nickname) {
+    } else if (!await GInfo.isPlayerInGame(socket) && session.nickname) {
         // if (session.nickname == null) {
         //     socket.disconnect();
         //     return;
@@ -779,7 +779,60 @@ io.on('connection', async (socket) => {
                 io.to(socket.rooms[1]).emit("player left");
             }
         });
-    } else if (session.nickname && (await GInfo.getPlayerGameData(socket)).data.type === "pvp") {
+    } else if (session.nickname && playerGameData && ['pvp', 'pve'].includes(playerGameData.data.type)) {
+        socket.on('place ship', async (type, posX, posY, rot) => {
+            const playerGame = await GInfo.getPlayerGameData(socket);
+
+            if (type < 0 || type > 3) {
+                return;
+            }
+
+            if (playerGame && playerGame.data.state === 'preparation') {
+                const playerShips = await GInfo.getPlayerShips(socket);
+                const canPlace = bships.validateShipPosition(playerShips, type, posX, posY, rot);
+                const shipsAvailable = bships.getShipsAvailable(playerShips);
+                const shipAvailable = shipsAvailable[type] > 0;
+
+                if (!canPlace) {
+                    const locale = new Lang(session.langs);
+
+                    socket.emit("toast", locale.t("board.You cannot place a ship like this"));
+                } else if (!shipAvailable) {
+                    const locale = new Lang(session.langs);
+
+                    socket.emit("toast", locale.t("board.You have ran out of ships of that type"));
+                } else if (shipsAvailable[3] > 0 && type != 3) {
+                    const locale = new Lang(session.langs);
+
+                    socket.emit("toast", locale.t("board.You must place a fourmasted ship first"));
+                } else {
+                    await GInfo.placeShip(socket, { type: type, posX: posX, posY: posY, rot: rot, hits: Array.from(new Array(type + 1), () => false) });
+                    socket.emit("placed ship", { type: type, posX: posX, posY: posY, rot: rot });
+                    await GInfo.incrStat(socket, 'placedShips');
+                }
+            }
+        });
+
+        socket.on('remove ship', async (posX, posY) => {
+            const playerGame = await GInfo.getPlayerGameData(socket);
+
+            if (playerGame && playerGame.data.state === 'preparation') {
+                const deletedShip = await GInfo.removeShip(socket, posX, posY);
+                socket.emit("removed ship", { posX: posX, posY: posY, type: deletedShip.type });
+                await GInfo.incrStat(socket, 'placedShips', -1);
+            }
+        });
+
+        socket.on('disconnecting', async () => {
+            const playerGame = await GInfo.getPlayerGameData(socket);
+            if (playerGame !== null) {
+                AFKEnd(playerGame.id);
+                await GInfo.resetTimer(playerGame.id);
+            }
+        });
+    }
+
+    if (session.nickname && playerGameData && playerGameData.data.type === "pvp") {
         const playerGame = await GInfo.getPlayerGameData(socket);
 
         if (playerGame.data.state === 'pregame') {
@@ -870,40 +923,6 @@ io.on('connection', async (socket) => {
             }
         });
 
-        socket.on('place ship', async (type, posX, posY, rot) => {
-            const playerGame = await GInfo.getPlayerGameData(socket);
-
-            if (playerGame && playerGame.data.state === 'preparation') {
-                const playerShips = await GInfo.getPlayerShips(socket);
-                let canPlace = bships.validateShipPosition(playerShips, type, posX, posY, rot);
-                let shipAvailable = bships.getShipsAvailable(playerShips)[type] > 0;
-
-                if (!canPlace) {
-                    const locale = new Lang(session.langs);
-
-                    socket.emit("toast", locale.t("board.You cannot place a ship like this"));
-                } else if (!shipAvailable) {
-                    const locale = new Lang(session.langs);
-
-                    socket.emit("toast", locale.t("board.You have ran out of ships of that type"));
-                } else {
-                    await GInfo.placeShip(socket, { type: type, posX: posX, posY: posY, rot: rot, hits: Array.from(new Array(type+1), () => false) });
-                    socket.emit("placed ship", { type: type, posX: posX, posY: posY, rot: rot });
-                    await GInfo.incrStat(socket, 'placedShips');
-                }
-            }
-        });
-
-        socket.on('remove ship', async (posX, posY) => {
-            const playerGame = await GInfo.getPlayerGameData(socket);
-
-            if (playerGame && playerGame.data.state === 'preparation') {
-                const deletedShip = await GInfo.removeShip(socket, posX, posY);
-                socket.emit("removed ship", { posX: posX, posY: posY, type: deletedShip.type });
-                await GInfo.incrStat(socket, 'placedShips', -1);
-            }
-        });
-
         socket.on('shoot', async (posX, posY) => {
             let playerGame = await GInfo.getPlayerGameData(socket);
 
@@ -972,15 +991,7 @@ io.on('connection', async (socket) => {
                 }
             }
         });
-
-        socket.on('disconnecting', async () => {
-            const playerGame = await GInfo.getPlayerGameData(socket);
-            if (playerGame !== null) {
-                AFKEnd(playerGame.id);
-                await GInfo.resetTimer(playerGame.id);
-            }
-        });
-    } else if (session.nickname && (await GInfo.getPlayerGameData(socket)).data.type === "pve") {
+    } else if (session.nickname && playerGameData && playerGameData.data.type === "pve") {
         const playerGame = await GInfo.getPlayerGameData(socket);
 
         if (playerGame.data.state === 'pregame') {
@@ -1029,44 +1040,6 @@ io.on('connection', async (socket) => {
                     await finishPrepPhase(socket, playerGame);
                     await placeAIShips(socket);
                 }
-            }
-        });
-
-        socket.on('place ship', async (type, posX, posY, rot) => {
-            const playerGame = await GInfo.getPlayerGameData(socket);
-
-            if (type < 0 || type > 3) {
-                return;
-            }
-
-            if (playerGame && playerGame.data.state === 'preparation') {
-                const playerShips = await GInfo.getPlayerShips(socket);
-                let canPlace = bships.validateShipPosition(playerShips, type, posX, posY, rot);
-                let shipAvailable = bships.getShipsAvailable(playerShips)[type] > 0;
-
-                if (!canPlace) {
-                    const locale = new Lang(session.langs);
-
-                    socket.emit("toast", locale.t("board.You cannot place a ship like this"));
-                } else if (!shipAvailable) {
-                    const locale = new Lang(session.langs);
-
-                    socket.emit("toast", locale.t("board.You have ran out of ships of that type"));
-                } else {
-                    await GInfo.placeShip(socket, { type: type, posX: posX, posY: posY, rot: rot, hits: Array.from(new Array(type + 1), () => false) });
-                    socket.emit("placed ship", { type: type, posX: posX, posY: posY, rot: rot });
-                    await GInfo.incrStat(socket, 'placedShips');
-                }
-            }
-        });
-
-        socket.on('remove ship', async (posX, posY) => {
-            const playerGame = await GInfo.getPlayerGameData(socket);
-
-            if (playerGame && playerGame.data.state === 'preparation') {
-                const deletedShip = await GInfo.removeShip(socket, posX, posY);
-                socket.emit("removed ship", { posX: posX, posY: posY, type: deletedShip.type });
-                await GInfo.incrStat(socket, 'placedShips', -1);
             }
         });
 
@@ -1187,14 +1160,6 @@ io.on('connection', async (socket) => {
                         AFKEnd(playerGame.id);
                     });
                 }
-            }
-        });
-
-        socket.on('disconnecting', async () => {
-            const playerGame = await GInfo.getPlayerGameData(socket);
-            if (playerGame !== null) {
-                AFKEnd(playerGame.id);
-                await GInfo.resetTimer(playerGame.id);
             }
         });
     }
