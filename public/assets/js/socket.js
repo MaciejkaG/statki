@@ -73,6 +73,11 @@ socket.emit("my profile", (profile) => {
     $("#totalPlayed").html(profile.stats.alltime_matches);
     $("#winrate").html(profile.stats.winrate !== null ? `${profile.stats.winrate}%` : "-");
 
+    // Show news if user didn't read them already.
+    if (!profile.profile.viewed_news) { // profile.profile.viewed_news would be 0 (falsy) if user didn't read the news
+        openNewsModal();
+    }
+
     // Match history
     var matchHistory = profile.matchHistory;
     var matchHistoryDOM = "";
@@ -98,8 +103,24 @@ socket.emit("my profile", (profile) => {
     }
 
     $(".matchList").html(matchHistoryDOM);
-    console.log("Profile data fetched successfully");
+
+    console.log("Profile data fetched and processed successfully");
 });
+
+document.getElementById('newsModalContainer').addEventListener('click', function (event) {
+    if (event.target === event.currentTarget) {
+        closeNewsModal();
+    }
+});
+
+function closeNewsModal() {
+    $('.newsModalContainer').addClass('unactive');
+}
+
+function openNewsModal() {
+    $('.newsModalContainer').removeClass('unactive');
+    $('.newsModalContainer').addClass('active');
+}
 
 socket.emit("whats my nick", (myNickname) => {
     nickname = myNickname;

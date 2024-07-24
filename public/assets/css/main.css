@@ -257,7 +257,7 @@ nav span:hover {
     cursor: pointer;
     padding: 0.7rem;
 
-    height: 5rem;
+    height: 4rem;
     overflow: hidden;
 
     transition: height 0.3s;
@@ -279,7 +279,7 @@ nav span:hover {
 }
 
 #profileView .matchList .match:hover {
-    height: 12rem;
+    height: 10.5rem;
 }
 
 #profileView .matchList .match:hover .statsButton {
@@ -374,15 +374,19 @@ nav span:hover {
     color: black;
 }
 
-#logout {
+#logout, #news {
     color: var(--danger);
     cursor: pointer;
 
     transition: opacity 0.3s;
 }
 
-#logout:hover {
+#logout:hover, #news:hover {
     opacity: 0.6;
+}
+
+#news {
+    color: var(--dynamic);
 }
 
 /* PvE */
@@ -440,4 +444,79 @@ nav span:hover {
     color: white;
     border-radius: 15px;
     outline: none;
+}
+
+.newsModalContainer {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(15px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 999;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: opacity 0.3s;
+}
+
+.newsModalContainer .newsModal {
+    width: 30rem;
+    max-width: 90%;
+    background: black;
+    border: solid 1px white;
+    height: 85%;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 1.5rem 2rem;
+    box-sizing: border-box;
+    border-radius: 15px;
+
+    transform: translateY(10%);
+
+    transition: transform 0.3s;
+}
+
+.newsModalContainer .newsModal h2 {
+    margin: 0;
+    opacity: 0.7;
+    font-weight: 500;
+    font-style: italic;
+}
+
+.newsModalContainer.active {
+    pointer-events: initial;
+    opacity: 1;
+}
+
+.newsModalContainer.active .newsModal {
+    transform: translateY(0%);
+}
+
+/* Please don't judge this, it works... */
+.newsModalContainer.unactive .newsModal {
+    transform: translateY(-10%);
+}
+
+.newsModalContainer.unactive {
+    pointer-events: none;
+    opacity: 0;
+}
+
+.newsModalContainer .newsModal .actualText {
+    margin-top: 1rem;
+    overflow-y: scroll;
+}
+
+.newsModalContainer .newsModal .actualText::-webkit-scrollbar {
+    display: none;
 }

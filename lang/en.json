@@ -21,7 +21,7 @@
 
         "Server error": "Server error",
         "Unkown error": "Unknown error",
-        "Wrong email address": "Wrong e-mail address",
+        "Wrong email address": "Wrong or forbidden e-mail address",
         "Wrong authorisation code": "Wrong authorisation code",
 
         "E-mail address is required": "E-mail address is required!",
@@ -96,6 +96,7 @@
             "General": "General",
             "Account": "Account",
 
+            "Show news and changes": "Show news and chanes",
             "Log out": "Log out",
 
             "Current nickname:": "Current nickname:",
@@ -103,7 +104,8 @@
         },
         "General": {
             "Unknown error occured": "Unknown error occured",
-            "Status:": "Status:"
+            "Status:": "Status:",
+            "News and changes": "News and changes"
         }
     },
 

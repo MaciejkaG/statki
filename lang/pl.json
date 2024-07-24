@@ -21,7 +21,7 @@
 
         "Server error": "Bład serwera",
         "Unkown error": "Nieznany błąd",
-        "Wrong email address": "Niepoprawny adres e-mail",
+        "Wrong email address": "Niepoprawny lub zabroniony adres e-mail",
         "Wrong authorisation code": "Niepoprawny kod autoryzacji",
 
         "E-mail address is required": "Adres e-mail jest wymagany!",
@@ -97,6 +97,7 @@
             "General": "Ogólne",
             "Account": "Konto",
 
+            "Show news and changes": "Pokaż nowości i zmiany",
             "Log out": "Wyloguj się",
 
             "Current nickname:": "Aktualny nickname:",
@@ -104,7 +105,8 @@
         },
         "General": {
             "Unknown error occured": "Wystąpił nieznany błąd",
-            "Status:": "Status:"
+            "Status:": "Status:",
+            "News and changes": "Nowości i zmiany"
         }
     },
 

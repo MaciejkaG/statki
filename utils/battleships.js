@@ -165,7 +165,8 @@ export class GameInfo {
 
         const placedShips = [];
 
-        for (let i = 0; i < availableShips.length; i++) {
+        // Iterate the types of ships left in reverse order to ensure the four-masted is always placed first to prevent one specific layout where it's impossible to place the four-masted ship.
+        for (let i = availableShips.length; i > -1; i--) {
             let availableShipsOfType = availableShips[i];
             for (let j = 0; j < availableShipsOfType; j++) {
                 playerShips = (await this.redis.json.get(key, { path: `.boards[${playerIdx}].ships` }));
@@ -291,9 +292,6 @@ export class GameInfo {
     }
 
     async makeAIMove(socket, difficulty) {
-        if (difficulty === 2) {
-            difficulty = 1;
-        }
         const gameId = socket.session.activeGame;
         const key = `game:${gameId}`;
 
@@ -335,7 +333,7 @@ export class GameInfo {
 
                             // subtrahents array contains sets of difference factors from the hit field.
                             // We will use them to target fields around the field that was already hit
-                            // They are similarto the ones used in validateShipPosition(), but shorter
+                            // They are similar to the ones used in validateShipPosition(), but shorter
                             // This is because we do not want to target fields that touch corners with our hit field, but the ones that touch with sides
                             let subtrahents = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 
@@ -413,13 +411,43 @@ export class GameInfo {
 
             return [posX, posY];
         } else { // If the difficulty mode is set to Overkill
-            // Iterate through player's ships
-            for (let i = 0; i < boards[0].ships.length; i++) {
-                const ship = boards[0].ships[i];
+            // Find all unsunk ships
+            const unsunkShips = boards[0].ships.filter(ship => ship.hits.includes(false));
 
-                // If ship is not sunk
-                if (ship.hits.includes(false)) {
-                    
+            // Pick a random unsunk ship
+            if (unsunkShips.length > 0) {
+                const randomShip = unsunkShips[Math.floor(Math.random() * unsunkShips.length)];
+
+                // Calculate ship positions based on rotation
+                const positions = [];
+                for (let i = 0; i < randomShip.hits.length; i++) {
+                    let targetX = randomShip.posX;
+                    let targetY = randomShip.posY;
+
+                    switch (randomShip.rot) {
+                        case 0: // left to right
+                            targetX += i;
+                            break;
+                        case 1: // top to bottom
+                            targetY += i;
+                            break;
+                        case 2: // right to left
+                            targetX -= i;
+                            break;
+                        case 3: // bottom to top
+                            targetY -= i;
+                            break;
+                    }
+
+                    positions.push([targetX, targetY]);
+                }
+
+                // Find the first unhit part of the ship
+                for (let i = 0; i < randomShip.hits.length; i++) {
+                    if (!randomShip.hits[i]) {
+                        // Return the coordinates of the first unhit part of the ship
+                        return positions[i];
+                    }
                 }
             }
         }
@@ -666,6 +694,7 @@ function findEmptyFields(grid, len) { // Find all empty fields in the board
     return shipPlacements;
 }
 
+// Basic array shuffling function
 function shuffle(array) {
     let currentIndex = array.length;
 

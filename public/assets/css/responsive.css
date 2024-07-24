@@ -10,7 +10,7 @@
     }
 
     #profileView .matchList .match {
-        height: 7rem;
+        height: 4rem;
     }
 }
 
@@ -24,6 +24,10 @@
         max-width: 90vw;
         height: 8rem;
         padding: 2rem 1.5rem;
+    }
+
+    #profileView .matchList .match {
+        height: 6rem;
     }
 
     #profileView .matchList .match:hover {

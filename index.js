@@ -18,6 +18,7 @@ import { rateLimit } from 'express-rate-limit';
 import { RedisStore as LimiterRedisStore } from 'rate-limit-redis';
 import SessionRedisStore from 'connect-redis';
 import mysql from 'mysql';
+import { isFakeEmail } from 'fakefilter';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -117,6 +118,14 @@ io.engine.use(sessionMiddleware);
 
 app.get('/privacy', (req, res) => {
     res.render("privacy");
+});
+
+app.get('/tos', (req, res) => {
+    res.redirect('/terms');
+});
+
+app.get('/terms', (req, res) => {
+    res.render("tos");
 });
 
 app.get('/', async (req, res) => {
@@ -295,7 +304,7 @@ app.post('/api/login', (req, res) => {
 
         res.render("error", {
             helpers: {
-                error: "Wrong e-mail address",
+                error: "Wrong or forbidden e-mail address",
                 fallback: "/login",
                 t: (key) => { return locale.t(key) }
             }
@@ -532,6 +541,8 @@ io.on('connection', async (socket) => {
             auth.getProfile(session.userId).then((profile) => {
                 profile.uid = session.userId;
                 callback(profile);
+
+                auth.setViewedNews(session.userId);
             });
         });
 
@@ -1279,7 +1290,7 @@ function validateEmail(email) {
         .toLowerCase()
         .match(
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        );
+        ) && !isFakeEmail(email);
 };
 
 function getIP(req) {
