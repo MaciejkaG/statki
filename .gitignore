@@ -132,5 +132,5 @@ dist
 # Redis
 dump.rdb
 
-# Secrets
-*.secret
+# Session secret
+.session.secret
