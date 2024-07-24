@@ -107,7 +107,7 @@ const sessionMiddleware = session({
     rolling: true,
     cookie: {
         secure: checkFlag("cookie_secure"),
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge: 14 * 24 * 60 * 60 * 1000, // That's 14 days btw
     },
 });
 
