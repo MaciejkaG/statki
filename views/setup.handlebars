@@ -2,16 +2,21 @@
     .container {
         display: flex;
     }
+
+    #pvpJoinView .modes div {
+        height: 11rem;
+    }
 </style>
 <div class="container" id="pvpJoinView">
     <div>
         <h1>Statki</h1>
-        <h2>Konfiguracja profilu</h2>
+        <h2>{{ t 'setup.Profile setup' }}</h2>
         <div class="modes">
             <div>
-                <form action="/api/setup-profile" method="post">
-                    <input type="text" name="nickname" placeholder="Nickname" style="font-size: 1rem;">
-                    <input type="submit" value="Zatwierdź">
+                <p>{{ t 'setup.Your nickname will be visible to other players' }}</p>
+                <form action="/api/nickname" method="post">
+                    <input type="text" name="nickname" placeholder="{{ t 'setup.Nickname' }}" style="font-size: 1rem;">
+                    <input type="submit" value="{{ t 'setup.Confirm' }}">
                 </form>
             </div>
         </div>

@@ -21,6 +21,13 @@ var hoveredField = null;
 refreshBoardView();
 
 $(".board .field").hover(function () {
+    if ($(window).width() <= 820) {
+        changedFields.forEach(field => {
+            field.css("background-color", "var(--field)");
+        });
+        changedFields.length = 0;
+    }
+
     hoveredField = this;
     // Pokaż "miarki"
     let posX = parseInt($(this).data("pos-x"));
@@ -95,12 +102,14 @@ $(".board .field").hover(function () {
         }
     }
 }, function () {
-    hoveredField = null;
-    // Wyłącz "miarki" po wyjściu kursora z pola (aby się nie duplikowały w przyszłości)
-    changedFields.forEach(field => {
-        field.css("background-color", "var(--field)");
-    });
-    changedFields.length = 0;
+    if ($(window).width() > 820) {
+        hoveredField = null;
+        // Wyłącz "miarki" po wyjściu kursora z pola (aby się nie duplikowały w przyszłości)
+        changedFields.forEach(field => {
+            field.css("background-color", "var(--field)");
+        });
+        changedFields.length = 0;
+    }
 });
 
 // $(".board .field").on("click", function() {
@@ -116,16 +125,12 @@ $(".controlsOwnBoard").css("opacity", 1);
 
 function switchBoards() {
     if (postPrep) {
-        if (ownBoardIsActive) { // Aktywna jest plansza użytkownika
+        if (ownBoardIsActive) { // Aktywna jest plansza przeciwnika
             $("#secondaryBoard").removeClass("secondary");
             $("#board").addClass("secondary");
-            $(".ownBoardInfo").css("opacity", 0);
-            $(".controlsOwnBoard").css("opacity", 0.3);
-        } else { // Aktywna jest plansza przeciwnika
+        } else { // Aktywna jest plansza gracza
             $("#board").removeClass("secondary");
             $("#secondaryBoard").addClass("secondary");
-            $(".ownBoardInfo").css("opacity", 1);
-            $(".controlsOwnBoard").css("opacity", 1);
         }
 
         ownBoardIsActive = !ownBoardIsActive;
@@ -143,20 +148,20 @@ function switchShips() {
     refreshBoardView();
 
     $("#selectedShip").addClass("changing");
-    
+
     setTimeout(() => {
         switch (selectedShip) {
             case 0:
-                $("#selectedShip").html("Jednomasztowiec");
+                $("#selectedShip").html(window.locale["Single-masted"]);
                 break;
             case 1:
-                $("#selectedShip").html("Dwumasztowiec");
+                $("#selectedShip").html(window.locale["Two-masted"]);
                 break;
             case 2:
-                $("#selectedShip").html("Trójmasztowiec");
+                $("#selectedShip").html(window.locale["Three-masted"]);
                 break;
             case 3:
-                $("#selectedShip").html("Czteromasztowiec");
+                $("#selectedShip").html(window.locale["Four-masted"]);
                 break;
         }
 

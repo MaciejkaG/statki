@@ -1,7 +1,7 @@
 // Handling connection errors
 socket.on("reconnecting", (number) => {
     Toastify({
-        text: `Ponowne łączenie... ${number}`,
+        text: `${window.locale["Reconnecting"]} ${number}`,
         duration: 5000,
         newWindow: true,
         gravity: "bottom",
@@ -13,7 +13,7 @@ socket.on("reconnecting", (number) => {
 
 socket.on("reconnect", () => {
     Toastify({
-        text: "Połączono ponownie",
+        text: window.locale["Reconnected"],
         duration: 5000,
         newWindow: true,
         gravity: "bottom",
@@ -25,7 +25,7 @@ socket.on("reconnect", () => {
 
 socket.on("reconnect_error", () => {
     Toastify({
-        text: "Wystąpił problem w trakcie ponownego łączenia",
+        text: window.locale["Reconnection error occured"],
         duration: 5000,
         newWindow: true,
         gravity: "bottom",
@@ -37,7 +37,7 @@ socket.on("reconnect_error", () => {
 
 socket.on("reconnect_failed", () => {
     Toastify({
-        text: "Nie udało się połączyć ponownie",
+        text: window.locale["Reconnection failed"],
         duration: 5000,
         newWindow: true,
         gravity: "bottom",
@@ -49,7 +49,7 @@ socket.on("reconnect_failed", () => {
 
 socket.on("disconnect", () => {
     Toastify({
-        text: "Rozłączono z serwerem\nSpróbuj odświeżyć stronę jeżeli błąd będzie się powtarzał",
+        text: `${window.locale["Disconnected"]}\n${window.locale["Try to refresh the page if this error reoccurs"]}`,
         duration: 5000,
         newWindow: true,
         gravity: "bottom",
@@ -61,7 +61,7 @@ socket.on("disconnect", () => {
 
 socket.on("error", () => {
     Toastify({
-        text: "Błąd połączenia",
+        text: window.locale["Connection error"],
         duration: 5000,
         newWindow: true,
         gravity: "bottom",

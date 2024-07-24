@@ -148,6 +148,9 @@ h1,h2,h3,h4,h5,h6 {
 .shapes, .spaceFiller {
     width: 15rem;
     user-select: none;
+}
+
+.spaceFiller {
     pointer-events: none;
 }
 
@@ -170,14 +173,15 @@ h1,h2,h3,h4,h5,h6 {
 #secondaryBoard, #board {
     position: absolute;
     transition: transform 0.3s;
-    background: black;
+    background-color: black;
 }
 
 .ownBoardInfo {
+    height: 11rem;
     transition: opacity 0.3s;
 }
 
-#boardSwitch {
+.boardSwitch {
     opacity: 0.3;
     transition: opacity 0.3s;
 }
@@ -206,7 +210,7 @@ h1,h2,h3,h4,h5,h6 {
     to {transform: translateX(0);opacity:1;}
 }
 
-#selectedShip.changing {
+#selectedShip.changing, .ownBoardInfo.changing {
     opacity: 0;
     animation: changingOut 1 0.2s ease;
 }
@@ -217,15 +221,15 @@ h1,h2,h3,h4,h5,h6 {
 
 .cover {
     position: fixed;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     top: 0;
     left: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    background-color: rgb(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(20px);
     transition: opacity 0.5s, transform 0.5s;
     z-index: 999;
@@ -285,4 +289,65 @@ h1,h2,h3,h4,h5,h6 {
 
 #timer.active {
     animation: timerDanger 1s infinite ease;
+}
+
+.tippyTemplate {
+    display: none;
+}
+
+.tippyBtn {
+    border-radius: 15px;
+    padding: 5px;
+    text-align: center;
+    width: 2rem;
+    aspect-ratio: 1;
+    color: white;
+
+    outline: none;
+    border: none;
+}
+
+.mobileControls {
+    display: none;
+}
+
+.mobileControls button, .readyButton {
+    padding: 0.5rem 2rem;
+    font-size: 1rem;
+    background-color: black;
+    border: solid 1px white;
+    color: white;
+    border-radius: 15px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    margin-bottom: 1.5rem;
+}
+
+.readyButton:hover {
+    color: black;
+    background-color: white;
+}
+
+.lateBoardInfo {
+    display: none;
+}
+
+.ownBoardInfo #accuracy {
+    transition: all 0.3s;
+}
+
+.ownBoardInfo #accuracy.animatingDown {
+    color: var(--ship-invalid);
+    transform: scale(1.2);
+}
+
+.ownBoardInfo #accuracy.animatingUp {
+    color: var(--ship-valid);
+    transform: scale(1.2);
+}
+
+.shipnote {
+    font-weight: bold;
 }

@@ -25,6 +25,26 @@
     align-items: center;
 }
 
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.7rem;
+    margin: 0.5rem;
+    font-family: 'Roboto Mono', monospace;
+}
+
+nav span {
+    cursor: pointer;
+    user-select: none;
+    padding: 0.2rem;
+}
+
+nav span:hover {
+    text-decoration: underline;
+    
+}
+
 .header {
     text-align: center;
 }
@@ -32,6 +52,8 @@
 /* index */
 #mainMenuView .modes {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 }
 
@@ -41,6 +63,7 @@
     background-color: black;
     border: solid 1px white;
     border-radius: 15px;
+    padding: 0.5rem 1rem;
     user-select: none;
     cursor: pointer;
     transition: all 0.3s;
@@ -54,6 +77,8 @@
 /* PvP/index */
 #pvpMenuView .modes {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 }
 
@@ -63,6 +88,7 @@
     background-color: black;
     border: solid 1px white;
     border-radius: 15px;
+    padding: 0.5rem 1rem;
     user-select: none;
     cursor: pointer;
     transition: all 0.3s;
@@ -76,17 +102,18 @@
 /* PvP/create */
 #pvpCreateView .modes {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 }
 
 #pvpCreateView .modes div {
-    height: 17rem;
     width: 15rem;
     background-color: black;
     border: solid 1px white;
     border-radius: 15px;
     user-select: none;
-    padding: 1rem 3rem;
+    padding: 2rem 3rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -118,6 +145,8 @@
 /* PvP/join */
 #pvpJoinView .modes {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 }
 
@@ -162,6 +191,8 @@
 /* Preparation */
 #preparingGame .modes {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 }
 
@@ -181,4 +212,311 @@
 #preparingGame .modes div * {
     margin: 0;
     width: 100%;
+}
+
+/* Profile */
+#profileView {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#profileView .profile {
+    display: flex;
+    margin: 3rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 45vw;
+    justify-content: space-between;
+
+    gap: 1rem;
+}
+
+#profileView .stats {
+    display: flex;
+    gap: 1rem;
+    width: 60vw;
+    flex-wrap: wrap;
+}
+
+#profileView .matchList {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    flex: 2;
+}
+
+#profileView .matchList::-webkit-scrollbar {
+    display: none;
+}
+
+#profileView .matchList .match {
+    background-color: rgba(24, 24, 24, 1);
+    border-radius: 15px;
+    cursor: pointer;
+    padding: 0.7rem;
+
+    height: 4rem;
+    overflow: hidden;
+
+    transition: height 0.3s;
+}
+
+#profileView .matchList .match .statsButton {
+    background-image: linear-gradient(to right, rgb(255, 255, 255, 1) 20%, rgba(0, 0, 0, 0) 40%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    margin: 0;
+    margin-bottom: 1rem;
+
+    background-position: 60%;
+    background-size: 400%;
+    background-repeat: no-repeat;
+    transition: background-position 0.9s;
+}
+
+#profileView .matchList .match:hover {
+    height: 10.5rem;
+}
+
+#profileView .matchList .match:hover .statsButton {
+    background-position: 0%;
+}
+
+#profileView .matchList .match div h1 {
+    margin: 0;
+}
+
+#profileView .matchList .match div {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    margin-top: 1rem;
+}
+
+#profileView .matchlist .match div span {
+    color: white;
+    font-size: 0.8rem;
+    line-height: 1rem;
+}
+
+#profileView .periodal {
+    flex: 1;
+}
+
+#profileView .periodal .stat {
+    margin-bottom: 1.5rem;
+}
+
+#profileView .periodal .stat h1 {
+    margin: 0.5rem;
+}
+
+.tippyTemplate {
+    display: none;
+}
+
+#settingsView label {
+    font-size: 1.2rem;
+}
+
+#settingsView select {
+    padding: 0.5rem 1rem;
+    padding: 0.5rem 2rem;
+    font-size: 1rem;
+    background-color: black;
+    border: solid 1px white;
+    color: white;
+    border-radius: 15px;
+    outline: none;
+    margin-left: 2rem;
+}
+
+#settingsView a {
+    text-decoration: none;
+    color: var(--dynamic);
+    
+    transition: opacity 0.3s;
+}
+
+#settingsView a:hover {
+    opacity: 0.6;
+    text-decoration: underline;
+}
+
+#settingsView .versionInfo {
+    margin-top: 3rem;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 15px;
+}
+
+#settingsView button {
+    background-color: black;
+    color: white;
+    border-radius: 15px;
+    border: 1px solid white;
+    text-align: center;
+    padding: 0.5rem 2rem;
+    outline: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+#settingsView button:hover {
+    background-color: white;
+    color: black;
+}
+
+#logout, #news {
+    color: var(--danger);
+    cursor: pointer;
+
+    transition: opacity 0.3s;
+}
+
+#logout:hover, #news:hover {
+    opacity: 0.6;
+}
+
+#news {
+    color: var(--dynamic);
+}
+
+/* PvE */
+#vsAiView .modes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+}
+
+#vsAiView .modes div {
+    /* height: 7rem; */
+    width: 15rem;
+    background-color: black;
+    border: solid 1px white;
+    border-radius: 15px;
+    user-select: none;
+    padding: 2rem 3rem;
+}
+
+#vsAiView form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+#vsAiView form input {
+    background-color: black;
+    color: white;
+    border-radius: 15px;
+    border: 1px solid white;
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 0.5rem 2rem;
+    outline: none;
+}
+
+#vsAiView form input[type=submit] {
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+#vsAiView form input[type=submit]:hover {
+    background-color: white;
+    color: black;
+}
+
+#vsAiView select {
+    padding: 0.5rem 1rem;
+    padding: 0.5rem 2rem;
+    font-size: 1rem;
+    background-color: black;
+    border: solid 1px white;
+    color: white;
+    border-radius: 15px;
+    outline: none;
+}
+
+.newsModalContainer {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(15px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 999;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: opacity 0.3s;
+}
+
+.newsModalContainer .newsModal {
+    width: 30rem;
+    max-width: 90%;
+    background: black;
+    border: solid 1px white;
+    height: 85%;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 1.5rem 2rem;
+    box-sizing: border-box;
+    border-radius: 15px;
+
+    transform: translateY(10%);
+
+    transition: transform 0.3s;
+}
+
+.newsModalContainer .newsModal h2 {
+    margin: 0;
+    opacity: 0.7;
+    font-weight: 500;
+    font-style: italic;
+}
+
+.newsModalContainer.active {
+    pointer-events: initial;
+    opacity: 1;
+}
+
+.newsModalContainer.active .newsModal {
+    transform: translateY(0%);
+}
+
+/* Please don't judge this, it works... */
+.newsModalContainer.unactive .newsModal {
+    transform: translateY(-10%);
+}
+
+.newsModalContainer.unactive {
+    pointer-events: none;
+    opacity: 0;
+}
+
+.newsModalContainer .newsModal .actualText {
+    margin-top: 1rem;
+    overflow-y: scroll;
+}
+
+.newsModalContainer .newsModal .actualText::-webkit-scrollbar {
+    display: none;
 }

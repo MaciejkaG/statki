@@ -1,0 +1,24 @@
+<style>
+    .container {
+        display: flex;
+    }
+
+    #pvpJoinView .modes div {
+        height: 13rem;
+    }
+</style>
+<div class="container" id="pvpJoinView">
+    <div>
+        <h1>Statki</h1>
+        <h2>{{ t 'auth.Authorisation' }}</h2>
+        <div class="modes">
+            <div>
+                <p>{{ t 'auth.Enter the code sent to your e-mail box' }}</p>
+                <form action="/api/auth" method="post">
+                    <input type="text" name="code" placeholder="{{ t 'auth.Code' }}" style="font-size: 1rem;" minlength="8" maxlength="10" autocomplete="off">
+                    <input type="submit" value="{{ t 'auth.Login' }}">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

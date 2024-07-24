@@ -1,0 +1,177 @@
+{
+    "errors": {
+        "Reconnecting": "Reconnecting...",
+        "Reconnected": "Reconnected",
+        "Reconnection error occured": "Reconnection error occured",
+        "Reconnection failed": "Reconnection failed",
+        "Disconnected": "Disconnected",
+        "Try to refresh the page if this error reoccurs": "Try to refresh the page if this error reoccurs",
+        "Connection error": "Connection error"
+    },
+
+    "email": {
+        "This is your Statki authorisation code": "%s is your Statki authorisation code"
+    },
+
+    "landing": {
+        "The #1 online multiplayer battleships game": "The #1 online multiplayer battleships game",
+        "SCROLL DOWN": "SCROLL DOWN",
+
+        "Privacy policy": "Privacy policy",
+
+        "Server error": "Server error",
+        "Unkown error": "Unknown error",
+        "Wrong email address": "Wrong or forbidden e-mail address",
+        "Wrong authorisation code": "Wrong authorisation code",
+
+        "E-mail address is required": "E-mail address is required!",
+        "Auth code is required": "Auth code is required"
+    },
+
+    "menu": {
+        "navbar": {
+            "Main menu": "Main menu",
+            "Profile": "Profile",
+            "Settings": "Settings"
+        },
+        "index": {
+            "Select game mode": "Select game mode",
+            "PvP": "PvP",
+            "Play against another player": "Play against another player",
+            "Vs AI": "Vs. AI",
+            "Play against the computer": "Play against the computer"
+        },
+        "PvP": {
+            "PvP": "PvP",
+            "Create": "Create",
+            "Create your own room": "Create your own room",
+            "Join": "Join",
+            "Join a room by a code": "Join a room by a code"
+        },
+        "PvP/Create": {
+            "PvP / Create": "PvP / Create",
+            "Room code:": "Room code:",
+            "Waiting for an opponent": "Waiting for an opponent",
+            "Leave the room": "Leave the room"
+        },
+        "PvP/Join": {
+            "PvP / Join": "PvP / Join",
+            "Room code": "Room code",
+            "Join": "Join"
+        },
+        "PvP/Loading": {
+            "PvP / Loading": "PvP / Loading",
+            "Wait": "Wait...",
+            "You will be redirected soon": "You will be redirected soon",
+            "Opponent:": "Opponent"
+        },
+        "PvE": {
+            "Create": "PvE / Create",
+            "Choose the difficulty mode": "Choose the difficulty mode",
+            "difficulty": {
+                "Simple": {
+                    "description": "In this mode, the bot is just randomly shooting at fields, without any intelligence."
+                },
+                "Smart": {
+                    "description": "In this mode, the bot understands the rules of the game and will try to predict where your ships could be and knows where they couldn't."
+                },
+                "Overkill": {
+                    "description": "This mode is an absolute overkill - the bot knows exact positions of all your ships and will shoot at them in random order with 100% accuracy. To win in this mode, you need to have 100% accuracy for the entire game."
+                }
+            },
+            "Begin": "Begin"
+        },
+        "Profile": {
+            "Loading": "Loading...",
+            "Player since:": "Player since:",
+            "Victory": "Victory",
+            "Defeat": "Defeat",
+            "Click to view match statistics": "Click to view match statistics",
+            "matches played this month": "matches played this month",
+            "total matches played": "total matches played",
+            "winrate": "winrate",
+            "No matches played": "No matches played"
+        },
+        "Settings": {
+            "General": "General",
+            "Account": "Account",
+
+            "Show news and changes": "Show news and chanes",
+            "Log out": "Log out",
+
+            "Current nickname:": "Current nickname:",
+            "Change nickname": "Change nickname"
+        },
+        "General": {
+            "Unknown error occured": "Unknown error occured",
+            "Status:": "Status:",
+            "News and changes": "News and changes"
+        }
+    },
+
+    "login": {
+        "Login": "Login",
+        "E-mail address": "E-mail address",
+        "Proceed": "Proceed"
+    },
+
+    "auth": {
+        "Authorisation": "Authorisation",
+        "Enter the code sent to your e-mail box": "Enter the code sent to your e-mail box",
+        "Code": "Code",
+        "Login": "Login"
+    },
+
+    "setup": {
+        "Profile setup": "Profile setup",
+        "Your nickname will be visible to other players": "Your nickname will be visible to other players",
+        "Nickname": "Nickname",
+        "Confirm": "Confirm"
+    },
+
+    "error": {
+        "Error": "Erorr",
+        "Return": "Return"
+    },
+
+    "board": {
+        "Connecting": "Connecting...",
+        "Waiting for the server": "Waiting for the server...",
+        "Back to menu": "Back to menu",
+
+        "Selected ship": "Selected ship",
+        "Single-masted": "Single-masted",
+        "Two-masted": "Two-masted",
+        "Three-masted": "Three-masted",
+        "Four-masted": "Four-masted",
+        "Available:": "Available:",
+
+        "To sunk": "To sunk",
+        "Single-mastedPlu": "Single-masted:",
+        "Two-mastedPlu": "Two-masted:",
+        "Three-mastedPlu": "Three-masted:",
+        "Four-mastedPlu": "Four-masted:",
+        "Your accuracy": "Your accuracy",
+
+        "Ready up": "Ready up",
+
+        "Controls": "Controls",
+        "Change ship": "Change ship",
+        "Rotate ship": "Rotate ship",
+        "Change boards": "Change boards",
+
+        "Preparation phase": "Preparation phase",
+        "Your turn": "Your turn",
+        "Opponents turn": "Opponent's turn",
+
+        "You cannot place a ship like this": "You cannot place a ship like this",
+        "You have ran out of ships of that type": "You have ran out of ships of that type",
+        "You have already shot at this field": "You have already shot at this field",
+        "Your remaining ships have been randomly placed": "Your remaining ships have been automatically placed",
+        "Your opponent is ready": "Your opponent is ready.\nTime for preparation has been reduced",
+        "You cannot ready up so early": "You cannot ready up so early!",
+
+        "Victory": "Victory",
+        "Defeat": "Defeat"
+    }
+}
