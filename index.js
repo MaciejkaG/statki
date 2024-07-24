@@ -804,7 +804,7 @@ io.on('connection', async (socket) => {
                 } else if (shipsAvailable[3] > 0 && type != 3) {
                     const locale = new Lang(session.langs);
 
-                    socket.emit("toast", locale.t("board.You must place a fourmasted ship first"));
+                    socket.emit("toast", locale.t("board.You must place a four-masted ship first"));
                 } else {
                     await GInfo.placeShip(socket, { type: type, posX: posX, posY: posY, rot: rot, hits: Array.from(new Array(type + 1), () => false) });
                     socket.emit("placed ship", { type: type, posX: posX, posY: posY, rot: rot });
