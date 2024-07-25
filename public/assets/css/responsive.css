@@ -10,11 +10,17 @@
     }
 
     #profileView .matchList .match {
-        height: 4rem;
+        height: 5rem;
     }
 
     #matchView .matchup {
         flex-direction: column;
+    }
+}
+
+@media only screen and (max-width: 995px) {
+    #profileView .matchList .match:hover {
+        height: 14rem;
     }
 }
 
@@ -31,11 +37,7 @@
     }
 
     #profileView .matchList .match {
-        height: 6rem;
-    }
-
-    #profileView .matchList .match:hover {
-        height: 16rem;
+        height: 7rem;
     }
 
     #profileView .stats {
@@ -49,4 +51,11 @@
     #profileView .matchList .match .statsButton {
         font-size: 1.3rem;
     }
+}
+
+@media only screen and (max-width: 580px) {
+    #profileView .matchList .match:hover {
+        height: 16rem;
+    }
+    
 }

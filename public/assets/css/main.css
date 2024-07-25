@@ -261,7 +261,7 @@ nav span:hover {
     cursor: pointer;
     padding: 0.7rem;
 
-    height: 4rem;
+    height: 5rem;
     overflow: hidden;
 
     transition: height 0.3s;
@@ -283,7 +283,7 @@ nav span:hover {
 }
 
 #profileView .matchList .match:hover {
-    height: 10.5rem;
+    height: 12rem;
 }
 
 #profileView .matchList .match:hover .statsButton {
