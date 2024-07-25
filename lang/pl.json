@@ -28,8 +28,8 @@
         "E-mail address is required": "Adres e-mail jest wymagany!",
         "Auth code is required": "Kod autoryzacji jest wymagany!",
 
-        "We will send you a verification code once you press Proceed": "Wyślemy tobie kod weryfikacyjny po kliknięciu Kontynuuj",
-        "By pressing Proceed you agree to our Terms of service and Privacy policy": "Poprzez kliknięcie Kontynuuj akceptujesz nasze Warunki serwisu i Politykę prywatności"
+        "We will send you a verification code once you press Proceed": "Wyślemy tobie kod weryfikacyjny po kliknięciu Kontynuuj.",
+        "By pressing Proceed you agree to our Terms of service and Privacy policy": "Poprzez kliknięcie Kontynuuj akceptujesz nasze Warunki serwisu i Politykę prywatności."
     },
 
     "menu": {
