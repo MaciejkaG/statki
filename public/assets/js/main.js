@@ -8,7 +8,7 @@ $("#secondaryBoard").html(board);
 
 var previousRow = $(":not(*)");
 var previousColumn = $(":not(*)");
-var selectedShip = 0;
+var selectedShip = 3;
 var shipRotation = 0;
 var shipsLeft = [4, 3, 2, 1];
 var changedFields = [];
