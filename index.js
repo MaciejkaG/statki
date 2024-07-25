@@ -247,15 +247,25 @@ app.get('/auth', (req, res) => {
 app.get('/nickname', (req, res) => {
     let login = loginState(req);
 
-    const locale = new Lang(req.acceptsLanguages());
-
-    if (!login) { // Niezalogowany
+    if (!login) { // Not logged in, log in before changing your nickname
         res.redirect('/login');
     } else {
-        res.render('setup', {
-            helpers: {
-                t: (key) => { return locale.t(key) }
+        auth.getLanguage(req.session.userId).then(language => {
+            let locale;
+
+            if (language) {
+                locale = new Lang([language]);
+                req.session.langs = [language];
+            } else {
+                locale = new Lang(req.acceptsLanguages());
+                req.session.langs = req.acceptsLanguages();
             }
+
+            res.render('setup', {
+                helpers: {
+                    t: (key) => { return locale.t(key) }
+                }
+            });
         });
     }
 });

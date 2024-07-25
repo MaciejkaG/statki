@@ -134,7 +134,7 @@ $("#createGameButton").on("click", function () {
     socket.emit("create lobby", (response) => {
         switch (response.status) {
             case "ok":
-                console.log("Lobby created");
+                console.log("Lobby created, code:", response.gameCode);
                 $("#createGameCode").val(response.gameCode);
                 lockUI(false);
                 switchView("pvpCreateView");

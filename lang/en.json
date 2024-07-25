@@ -17,6 +17,7 @@
         "The #1 online multiplayer battleships game": "The #1 online multiplayer battleships game",
         "SCROLL DOWN": "SCROLL DOWN",
 
+        "Terms of service": "Terms of service",
         "Privacy policy": "Privacy policy",
 
         "Server error": "Server error",
@@ -25,7 +26,10 @@
         "Wrong authorisation code": "Wrong authorisation code",
 
         "E-mail address is required": "E-mail address is required!",
-        "Auth code is required": "Auth code is required"
+        "Auth code is required": "Auth code is required",
+
+        "We will send you a verification code once you press Proceed": "We will send you a verification code once you press Proceed",
+        "By pressing Proceed you agree to our Terms of service and Privacy policy (links below)": "By pressing Proceed you agree to our Terms of service and Privacy policy (links below)"
     },
 
     "menu": {
@@ -100,7 +104,8 @@
             "Log out": "Log out",
 
             "Current nickname:": "Current nickname:",
-            "Change nickname": "Change nickname"
+            "Change nickname": "Change nickname",
+            "See: Privacy policy for modifying or removing other account data": "See: Privacy policy for modifying or removing other account data."
         },
         "General": {
             "Unknown error occured": "Unknown error occured",

@@ -174,7 +174,7 @@ body.closed .landing {
 }
 
 #loginView .modes div {
-    height: 7rem;
+    height: auto;
     width: 15rem;
     background-color: black;
     border: solid 1px white;
@@ -209,6 +209,23 @@ body.closed .landing {
 #loginView form input[type=submit]:hover {
     background-color: white;
     color: black;
+}
+
+#loginView form p {
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+#loginView form p a {
+    text-decoration: none;
+    color: var(--dynamic);
+
+    transition: opacity 0.3s;
+}
+
+#loginView form p a:hover {
+    opacity: 0.6;
+    text-decoration: underline;
 }
 
 #authView .modes {

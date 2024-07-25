@@ -3,14 +3,18 @@
     transition: opacity 0.175s;
 }
 
+.tippyTemplate {
+    display: none;
+}
+
 @keyframes OutAnim {
-    from {transform: translateY(0)}
-    to {transform: translateY(5%);}
+    from {transform: translateY(0); filter: blur(0px); opacity: 1;}
+    to {transform: translateY(3rem); filter: blur(10px); opacity: 0.4;}
 }
 
 @keyframes InAnim {
-    from {transform: translateY(-5%)}
-    to {transform: translateY(0%);}
+    from {transform: translateY(-3rem); filter: blur(10px); opacity: 0.4;}
+    to {transform: translateY(0); filter: blur(0px); opacity: 1;}
 }
 
 .bshipstoast {
@@ -306,21 +310,123 @@ nav span:hover {
     line-height: 1rem;
 }
 
-#profileView .periodal {
+#profileView .periodical {
     flex: 1;
 }
 
-#profileView .periodal .stat {
+#profileView .periodical .stat {
     margin-bottom: 1.5rem;
 }
 
-#profileView .periodal .stat h1 {
+#profileView .periodical .stat h1 {
     margin: 0.5rem;
 }
 
-.tippyTemplate {
+/* Match statistics */
+#matchView {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#matchView .matchup {
+    display: flex;
+    margin: 3rem 0;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 45vw;
+    justify-content: space-between;
+
+    /* gap: 3rem; */
+}
+
+#matchView .stats {
+    display: flex;
+    gap: 1rem;
+    width: 60vw;
+    flex-wrap: wrap;
+}
+
+#matchView .matchList {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    flex: 2;
+}
+
+#matchView .matchList::-webkit-scrollbar {
     display: none;
 }
+
+#matchView .matchList .match {
+    background-color: rgba(24, 24, 24, 1);
+    border-radius: 15px;
+    cursor: pointer;
+    padding: 0.7rem;
+
+    height: 4rem;
+    overflow: hidden;
+
+    transition: height 0.3s;
+}
+
+#matchView .matchList .match .statsButton {
+    background-image: linear-gradient(to right, rgb(255, 255, 255, 1) 20%, rgba(0, 0, 0, 0) 40%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    margin: 0;
+    margin-bottom: 1rem;
+
+    background-position: 60%;
+    background-size: 400%;
+    background-repeat: no-repeat;
+    transition: background-position 0.9s;
+}
+
+#matchView .matchList .match:hover {
+    height: 10.5rem;
+}
+
+#matchView .matchList .match:hover .statsButton {
+    background-position: 0%;
+}
+
+#matchView .matchList .match div h1 {
+    margin: 0;
+}
+
+#matchView .matchList .match div {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    margin-top: 1rem;
+}
+
+#matchView .matchlist .match div span {
+    color: white;
+    font-size: 0.8rem;
+    line-height: 1rem;
+}
+
+#matchView .periodical {
+    flex: 1;
+}
+
+#matchView .periodical .stat {
+    margin-bottom: 1.5rem;
+}
+
+#matchView .periodical .stat h1 {
+    margin: 0.5rem;
+}
+
+/* Settings */
 
 #settingsView label {
     font-size: 1.2rem;

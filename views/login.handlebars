@@ -4,7 +4,25 @@
     }
 
     #pvpJoinView .modes div {
-        height: 7rem;
+        height: auto;
+    }
+
+    #pvpJoinView .modes p {
+        font-size: 0.75rem;
+        opacity: 0.6;
+        margin: 0;
+    }
+
+    a {
+        text-decoration: none;
+        color: var(--dynamic);
+        
+        transition: opacity 0.3s;
+    }
+
+    a:hover {
+        opacity: 0.6;
+        text-decoration: underline;
     }
 </style>
 <div class="container" id="pvpJoinView">
@@ -16,6 +34,8 @@
                 <form action="/api/login" method="post">
                     <input type="email" name="email" placeholder="{{ t 'login.E-mail address' }}" style="font-size: 1rem;">
                     <input type="submit" value="{{ t 'login.Proceed' }}">
+                    <p>{{ t 'landing.We will send you a verification code once you press Proceed'}}<br>{{ t 'landing.By pressing Proceed you agree to our Terms of service and Privacy policy' }}.</p>
+                    <p><a href="/terms">{{ t 'landing.Terms of service' }}</a> / <a href="/privacy">{{ t 'landing.Privacy policy' }}</a></p>
                 </form>
             </div>
         </div>

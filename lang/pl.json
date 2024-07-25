@@ -17,6 +17,7 @@
         "The #1 online multiplayer battleships game": "Najlepsza wielosobowa gra w statki",
         "SCROLL DOWN": "SCROLLUJ W DÓŁ",
 
+        "Terms of service": "Warunki serwisu",
         "Privacy policy": "Polityka prywatności",
 
         "Server error": "Bład serwera",
@@ -25,7 +26,10 @@
         "Wrong authorisation code": "Niepoprawny kod autoryzacji",
 
         "E-mail address is required": "Adres e-mail jest wymagany!",
-        "Auth code is required": "Kod autoryzacji jest wymagany!"
+        "Auth code is required": "Kod autoryzacji jest wymagany!",
+
+        "We will send you a verification code once you press Proceed": "Wyślemy tobie kod weryfikacyjny po kliknięciu Kontynuuj",
+        "By pressing Proceed you agree to our Terms of service and Privacy policy": "Poprzez kliknięcie Kontynuuj akceptujesz nasze Warunki serwisu i Politykę prywatności"
     },
 
     "menu": {
@@ -101,7 +105,8 @@
             "Log out": "Wyloguj się",
 
             "Current nickname:": "Aktualny nickname:",
-            "Change nickname": "Zmień nickname"
+            "Change nickname": "Zmień nickname",
+            "See: Privacy policy for modifying or removing other account data": "Patrz: Polityka prywatności po zmianę lub usunięcie innych danych konta."
         },
         "General": {
             "Unknown error occured": "Wystąpił nieznany błąd",

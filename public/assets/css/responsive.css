@@ -12,6 +12,10 @@
     #profileView .matchList .match {
         height: 4rem;
     }
+
+    #matchView .matchup {
+        flex-direction: column;
+    }
 }
 
 @media only screen and (max-width: 820px) {
