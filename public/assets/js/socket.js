@@ -107,6 +107,12 @@ socket.emit("my profile", (profile) => {
     console.log("Profile data fetched and processed successfully");
 });
 
+function showMatchInfo(matchId) {
+    socket.emit('match info', matchId, (matchInfo) => {
+        console.log(matchInfo);
+    });
+}
+
 document.getElementById('newsModalContainer').addEventListener('click', function (event) {
     if (event.target === event.currentTarget) {
         closeNewsModal();

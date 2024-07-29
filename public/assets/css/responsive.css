@@ -14,7 +14,12 @@
     }
 
     #matchView .matchup {
+        width: 100vw;
         flex-direction: column;
+    }
+
+    #matchView .matchup h1 {
+        font-size: 1.5rem;
     }
 }
 

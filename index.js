@@ -208,6 +208,26 @@ app.get('/', async (req, res) => {
     }
 });
 
+app.get('/match/:searchId', (req, res) => {
+    // req.params.searchId is the matchId user searched through the URL (e.g. /match/9ba20a03-505c-41a1-9933-3bc456e5948f)
+
+    if (req.params.searchId.length !== 36) {
+        res.sendStatus(400);
+        res.render('error', {
+            helpers: {
+                error: 'Wrong or missing match ID',
+                fallback: '/',
+                t: (key) => { return locale.t(key) }
+            }
+        });
+        return;
+    }
+
+    auth.getMatch(req.params.searchId).then(result => {
+        res.send(result);
+    });
+})
+
 app.get('/login', (req, res) => {
     let login = loginState(req);
 
@@ -300,10 +320,10 @@ app.post('/api/login', (req, res) => {
         }).catch((err) => {
             const locale = new Lang(req.acceptsLanguages());
 
-            res.render("error", {
+            res.render('error', {
                 helpers: {
-                    error: "Unknown login error occured",
-                    fallback: "/login",
+                    error: 'Unknown login error occured',
+                    fallback: '/login',
                     t: (key) => { return locale.t(key) }
                 }
             });
@@ -312,10 +332,10 @@ app.post('/api/login', (req, res) => {
     } else {
         const locale = new Lang(req.acceptsLanguages());
 
-        res.render("error", {
+        res.render('error', {
             helpers: {
-                error: "Wrong or forbidden e-mail address",
-                fallback: "/login",
+                error: 'Wrong or forbidden e-mail address',
+                fallback: '/login',
                 t: (key) => { return locale.t(key) }
             }
         });
@@ -441,7 +461,7 @@ io.on('connection', async (socket) => {
 
     const playerGameData = await GInfo.getPlayerGameData(socket);
 
-    if (!session.loggedIn) {
+    if (!session.loggedIn) { // User is on the landing page
         socket.on('email login', (email, callback) => {
             let login = socket.request.session.loggedIn;
 
@@ -537,11 +557,11 @@ io.on('connection', async (socket) => {
                 });
             }
         });
-    } else if (!await GInfo.isPlayerInGame(socket) && session.nickname) {
-        // if (session.nickname == null) {
-        //     socket.disconnect();
-        //     return;
-        // }
+    } else if (!await GInfo.isPlayerInGame(socket) && session.nickname) { // User is in the main menu
+        if (session.nickname == null) {
+            socket.disconnect();
+            return;
+        }
 
         socket.on('whats my nick', (callback) => {
             callback(session.nickname);
@@ -553,6 +573,12 @@ io.on('connection', async (socket) => {
                 callback(profile);
 
                 auth.setViewedNews(session.userId);
+            });
+        });
+
+        socket.on('match info', (match_id, callback) => {
+            auth.getMatch(match_id).then(result => {
+                callback(result);
             });
         });
 
@@ -789,7 +815,7 @@ io.on('connection', async (socket) => {
                 io.to(socket.rooms[1]).emit("player left");
             }
         });
-    } else if (session.nickname && playerGameData && ['pvp', 'pve'].includes(playerGameData.data.type)) {
+    } else if (session.nickname && playerGameData && ['pvp', 'pve'].includes(playerGameData.data.type)) { // User is either playing in PvP or PvE
         socket.on('place ship', async (type, posX, posY, rot) => {
             const playerGame = await GInfo.getPlayerGameData(socket);
 
@@ -842,7 +868,7 @@ io.on('connection', async (socket) => {
         });
     }
 
-    if (session.nickname && playerGameData && playerGameData.data.type === "pvp") {
+    if (session.nickname && playerGameData && playerGameData.data.type === "pvp") { // User is playing PvP
         const playerGame = await GInfo.getPlayerGameData(socket);
 
         if (playerGame.data.state === 'pregame') {
@@ -1001,7 +1027,7 @@ io.on('connection', async (socket) => {
                 }
             }
         });
-    } else if (session.nickname && playerGameData && playerGameData.data.type === "pve") {
+    } else if (session.nickname && playerGameData && playerGameData.data.type === "pve") { // User is playing PvE
         const playerGame = await GInfo.getPlayerGameData(socket);
 
         if (playerGame.data.state === 'pregame') {

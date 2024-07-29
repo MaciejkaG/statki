@@ -239,7 +239,12 @@ export class MailAuth {
     getProfile(userId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            conn.query(`SELECT nickname, viewed_news, account_creation FROM accounts WHERE user_id = ${conn.escape(userId)}; SELECT ROUND((AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.user_id = ${conn.escape(userId)}; SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.ai_type, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = ${conn.escape(userId)} ORDER BY matches.date DESC LIMIT 10;`, async (error, response) => {
+            const query = `
+            SELECT nickname, viewed_news, account_creation FROM accounts WHERE user_id = ?;
+            SELECT ROUND((AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.user_id = ?;
+            SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.ai_type, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = ? ORDER BY matches.date DESC LIMIT 10;
+            `;
+            conn.query(query, [userId, userId, userId], async (error, response) => {
                 if (error) reject(error);
                 else {
                     if (response[0].length === 0 || response[1].length === 0) {
@@ -252,6 +257,47 @@ export class MailAuth {
                     resolve({ profile, stats, matchHistory });
                 }
 
+                conn.end();
+            });
+        });
+    }
+
+    getMatch(matchId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            const query = `
+            SELECT m.match_type, m.host_id, m.guest_id, m.ai_type, m.duration, m.date,
+                   h.nickname AS host_username, g.nickname AS guest_username
+            FROM matches m
+            LEFT JOIN accounts h ON m.host_id = h.user_id
+            LEFT JOIN accounts g ON m.guest_id = g.user_id
+            WHERE m.match_id = ?;
+            
+            SELECT s.board, s.won 
+            FROM statistics s
+            WHERE s.match_id = ? 
+            AND s.user_id = (SELECT m.host_id FROM matches m WHERE m.match_id = ?);
+            
+            SELECT s.board, s.won 
+            FROM statistics s
+            WHERE s.match_id = ? 
+            AND s.user_id = (SELECT m.guest_id FROM matches m WHERE m.match_id = ?);
+        `;
+            conn.query(query, [matchId, matchId, matchId, matchId, matchId], (error, response) => {
+                if (error) reject(error);
+                else {
+                    const [[matchInfo], [{ board: hostStats, won: hostWon }], [{ board: guestStats, won: guestWon }]] = response;
+
+                    resolve({
+                        match_info: {
+                            ...matchInfo,
+                            host_username: matchInfo.host_username,
+                            guest_username: matchInfo.guest_username
+                        },
+                        host_stats: {...JSON.parse(hostStats), won: hostWon == 1 ? true : false},
+                        guest_stats: {...JSON.parse(guestStats), won: guestWon == 1 ? true : false}
+                    });
+                }
                 conn.end();
             });
         });
