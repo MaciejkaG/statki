@@ -94,7 +94,8 @@
             "matches played this month": "matches played this month",
             "total matches played": "total matches played",
             "winrate": "winrate",
-            "No matches played": "No matches played"
+            "No matches played": "No matches played",
+            "Thats all of your matches Theres nothing more to see here": "That's all of your matches. There's nothing more to see here."
         },
         "Settings": {
             "General": "General",

@@ -251,6 +251,9 @@ app.get('/match/:searchId', async (req, res) => {
                 guestHits: result.guest_stats.stats.hits,
                 guestAccuracy: Math.floor(result.guest_stats.stats.hits / result.guest_stats.stats.shots * 100),
                 guestSunkShips: result.guest_stats.stats.sunkShips,
+
+                hostBoard: JSON.stringify(result.host_stats),
+                guestBoard: JSON.stringify(result.guest_stats),
             }
         });
     });
@@ -601,6 +604,21 @@ io.on('connection', async (socket) => {
                 callback(profile);
 
                 auth.setViewedNews(session.userId);
+            });
+        });
+
+        socket.on('match list', (page, callback) => {
+            if (typeof page !== 'number' && 1 > page) {
+                return;
+            }
+
+            auth.getMatchList(session.userId, page).then((matchlist) => {
+                if (matchlist.length === 0) {
+                    callback(null);
+                    return;
+                }
+
+                callback(matchlist);
             });
         });
 

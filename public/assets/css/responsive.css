@@ -1,6 +1,12 @@
+@media only screen and (max-width: 1550px) {
+    #profileView .matchList .match:hover {
+        height: 14rem;
+    }
+}
+
 @media only screen and (max-width: 1280px) {
     #profileView .stats  {
-        flex-direction: column;
+        flex-direction: column-reverse;
     }
 
     #profileView .profile {

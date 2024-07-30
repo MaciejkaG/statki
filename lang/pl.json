@@ -95,7 +95,8 @@
             "total matches played": "meczy zagranych łącznie",
             "winrate": "winrate",
 
-            "No matches played": "Nie zagrano żadnych meczy"
+            "No matches played": "Nie zagrano żadnych meczy",
+            "Thats all of your matches Theres nothing more to see here": "To wszystkie Twoje mecze. Nic już tu nie ma."
         },
         "Settings": {
             "General": "Ogólne",

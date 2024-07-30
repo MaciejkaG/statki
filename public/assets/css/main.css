@@ -249,6 +249,8 @@ nav span:hover {
     flex-direction: column;
     gap: 2rem;
     flex: 2;
+
+    user-select: none;
 }
 
 #profileView .matchList::-webkit-scrollbar {

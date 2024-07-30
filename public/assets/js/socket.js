@@ -1,5 +1,7 @@
 switchView("mainMenuView");
 
+let profileLoaded;
+
 const socket = io();
 
 // Handling server-sent events
@@ -94,7 +96,6 @@ socket.emit("my profile", (profile) => {
         
         const duration = `${minutes}:${seconds}`;
 
-        console.log(match);
         matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}" onclick="window.open(\`/match/\${$(this).data('matchid')}\`, '_blank')"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "<span class=\"important\">AI ("+match.ai_type+")</span>"}</span></div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
     }
 
@@ -104,7 +105,51 @@ socket.emit("my profile", (profile) => {
 
     $(".matchList").html(matchHistoryDOM);
 
+    profileLoaded = true;
     console.log("Profile data fetched and processed successfully");
+});
+
+let lastLoad = new Date().getTime();
+let page = 2;
+let allMatches;
+let loadLock = false;
+
+$(window).scroll(function () {
+    if ($(window).scrollTop() + $(window).height() == $(document).height() && profileLoaded && !allMatches && !loadLock && activeView === 'profileView' && new Date().getTime() - lastLoad > 300) {
+        loadLock = true;
+        socket.emit("match list", page, (matchlist) => {
+            if (matchlist === null) {
+                $(".matchList").html($(".matchList").html() + `<h2>${window.locale["Thats all of your matches Theres nothing more to see here"]}</h2>`);
+                console.log('all list')
+                allMatches = true;
+                return;
+            }
+
+            var matchHistory = matchlist;
+            var matchHistoryDOM = "";
+
+            options = { hour: '2-digit', minute: '2-digit', time: 'numeric', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+            for (let i = 0; i < matchHistory.length; i++) {
+                const match = matchHistory[i];
+
+                let date = new Date(match.date).toLocaleDateString(undefined, options);
+
+                const minutes = Math.floor(match.duration / 60).toLocaleString(undefined, { minimumIntegerDigits: 2, useGrouping: false });
+                const seconds = (match.duration - minutes * 60).toLocaleString(undefined, { minimumIntegerDigits: 2, useGrouping: false });
+
+                const duration = `${minutes}:${seconds}`;
+
+                matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}" onclick="window.open(\`/match/\${$(this).data('matchid')}\`, '_blank')"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "<span class=\"important\">AI (" + match.ai_type + ")</span>"}</span></div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
+            }
+
+            $(".matchList").html($(".matchList").html() + matchHistoryDOM);
+
+            lastLoad = new Date().getTime();
+            page++;
+            loadLock = false;
+        });
+    }
 });
 
 function showMatchInfo(matchId) {

@@ -32,7 +32,7 @@ class Battleships {
 
     getFieldSecondary(x, y) {
         console.log(x, y);
-        if (0 <= x && x < this.boardSize && 0 <= y && y <= this.boardSize) {
+        if (0 <= x && x < this.boardSize && 0 <= y && y < this.boardSize) {
             return $(`#secondaryBoard .row:nth-child(${y + 1}) .field:nth-child(${x + 1})`);
         } else {
             throw new RangeError("getField position out of range.");
@@ -40,18 +40,16 @@ class Battleships {
     }
 
     getRow(row) {
-        row++;
-        if (row<=this.boardSize) {
-            return $(`.board .row:nth-child(${row}) .field`);
+        if (row < this.boardSize) {
+            return $(`.board .row:nth-child(${row + 1}) .field`);
         } else {
             throw new RangeError("getRow position out of range.");
         }
     }
 
     getColumn(column) {
-        column++;
-        if (column<=this.boardSize) {
-            return $(`.board .row .field:nth-child(${column})`);
+        if (column < this.boardSize) {
+            return $(`.board .row .field:nth-child(${column + 1})`);
         } else {
             throw new RangeError("getColumn position out of range.");
         }
@@ -83,7 +81,7 @@ class Battleships {
         }
     }
 
-    placeShip(data) {
+    placeShip(data, secondary = false) {
         let fields = [];
         switch (data.rot) {
             case 0:
@@ -111,7 +109,11 @@ class Battleships {
         for (let i = 0; i < fields.length; i++) {
             const field = fields[i];
             setTimeout(() => {
-                this.getField(field[0], field[1]).addClass("active");
+                if (secondary) {
+                    this.getFieldSecondary(field[0], field[1]).addClass("active");
+                } else {
+                    this.getField(field[0], field[1]).addClass("active");
+                }
             }, i * 150);
         }
 

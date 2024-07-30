@@ -26,7 +26,7 @@ export class MailAuth {
             },
         });
 
-        this.mailFrom = `"Statki" <${options.user}>`
+        this.mailFrom = `"Statki" <${options.getMatchListuser}>`
     }
 
     async timer(tId, time, callback) {
@@ -257,6 +257,44 @@ export class MailAuth {
                     resolve({ profile, stats, matchHistory });
                 }
 
+                conn.end();
+            });
+        });
+    }
+
+    getMatchList(userId, page) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            const limit = 10;
+            const offset = (page - 1) * limit;
+
+            const query = `
+            SELECT 
+                statistics.match_id, 
+                accounts.nickname AS opponent, 
+                matches.match_type, 
+                statistics.won, 
+                matches.ai_type, 
+                matches.duration, 
+                matches.date 
+            FROM statistics 
+            JOIN matches ON matches.match_id = statistics.match_id 
+            JOIN accounts ON accounts.user_id = 
+                (CASE 
+                    WHEN matches.host_id != statistics.user_id THEN matches.host_id 
+                    ELSE matches.guest_id 
+                END) 
+            WHERE statistics.user_id = ? 
+            ORDER BY matches.date DESC 
+            LIMIT ? OFFSET ?;
+        `;
+
+            conn.query(query, [userId, limit, offset], (error, response) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(response);
+                }
                 conn.end();
             });
         });
