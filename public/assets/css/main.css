@@ -497,6 +497,10 @@ nav span:hover {
     font-style: italic;
 }
 
+.newsModalContainer .newsModal h3 {
+    margin: 0;
+}
+
 .newsModalContainer.active {
     pointer-events: initial;
     opacity: 1;
