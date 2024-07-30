@@ -1,0 +1,57 @@
+<link rel="stylesheet" href="/assets/css/match.css">
+
+<h1 class="title">{{ t 'match.Match statistics' }}</h1>
+
+<div class="matchup">
+    <h1 class="{{ hostNicknameClass }}">{{ hostNickname }}</h1>
+    <h2>Vs.</h2>
+    <h1 class="{{ guestNicknameClass }}">{{ guestNickname }}</h1>
+</div>
+
+<div class="matchup">
+    <div class="toggle-switch">
+        <input type="checkbox" id="toggle" class="toggle-input" onclick="switchStats()">
+        <label for="toggle" class="toggle-label">
+            <span class="toggle-option">{{ t 'match.Host' }}</span>
+            <span class="toggle-option">{{ t 'match.Guest' }}</span>
+            <span class="toggle-backlight"></span>
+        </label>
+    </div>
+</div>
+
+<div class="stats" id="hostStats">
+    <div class="board">
+        <div class="board" id="board" oncontextmenu="return false;"></div>
+    </div>
+    <div class="numbers">
+        <h1>{{ t 'match.Stats' }}</h1>
+        <h2>{{ t 'match.Shots' }}</h2>
+        <h3>{{ hostShots }}</h3>
+        <h2>{{ t 'match.Hits' }}</h2>
+        <h3>{{ hostHits }}</h3>
+        <h2>{{ t 'match.Accuracy' }}</h2>
+        <h3>{{ hostAccuracy }}%</h3>
+        <h2>{{ t 'match.Sunk ships' }}</h2>
+        <h3>{{ hostSunkShips }}</h3>
+    </div>
+</div>
+
+<div class="stats" id="guestStats">
+    <div class="board">
+        <div class="board" id="secondaryBoard" oncontextmenu="return false;"></div>
+    </div>
+    <div class="numbers">
+        <h1>{{ t 'match.Stats' }}</h1>
+        <h2>{{ t 'match.Shots' }}</h2>
+        <h3>{{ guestShots }}</h3>
+        <h2>{{ t 'match.Hits' }}</h2>
+        <h3>{{ guestHits }}</h3>
+        <h2>{{ t 'match.Accuracy' }}</h2>
+        <h3>{{ guestAccuracy }}%</h3>
+        <h2>{{ t 'match.Sunk ships' }}</h2>
+        <h3>{{ guestSunkShips }}</h3>
+    </div>
+</div>
+
+<script src="/assets/js/battleships-lib.js"></script>
+<script src="/assets/js/match.js"></script>

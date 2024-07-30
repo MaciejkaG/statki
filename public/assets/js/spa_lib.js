@@ -25,7 +25,7 @@ function lockUI(doLock) {
         $("body").css("pointer-events", "none");
         $(".container").css("opacity", "0.4");
     } else {
-        $("body").css("pointer-events", "inherit");
+        $("body").css("pointer-events", "initial");
         $(".container").css("opacity", "1");
     }
 }

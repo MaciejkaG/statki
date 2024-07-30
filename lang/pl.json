@@ -180,5 +180,18 @@
 
         "Victory": "Zwycięstwo",
         "Defeat": "Porażka"
+    },
+
+    "match": {
+        "Match statistics": "Statystyki meczu",
+        "Host": "Host",
+        "Guest": "Gość",
+
+        "Stats": "Statystyki",
+
+        "Shots": "Strzały",
+        "Hits": "Trafienia",
+        "Accuracy": "Celność",
+        "Sunk ships": "Zatopione statki"
     }
 }

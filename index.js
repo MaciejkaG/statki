@@ -208,7 +208,7 @@ app.get('/', async (req, res) => {
     }
 });
 
-app.get('/match/:searchId', (req, res) => {
+app.get('/match/:searchId', async (req, res) => {
     // req.params.searchId is the matchId user searched through the URL (e.g. /match/9ba20a03-505c-41a1-9933-3bc456e5948f)
 
     if (req.params.searchId.length !== 36) {
@@ -223,8 +223,36 @@ app.get('/match/:searchId', (req, res) => {
         return;
     }
 
+    let locale;
+
+    if (loginState(req) != 2) {
+        locale = new Lang(req.acceptsLanguages());
+    } else {
+        // Assume this code is within an async function
+        locale = new Lang([await auth.getLanguage(req.session.userId)]);
+    }
+
     auth.getMatch(req.params.searchId).then(result => {
-        res.send(result);
+        // res.send(result);
+        res.render('match', {
+            helpers: {
+                t: (key) => { return locale.t(key) },
+                hostNickname: result.match_info.host_username,
+                guestNickname: result.match_info.ai_type ? `AI (${result.match_info.ai_type})` : result.match_info.guest_username,
+                hostNicknameClass: result.host_stats.won ? 'dynamic' : 'danger',
+                guestNicknameClass: result.host_stats.won ? 'danger' : 'dynamic',
+
+                hostShots: result.host_stats.stats.shots,
+                hostHits: result.host_stats.stats.hits,
+                hostAccuracy: Math.floor(result.host_stats.stats.hits / result.host_stats.stats.shots * 100),
+                hostSunkShips: result.host_stats.stats.sunkShips,
+
+                guestShots: result.guest_stats.stats.shots,
+                guestHits: result.guest_stats.stats.hits,
+                guestAccuracy: Math.floor(result.host_stats.stats.hits / result.guest_stats.stats.shots * 100),
+                guestSunkShips: result.guest_stats.stats.sunkShips,
+            }
+        });
     });
 })
 

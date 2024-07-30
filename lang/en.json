@@ -179,5 +179,18 @@
 
         "Victory": "Victory",
         "Defeat": "Defeat"
+    },
+
+    "match": {
+        "Match statistics": "Match statistics",
+        "Host": "Host",
+        "Guest": "Guest",
+
+        "Stats": "Stats",
+
+        "Shots": "Shots",
+        "Hits": "Hits",
+        "Accuracy": "Accuracy",
+        "Sunk ships": "Sunk ships"
     }
 }

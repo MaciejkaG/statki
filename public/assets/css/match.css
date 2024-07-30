@@ -1,0 +1,136 @@
+html {
+    overflow-x: hidden;
+}
+
+.title {
+    text-align: center;
+    font-size: 1.25rem;
+}
+
+.matchup {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.matchup h1 {
+    width: 10em;
+    text-align: center;
+}
+
+@media only screen and (max-width: 1000px) {
+    .matchup {
+        flex-direction: column;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .matchup h1 {
+        font-size: 1.5rem;
+    }
+}
+
+.toggle-switch {
+    position: relative;
+    width: 300px;
+    /* Adjusted width */
+    height: 40px;
+    /* Adjusted height */
+}
+
+.toggle-input {
+    display: none;
+}
+
+.toggle-label {
+    display: flex;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    overflow: hidden;
+    align-items: center;
+}
+
+.toggle-option {
+    flex: 1;
+    text-align: center;
+    color: #fff;
+    font-weight: bold;
+    z-index: 1;
+    line-height: 40px;
+    white-space: nowrap;
+}
+
+.toggle-backlight {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    transition: transform 0.2s ease;
+}
+
+.toggle-input:checked+.toggle-label .toggle-backlight {
+    transform: translateX(100%);
+}
+
+@keyframes HostStatsOutAnim {
+    from {transform: translateX(0); filter: blur(0px); opacity: 1;display: flex;}
+    99% {transform: translateX(5rem); filter: blur(10px); opacity: 0.4;display:flex;}
+    100% {display: none;}
+}
+
+@keyframes HostStatsInAnim {
+    from {transform: translateX(5rem); filter: blur(10px); opacity: 0.4;display:flex;}
+    to {transform: translateX(0); filter: blur(0px); opacity: 1;}
+}
+
+@keyframes GuestStatsOutAnim {
+    from {transform: translateX(0); filter: blur(0px); opacity: 1;display:flex;}
+    99% {transform: translateX(-5rem); filter: blur(10px); opacity: 0.4;display:flex;}
+    100% {display: none;}
+}
+
+@keyframes GuestStatsInAnim {
+    from {transform: translateX(-5rem); filter: blur(10px); opacity: 0.4;display:flex;}
+    to {transform: translateX(0); filter: blur(0px); opacity: 1;}
+}
+
+.stats {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    gap: 2rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+}
+
+#guestStats {
+    display: none;
+}
+
+#secondaryBoard, #board {
+    position: initial;
+}
+
+.stats .numbers {
+    text-align: center;
+}
+
+.stats .numbers * {
+    margin: 0;
+}
+
+/* .stats .numbers h1 {
+    margin-bottom: 1rem;
+} */
+
+.stats .numbers h2 {
+    margin-top: 1.5rem;
+}
