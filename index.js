@@ -249,7 +249,7 @@ app.get('/match/:searchId', async (req, res) => {
 
                 guestShots: result.guest_stats.stats.shots,
                 guestHits: result.guest_stats.stats.hits,
-                guestAccuracy: Math.floor(result.host_stats.stats.hits / result.guest_stats.stats.shots * 100),
+                guestAccuracy: Math.floor(result.guest_stats.stats.hits / result.guest_stats.stats.shots * 100),
                 guestSunkShips: result.guest_stats.stats.sunkShips,
             }
         });
