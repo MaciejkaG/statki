@@ -44,9 +44,26 @@ nav span {
     padding: 0.2rem;
 }
 
+nav .item {
+    width: 12rem;
+}
+
 nav span:hover {
     text-decoration: underline;
-    
+}
+
+#shopButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--masts-color);
+}
+
+nav div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: end;
 }
 
 .header {
@@ -235,6 +252,32 @@ nav span:hover {
     justify-content: space-between;
 
     gap: 1rem;
+}
+
+#profileView .accountinfo {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+#profileView .progress-container {
+    width: 100%;
+    background-color: var(--accent-bg);
+    border-radius: 5px;
+    overflow: hidden;
+    height: 5px;
+}
+
+#profileView .levelContainer span {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+#profileView .progress-bar {
+    height: 100%;
+    background-color: var(--accent-main);
+    border-radius: 5px 0 0 5px;
 }
 
 #profileView .stats {

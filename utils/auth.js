@@ -74,7 +74,7 @@ export class MailAuth {
     loginAuthless(email) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
+            conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)};`, async (error, response) => {
                 if (error) { reject(error); return; }
 
                 if (response.length === 0 || response[0].nickname == null) {
@@ -82,7 +82,7 @@ export class MailAuth {
                         conn.query(`INSERT INTO accounts(email) VALUES (${conn.escape(email)});`, (error) => { if (error) reject(error) });
                     }
 
-                    conn.query(`SELECT user_id FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
+                    conn.query(`SELECT user_id FROM accounts WHERE email = ${conn.escape(email)};`, async (error, response) => {
                         if (error) reject(error);
                         const row = response[0];
 
@@ -104,7 +104,7 @@ export class MailAuth {
     getLanguage(userId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            conn.query(`SELECT language FROM accounts WHERE user_id = ${conn.escape(userId)}`, (error, response) => {
+            conn.query(`SELECT language FROM accounts WHERE user_id = ${conn.escape(userId)};`, (error, response) => {
                 if (error) { reject(error); return; }
 
                 if (response.length !== 0) {
@@ -123,7 +123,7 @@ export class MailAuth {
             const conn = mysql.createConnection(this.mysqlOptions);
             const lang = new Lang([langId]);
 
-            conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
+            conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)};`, async (error, response) => {
                 if (error) { reject(error); conn.end(); return; }
                 if (response.length !== 0) {
                     let timer = await this.redis.get(`loginTimer:${response[0].user_id}`);
@@ -139,7 +139,7 @@ export class MailAuth {
                         conn.query(`INSERT INTO accounts(email) VALUES (${conn.escape(email)});`, (error) => { if (error) reject(error) });
                     }
 
-                    conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)}`, async (error, response) => {
+                    conn.query(`SELECT user_id, nickname FROM accounts WHERE email = ${conn.escape(email)};`, async (error, response) => {
                         if (error) reject(error);
                         const row = response[0];
 
@@ -240,7 +240,7 @@ export class MailAuth {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             const query = `
-            SELECT nickname, viewed_news, account_creation FROM accounts WHERE user_id = ?;
+            SELECT nickname, viewed_news, xp, level, masts, account_creation FROM accounts WHERE user_id = ?;
             SELECT ROUND((AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.user_id = ?;
             SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.ai_type, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = ? ORDER BY matches.date DESC LIMIT 10;
             `;
@@ -253,6 +253,8 @@ export class MailAuth {
                     }
 
                     const [[profile], [stats], matchHistory] = response;
+
+                    profile.levelProgress = Math.floor((profile.xp - getXPForLevel(profile.level)) / getXPForLevel(profile.level + 1) * 100);
 
                     resolve({ profile, stats, matchHistory });
                 }
@@ -356,7 +358,7 @@ export class MailAuth {
     setNickname(uid, nickname) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            conn.query(`UPDATE accounts SET nickname = ${conn.escape(nickname)} WHERE user_id = ${conn.escape(uid)}`, (error) => {
+            conn.query(`UPDATE accounts SET nickname = ${conn.escape(nickname)} WHERE user_id = ${conn.escape(uid)};`, (error) => {
                 if (error) reject(error);
                 resolve();
 
@@ -368,7 +370,7 @@ export class MailAuth {
     setViewedNews(uid) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            conn.query(`UPDATE accounts SET viewed_news = 1 WHERE user_id = ${conn.escape(uid)}`, (error) => {
+            conn.query(`UPDATE accounts SET viewed_news = 1 WHERE user_id = ${conn.escape(uid)};`, (error) => {
                 if (error) reject(error);
                 resolve();
 
@@ -380,7 +382,7 @@ export class MailAuth {
     getNickname(uid) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            conn.query(`SELECT nickname FROM accounts WHERE user_id = ${conn.escape(uid)}`, (error, response) => {
+            conn.query(`SELECT nickname FROM accounts WHERE user_id = ${conn.escape(uid)};`, (error, response) => {
                 if (error) reject(error);
                 resolve(response[0].nickname);
             });
@@ -388,8 +390,54 @@ export class MailAuth {
             conn.end();
         });
     }
+
+    addXP(userId, amount) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            conn.query('SELECT xp, level FROM accounts WHERE user_id = ?;', [userId], (err, results) => {
+                amount = Math.floor(amount);
+
+                if (err) return reject(err);
+                if (results.length === 0) return reject('Player not found');
+
+                let { xp, level } = results[0];
+                xp += amount;
+
+                let nextLevelXP = getXPForLevel(level + 1);
+                let mastsEarned = 0;
+                while (xp >= nextLevelXP) {
+                    level++;
+                    xp -= nextLevelXP;
+                    nextLevelXP = getXPForLevel(level + 1);
+
+                    // Levelup rewards in masts (ingame currency)
+                    if (level % 50 === 0)      mastsEarned += 5000;
+                    else if (level % 10 === 0) mastsEarned += 2000;
+                    else                       mastsEarned += 500;
+                }
+
+                conn.query('UPDATE accounts SET xp = ?, level = ?, masts = masts + ? WHERE user_id = ?;', [xp, level, mastsEarned, userId], (err, results) => {
+                    if (err) return reject(err);
+                    resolve({ xp, level });
+                });
+            });
+        });
+    }
 }
 
 function genCode() {
     return Math.floor(10000000 + Math.random() * 90000000).toString();
+}
+
+function getXPForLevel(level) {
+    return 500 * level / 5 * (level - 1);
+}
+
+function calculateLevel(xp) {
+    let level = 1;
+    while (xp >= getXPForLevel(level + 1)) {
+        level++;
+        xp -= getXPForLevel(level);
+    }
+    return level;
 }

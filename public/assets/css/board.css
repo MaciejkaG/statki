@@ -20,6 +20,10 @@
     --dynamic: rgb(83, 83, 245);
     --danger: rgb(230, 73, 73);
     --important: rgb(203, 50, 241);
+    --masts-color: rgb(214, 181, 65);
+
+    --accent-bg: rgba(255, 255, 255, 0.1);
+    --accent-main: rgba(255, 255, 255, 0.2);
 
     color: rgb(136, 136, 136)
 }

@@ -4,6 +4,14 @@ let profileLoaded;
 
 const socket = io();
 
+tippy('#shopButton', {
+    placement: 'bottom',
+    theme: 'dark',
+    followCursor: 'horizontal',
+    animation: 'scale-subtle',
+    content: window.locale['These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!']
+});
+
 // Handling server-sent events
 socket.on("joined", (nick) => {
     returnLock = false;
@@ -74,6 +82,10 @@ socket.emit("my profile", (profile) => {
     $("#monthlyPlayed").html(profile.stats.monthly_matches);
     $("#totalPlayed").html(profile.stats.alltime_matches);
     $("#winrate").html(profile.stats.winrate !== null ? `${profile.stats.winrate}%` : "-");
+
+    $("#xpbar").css('width', `${profile.profile.levelProgress}%`);
+    $("#level").html(profile.profile.level);
+    $("#masts").html(profile.profile.masts);
 
     // Show news if user didn't read them already.
     if (!profile.profile.viewed_news) { // profile.profile.viewed_news would be 0 (falsy) if user didn't read the news

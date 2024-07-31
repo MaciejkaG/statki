@@ -1174,6 +1174,9 @@ io.on('connection', async (socket) => {
                             playerGame = await GInfo.getPlayerGameData(socket);
                             auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 1, difficulty);
 
+                            const playerStats = playerGame.data.boards[0].stats;
+                            auth.addXP(session.userId, calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty));
+
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);
                             return;
@@ -1228,6 +1231,9 @@ io.on('connection', async (socket) => {
 
                             playerGame = await GInfo.getPlayerGameData(socket);
                             auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 0, difficulty);
+                            
+                            const playerStats = playerGame.data.boards[0].stats;
+                            auth.addXP(session.userId, calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty));
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);
@@ -1362,4 +1368,29 @@ function checkFlag(key) {
     } else {
         return false;
     }
+}
+
+function calculateXP(shots, accuracy, shipsSunk, difficulty) {
+    let difficultyMultiplier;
+
+    switch (difficulty) {
+        case 0: // simple
+            difficultyMultiplier = 2;
+            break;
+
+        case 1: // smart
+            difficultyMultiplier = 4;
+            break;
+
+        case 2: // overkill
+            difficultyMultiplier = 30;
+            break;
+    
+        default:
+            return 0;
+            break;
+    }
+
+    console.log(Math.floor(shots * accuracy * shipsSunk / 3 * difficultyMultiplier / 100))
+    return Math.floor(shots * accuracy * shipsSunk / 3 * difficultyMultiplier / 100);
 }

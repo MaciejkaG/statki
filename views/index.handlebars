@@ -18,7 +18,7 @@
     </div>
 </div>
 
-<nav><span onclick="switchView('settingsView')">{{ t 'menu.navbar.Settings' }}</span><span onclick="switchView('mainMenuView')">{{ t 'menu.navbar.Main menu' }}</span> <span id="profileButton" onclick="switchView('profileView')">{{ t 'menu.navbar.Profile' }}</span></nav>
+<nav><span onclick="switchView('settingsView')" class="item" style="text-align: left;">{{ t 'menu.navbar.Settings' }}</span><span onclick="switchView('mainMenuView')" class="item" style="text-align: center;">{{ t 'menu.navbar.Main menu' }}</span> <div class="item"><span id="profileButton" onclick="switchView('profileView')">{{ t 'menu.navbar.Profile' }}</span><span id="shopButton"><img src="/assets/img/mast-logo.png" alt="Masts" style="height: 1em;"><span id="masts">0</span></span></div></nav>
 <div class="container" id="mainMenuView" data-path="/">
     <div>
         
@@ -119,9 +119,20 @@
 <div class="container" id="profileView" data-path="/profile">
     <div class="profile">
         <h1 class="nickname">{{ t 'menu.Profile.Loading' }}</h1>
-        <div>
-            <span>{{ t 'menu.Profile.Player since:' }} </span>
-            <span id="playerSince">-</span>
+        <div class="accountinfo">
+            <div class="levelContainer">
+                <span id="level">0</span>
+                <div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="xpbar" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <span>{{ t 'menu.Profile.Player since:' }} </span>
+                <span id="playerSince">-</span><br>
+            </div>
+            
         </div>
     </div>
     <div class="stats">
@@ -173,6 +184,8 @@
         "Simple description": "{{ t 'menu.PvE.difficulty.Simple.description' }}",
         "Smart description": "{{ t 'menu.PvE.difficulty.Smart.description' }}",
         "Overkill description": "{{ t 'menu.PvE.difficulty.Overkill.description' }}",
+
+        "These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!": "{{ t 'menu.General.These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!' }}"
     };
 </script>
 <script src="/assets/js/spa_lib.js"></script>

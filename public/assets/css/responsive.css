@@ -33,6 +33,11 @@
     #profileView .matchList .match:hover {
         height: 14rem;
     }
+
+    nav div {
+        flex-direction: column;
+        gap: 0rem;
+    }
 }
 
 @media only screen and (max-width: 820px) {
