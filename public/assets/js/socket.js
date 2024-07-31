@@ -87,14 +87,23 @@ socket.emit("my profile", (profile) => {
     $("#level").html(profile.profile.level);
     $("#masts").html(profile.profile.masts);
 
+    tippy('#levelcontainer', {
+        theme: 'dark',
+        followCursor: 'horizontal',
+        animation: 'scale-subtle',
+        content: `${profile.profile.xp} / ${profile.profile.levelThreshold}`
+    });
+
     // Show news if user didn't read them already.
     if (!profile.profile.viewed_news) { // profile.profile.viewed_news would be 0 (falsy) if user didn't read the news
         openNewsModal();
     }
 
     // Match history
-    var matchHistory = profile.matchHistory;
-    var matchHistoryDOM = "";
+    const matchHistory = profile.matchHistory;
+    let matchHistoryDOM = "";
+
+    console.log(profile);
 
     options = { hour: '2-digit', minute: '2-digit', time: 'numeric', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -108,7 +117,7 @@ socket.emit("my profile", (profile) => {
         
         const duration = `${minutes}:${seconds}`;
 
-        matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}" onclick="window.open(\`/match/\${$(this).data('matchid')}\`, '_blank')"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "<span class=\"important\">AI ("+match.ai_type+")</span>"}</span></div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
+        matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}" onclick="window.open(\`/match/\${$(this).data('matchid')}\`, '_blank')"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "<span class=\"important\">AI (" + match.ai_type + ")</span>"}</span>${match.xp ? `<span class="xpincrease">+${match.xp}XP</span>` : ''}</div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
     }
 
     if (!matchHistoryDOM) {

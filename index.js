@@ -1171,11 +1171,12 @@ io.on('connection', async (socket) => {
 
                             socket.emit("game finished", 0, guestNickname);
 
-                            playerGame = await GInfo.getPlayerGameData(socket);
-                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 1, difficulty);
-
                             const playerStats = playerGame.data.boards[0].stats;
-                            auth.addXP(session.userId, calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty));
+                            const xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty);
+
+                            playerGame = await GInfo.getPlayerGameData(socket);
+                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 1, difficulty, xp);
+                            auth.addXP(session.userId, xp);
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);
@@ -1229,11 +1230,13 @@ io.on('connection', async (socket) => {
 
                             socket.emit("game finished", 1, guestNickname);
 
-                            playerGame = await GInfo.getPlayerGameData(socket);
-                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 0, difficulty);
-                            
                             const playerStats = playerGame.data.boards[0].stats;
-                            auth.addXP(session.userId, calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty));
+                            const xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty);
+
+                            playerGame = await GInfo.getPlayerGameData(socket);
+                            auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 0, difficulty, xp);
+
+                            auth.addXP(session.userId, xp);
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);
@@ -1383,7 +1386,7 @@ function calculateXP(shots, accuracy, shipsSunk, difficulty) {
             break;
 
         case 2: // overkill
-            difficultyMultiplier = 30;
+            difficultyMultiplier = 40;
             break;
     
         default:
@@ -1391,6 +1394,5 @@ function calculateXP(shots, accuracy, shipsSunk, difficulty) {
             break;
     }
 
-    console.log(Math.floor(shots * accuracy * shipsSunk / 3 * difficultyMultiplier / 100))
-    return Math.floor(shots * accuracy * shipsSunk / 3 * difficultyMultiplier / 100);
+    return Math.floor(shots / 2 * accuracy * shipsSunk * 1.5 * difficultyMultiplier / 100);
 }

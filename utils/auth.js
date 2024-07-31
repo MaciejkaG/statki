@@ -221,10 +221,10 @@ export class MailAuth {
         });
     }
 
-    saveMatch(matchId, duration, type, hostId, guestId, boards, winnerIdx, aitype = null) {
+    saveMatch(matchId, duration, type, hostId, guestId, boards, winnerIdx, aitype = null, xp = null) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            conn.query(`INSERT INTO matches(match_id, match_type, host_id, guest_id, duration${aitype == null ? "" : ", ai_type"}) VALUES (${conn.escape(matchId)}, ${conn.escape(type)}, ${conn.escape(hostId)}, ${conn.escape(guestId)}, ${conn.escape(duration)}${aitype == null ? "" : ", " + conn.escape(aitype)})`, async (error) => {
+            conn.query(`INSERT INTO matches(match_id, match_type, host_id, guest_id, duration${aitype == null ? "" : ", ai_type"}${xp == null ? "" : ", xp"}) VALUES (${conn.escape(matchId)}, ${conn.escape(type)}, ${conn.escape(hostId)}, ${conn.escape(guestId)}, ${conn.escape(duration)}${aitype == null ? "" : ", " + conn.escape(aitype)}${xp == null ? "" : ", " + conn.escape(xp)})`, async (error) => {
                 if (error) reject(error);
                 else conn.query(`INSERT INTO statistics(match_id, user_id, board, won) VALUES (${conn.escape(matchId)}, ${conn.escape(hostId)}, ${conn.escape(JSON.stringify(boards[0]))}, ${conn.escape(winnerIdx ? 1 : 0)}), (${conn.escape(matchId)}, ${conn.escape(guestId)}, ${conn.escape(JSON.stringify(boards[1]))}, ${conn.escape(winnerIdx ? 0 : 1)})`, async (error, response) => {
                     if (error) reject(error);
@@ -241,8 +241,8 @@ export class MailAuth {
             const conn = mysql.createConnection(this.mysqlOptions);
             const query = `
             SELECT nickname, viewed_news, xp, level, masts, account_creation FROM accounts WHERE user_id = ?;
-            SELECT ROUND((AVG(statistics.won)) * 100) AS winrate, COUNT(statistics.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(matches.date) = YEAR(NOW()) AND MONTH(matches.date) = MONTH(NOW())) THEN matches.match_id END) AS monthly_matches FROM accounts NATURAL JOIN statistics NATURAL JOIN matches WHERE accounts.user_id = ?;
-            SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.ai_type, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = ? ORDER BY matches.date DESC LIMIT 10;
+            SELECT ROUND((AVG(s.won)) * 100) AS winrate, COUNT(s.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(m.date) = YEAR(NOW()) AND MONTH(m.date) = MONTH(NOW())) THEN m.match_id END) AS monthly_matches FROM accounts a JOIN statistics s ON s.user_id = a.user_id JOIN matches m ON m.match_id = s.match_id WHERE a.user_id = ?;
+            SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.ai_type, matches.xp, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = ? ORDER BY matches.date DESC LIMIT 10;
             `;
             conn.query(query, [userId, userId, userId], async (error, response) => {
                 if (error) reject(error);
@@ -254,7 +254,8 @@ export class MailAuth {
 
                     const [[profile], [stats], matchHistory] = response;
 
-                    profile.levelProgress = Math.floor((profile.xp - getXPForLevel(profile.level)) / getXPForLevel(profile.level + 1) * 100);
+                    profile.levelProgress = Math.floor(profile.xp / getXPForLevel(profile.level + 1) * 100);
+                    profile.levelThreshold = getXPForLevel(profile.level + 1);
 
                     resolve({ profile, stats, matchHistory });
                 }
@@ -277,6 +278,7 @@ export class MailAuth {
                 matches.match_type, 
                 statistics.won, 
                 matches.ai_type, 
+                matches.xp, 
                 matches.duration, 
                 matches.date 
             FROM statistics 
@@ -430,7 +432,7 @@ function genCode() {
 }
 
 function getXPForLevel(level) {
-    return 500 * level / 5 * (level - 1);
+    return 500 + 11 * (level - 1);
 }
 
 function calculateLevel(xp) {

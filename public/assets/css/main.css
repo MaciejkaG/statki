@@ -269,6 +269,10 @@ nav div {
     height: 5px;
 }
 
+#profileView .levelContainer {
+    user-select: none;
+}
+
 #profileView .levelContainer span {
     display: block;
     margin-bottom: 0.5rem;
@@ -310,6 +314,11 @@ nav div {
     overflow: hidden;
 
     transition: height 0.3s;
+}
+
+#profileView .matchList .match .xpincrease {
+    font-size: 0.75rem;
+    color: var(--ship-valid);
 }
 
 #profileView .matchList .match .statsButton {
