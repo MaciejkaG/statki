@@ -118,7 +118,7 @@ export class MailAuth {
         });
     }
 
-    startVerification(email, ip, agent, langId) {
+    startVerification(email, ip, agent, langId, timeoutCallback = () => {}) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             const lang = new Lang([langId]);
@@ -148,8 +148,11 @@ export class MailAuth {
 
                         await this.redis.set(`codeAuth:${authCode}`, row.user_id);
 
+                        // This timer executes a function if it ends a countdown.
+                        // In this case it will destroy the user session and reset the log in process
                         await this.timer(row.user_id, 600, async () => {
                             await this.redis.unlink(`codeAuth:${authCode}`);
+                            timeoutCallback();
                         });
 
                         authCode = authCode.slice(0, 4) + " " + authCode.slice(4);
@@ -219,6 +222,18 @@ export class MailAuth {
                 resolve({ status: 1, uid: row.user_id });
             });
         });
+    }
+
+    async finishVerification(uid, authCode) {
+        authCode = authCode.replace(/\s+/g, "");
+        const rUid = await this.redis.get(`codeAuth:${authCode}`);
+        if (rUid != null && rUid === uid) {
+            this.resetTimer(rUid);
+            await this.redis.unlink(`codeAuth:${authCode}`);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     saveMatch(matchId, duration, type, hostId, guestId, boards, winnerIdx, aitype = null, xp = null) {
@@ -644,18 +659,6 @@ export class MailAuth {
                 conn.end();
             });
         });
-    }
-
-    async finishVerification(uid, authCode) {
-        authCode = authCode.replace(/\s+/g, "");
-        const rUid = await this.redis.get(`codeAuth:${authCode}`);
-        if (rUid != null && rUid === uid) {
-            this.resetTimer(rUid);
-            await this.redis.unlink(`codeAuth:${authCode}`);
-            return true;
-        } else {
-            return false;
-        }
     }
 
     setNickname(uid, nickname) {

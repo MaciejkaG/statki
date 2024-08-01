@@ -355,7 +355,7 @@ app.post('/api/login', (req, res) => {
 
         const locale = new Lang(req.acceptsLanguages());
 
-        auth.startVerification(req.body.email, getIP(req), req.get('user-agent'), locale.lang).then(async result => {
+        auth.startVerification(req.body.email, getIP(req), req.get('user-agent'), locale.lang, () => { req.session.destroy(); }).then(async result => {
             if (result.status === 1 || result.status === -1) {
                 req.session.userId = result.uid;
 
@@ -532,7 +532,14 @@ io.on('connection', async (socket) => {
 
                 const locale = new Lang(session.langs);
 
-                auth.startVerification(email, getIPSocket(socket), socket.client.request.headers["user-agent"], locale.lang).then(async result => {
+                auth.startVerification(email, getIPSocket(socket), socket.client.request.headers["user-agent"], locale.lang, 
+                () => {
+                    req.session.reload((err) => {
+                        if (err) return socket.disconnect(); 
+                        req.session.destroy();
+                        req.session.save();
+                    })
+                }).then(async result => {
                     if (result.status === 1 || result.status === -1) {
                         req.session.reload((err) => {
                             if (err) return socket.disconnect();
