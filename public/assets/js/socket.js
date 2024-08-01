@@ -26,10 +26,11 @@ tippy('#profileButton', {
 });
 
 // Handling server-sent events
-socket.on("joined", (nick) => {
+socket.on("joined", (nick, oppNameStyle) => {
     returnLock = false;
     lockUI(true);
     $("#oppNameField").html(nick);
+    $("#oppNameField").css('background', oppNameStyle);
     lockUI(false);
     switchView("preparingGame");
 
@@ -43,7 +44,7 @@ socket.on("player left", () => {
     console.log("Player left the game");
 });
 
-socket.on("gameReady", (gameId) => {
+socket.on("game ready", (gameId) => {
     console.log("Game is ready, redirecting in 2 seconds. Game ID:", gameId);
     setTimeout(() => {
         console.log("Redirecting...");
@@ -103,6 +104,8 @@ socket.emit("my profile", (profile) => {
     $("#masts").html(profile.profile.masts.toLocaleString(undefined));
     currentMasts = profile.profile.masts;
 
+    $('.nickname.username').css('background', profile.profile.nameStyle);
+
     tippy('#levelcontainer', {
         theme: 'dark',
         followCursor: 'horizontal',
@@ -119,8 +122,6 @@ socket.emit("my profile", (profile) => {
     const matchHistory = profile.matchHistory;
     let matchHistoryDOM = "";
 
-    console.log(profile);
-
     options = { hour: '2-digit', minute: '2-digit', time: 'numeric', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
     for (let i = 0; i < matchHistory.length; i++) {
@@ -133,7 +134,7 @@ socket.emit("my profile", (profile) => {
         
         const duration = `${minutes}:${seconds}`;
 
-        matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}" onclick="window.open(\`/match/\${$(this).data('matchid')}\`, '_blank')"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "<span class=\"important\">AI (" + match.ai_type + ")</span>"}</span>${match.xp ? `<span class="xpincrease">+${match.xp}XP</span>` : ''}</div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
+        matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}" onclick="window.open(\`/match/\${$(this).data('matchid')}\`, '_blank')"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span style="display: flex;align-items: center;gap: 0.5rem;"> vs. <span ${match.match_type === 'pvp' ? `class="username" style="background:${match.opponent_name_style}"` : 'class="important"'}>${match.match_type === "pvp" ? match.opponent : `AI (${match.ai_type})`}</span></span>${match.xp ? `<span class="xpincrease">+${match.xp}XP</span>` : ''}</div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
     }
 
     if (!matchHistoryDOM) {
@@ -151,16 +152,24 @@ let page = 2;
 let allMatches;
 let loadLock = false;
 
+const endReached = () => {
+    console.log('Match list end reached.');
+    $(".matchList").html($(".matchList").html() + `<h2>${window.locale["Thats all of your matches Theres nothing more to see here"]}</h2>`);
+    allMatches = true;
+}
+
 $(window).scroll(function () {
     if ($(window).scrollTop() + $(window).height() == $(document).height() && profileLoaded && !allMatches && !loadLock && activeView === 'profileView' && new Date().getTime() - lastLoad > 300) {
         loadLock = true;
+
+        console.log('Requesting match list continuation. Page:', page);
         socket.emit("match list", page, (matchlist) => {
             if (matchlist === null) {
-                $(".matchList").html($(".matchList").html() + `<h2>${window.locale["Thats all of your matches Theres nothing more to see here"]}</h2>`);
-                console.log('all list')
-                allMatches = true;
+                endReached();
                 return;
             }
+
+            console.log('Received match list continuation data:', matchlist);
 
             var matchHistory = matchlist;
             var matchHistoryDOM = "";
@@ -177,10 +186,16 @@ $(window).scroll(function () {
 
                 const duration = `${minutes}:${seconds}`;
 
-                matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}" onclick="window.open(\`/match/\${$(this).data('matchid')}\`, '_blank')"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span> vs. ${match.match_type === "pvp" ? match.opponent : "<span class=\"important\">AI (" + match.ai_type + ")</span>"}</span></div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
+                matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}" onclick="window.open(\`/match/\${$(this).data('matchid')}\`, '_blank')"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span ${match.match_type === 'pvp' ? `class="username" style="${match.opponent_name_style}"` : ''}> vs. ${match.match_type === "pvp" ? match.opponent : "<span class=\"important\">AI (" + match.ai_type + ")</span>"}</span>${match.xp ? `<span class="xpincrease">+${match.xp}XP</span>` : ''}</div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
             }
 
             $(".matchList").html($(".matchList").html() + matchHistoryDOM);
+
+            if (matchHistory.length < 10) {
+                endReached();
+            }
+
+            console.log('Processed match list data. Page:', page);
 
             lastLoad = new Date().getTime();
             page++;
@@ -214,7 +229,7 @@ socket.emit('get shop', (shopItems) => {
                         <span>${window.locale['This will cost you']} <span class="masts"><img src="/assets/img/masts-logo.png" alt="Masts" style="height: 0.9em;"> ${item.price.toLocaleString(undefined)} ${window.locale['masts']}</span></span>
                         <div>
                             <button class="cancelCheckout">${window.locale['Cancel']}</button>
-                            <button onclick="buyShopItem(this, ${item.price}, ${item.item_id})">${window.locale['Confirm']}</button>
+                            <button class="buyItem" onclick="buyShopItem(this, ${item.price}, ${item.item_id})">${window.locale['Confirm']}</button>
                         </div>
                     </div>
                     <div class="overlayBase">
@@ -237,6 +252,10 @@ socket.emit('get shop', (shopItems) => {
 
             case 'name_style':
                 document.getElementById('namestyles').innerHTML += itemHTML;
+                break;
+
+            case 'lootbox':
+                document.getElementById('statboxes').innerHTML += itemHTML;
                 break;
         }
     }
@@ -321,6 +340,21 @@ function reloadInventory() {
                         </div>
                     `;
                     break;
+
+                case 'name_style':
+                    itemHTML = `
+                        <div class="item">
+                            <div class="options">
+                                <button onclick="applyNameStyle(${item.item_id})">${window.locale['Apply']}</button>
+                            </div>
+                            <div class="content">
+                                <h2>${window.locale['Name style']}</h2>
+                                <h1>${item.name}</h1>
+                                <span>${item.description}</span>
+                            </div>
+                        </div>
+                    `;
+                    break;
             }
 
             itemsHTML += itemHTML;
@@ -350,7 +384,41 @@ function applyTheme(themeId) {
                 $('#themeBackground').css('background-image', response);
                 $('#themeBackground').css('opacity', '0.6');
                 lockUI(false);
-            }, 2000);
+            }, 1000);
+        } else if (response === null && themeId === null) {
+            $('#themeBackground').css('opacity', '0');
+            lockUI(false);
+        } else {
+            Toastify({
+                text: window.location['Operation failed'],
+                duration: 5000,
+                newWindow: true,
+                gravity: "bottom",
+                position: "right",
+                stopOnFocus: true,
+                className: "bshipstoast",
+            }).showToast();
+        }
+    });
+}
+
+function applyNameStyle(nameStyleId) {
+    lockUI(true);
+    socket.emit('set name style', nameStyleId, (response) => {
+        if (response) {
+            window.location.href = '/profile';
+        } else if (response === null && nameStyleId === null) {
+            lockUI(false);
+        } else {
+            Toastify({
+                text: window.location['Operation failed'],
+                duration: 5000,
+                newWindow: true,
+                gravity: "bottom",
+                position: "right",
+                stopOnFocus: true,
+                className: "bshipstoast",
+            }).showToast();
         }
     });
 }
@@ -449,6 +517,7 @@ joinForm.addEventListener('submit', (e) => {
                 case "ok":
                     console.log("Joined a lobby by:", response.oppNickname);
                     $("#oppNameField").html(response.oppNickname);
+                    $("#oppNameField").css('background', response.oppNameStyle);
                     lockUI(false);
                     switchView("preparingGame");
                     break;
@@ -476,7 +545,7 @@ pveForm.addEventListener('submit', (e) => {
         socket.emit("create pve", pveDifficulty, (response) => {
             switch (response.status) {
                 case "ok":
-                    console.log("Joined a PvE lobby: ", response.oppNickname);
+                    console.log("Joined a PvE lobby");
                     $("#oppNameField").html(`AI (${pveDifficulty})`);
                     lockUI(false);
                     switchView("preparingGame");

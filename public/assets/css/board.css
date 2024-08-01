@@ -1,9 +1,13 @@
 :root {
     font-size: 20px;
 
-    --field: rgb(36, 36, 36);
+    /* --field: rgb(36, 36, 36);
     --mark-line: rgb(59, 59, 59);
-    --mark-spot: rgb(90, 90, 90);
+    --mark-spot: rgb(90, 90, 90); */
+
+    --field: rgba(255, 255, 255, 0.2);
+    --mark-line: rgba(255, 255, 255, 0.4);
+    --mark-spot: rgba(255, 255, 255, 0.6);
 
     --mark-ship-valid: hsl(120, 100%, 80%);
     --mark-ship-invalid: hsl(0, 100%, 80%);
@@ -157,6 +161,13 @@ h1,h2,h3,h4,h5,h6 {
     transition: 0.15s opacity;
 }
 
+.shapes {
+    padding: 1rem;
+    border-radius: 15px;
+    backdrop-filter: blur(20px);
+    background-color: var(--element-bg);
+}
+
 .shapes h2, .shapes h3 {
     margin: 0;
 }
@@ -189,7 +200,6 @@ h1,h2,h3,h4,h5,h6 {
 #secondaryBoard, #board {
     position: absolute;
     transition: transform 0.3s;
-    background-color: black;
 }
 
 .ownBoardInfo {
@@ -267,7 +277,7 @@ h1,h2,h3,h4,h5,h6 {
 .cover .dialog button {
     padding: 0.5rem 2rem;
     font-size: 1rem;
-    background-color: black;
+    background-color: var(--element-bg);
     border: solid 1px white;
     color: white;
     border-radius: 15px;
@@ -330,7 +340,7 @@ h1,h2,h3,h4,h5,h6 {
 .mobileControls button, .readyButton {
     padding: 0.5rem 2rem;
     font-size: 1rem;
-    background-color: black;
+    background-color: var(--element-bg);
     border: solid 1px white;
     color: white;
     border-radius: 15px;

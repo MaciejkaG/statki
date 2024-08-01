@@ -19,6 +19,22 @@ import { RedisStore as LimiterRedisStore } from 'rate-limit-redis';
 import SessionRedisStore from 'connect-redis';
 import mysql from 'mysql';
 import { isFakeEmail } from 'fakefilter';
+import winston from 'winston';
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'combined.log' }),
+    ],
+});
+
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new winston.transports.Console({
+        format: winston.format.simple(),
+    }));
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -186,7 +202,7 @@ app.get('/', async (req, res) => {
                     res.redirect('/nickname');
                 }
             });
-        });
+        }).catch(err => logger.error({ level: 'error', message: err }));
     } else {
         auth.getLanguage(req.session.userId).then(language => {
             var locale;
@@ -204,7 +220,7 @@ app.get('/', async (req, res) => {
                     ver: packageJSON.version
                 }
             });
-        });
+        }).catch(err => logger.error({ level: 'error', message: err }));
     }
 });
 
@@ -256,7 +272,7 @@ app.get('/match/:searchId', async (req, res) => {
                 guestBoard: JSON.stringify(result.guest_stats),
             }
         });
-    });
+    }).catch(err => logger.error({ level: 'error', message: err }));
 })
 
 app.get('/login', (req, res) => {
@@ -317,7 +333,7 @@ app.get('/nickname', (req, res) => {
                     t: (key) => { return locale.t(key) }
                 }
             });
-        });
+        }).catch(err => logger.error({ level: 'error', message: err }));
     }
 });
 
@@ -332,7 +348,7 @@ app.post('/api/login', (req, res) => {
                 req.session.userId = result.uid;
                 req.session.loggedIn = 2;
                 res.redirect('/');
-            });
+            }).catch(err => logger.error({ level: 'error', message: err }));
 
             return;
         }
@@ -358,7 +374,8 @@ app.post('/api/login', (req, res) => {
                     t: (key) => { return locale.t(key) }
                 }
             });
-            throw err;
+
+            logger.error({ level: 'error', message: err });
         });
     } else {
         const locale = new Lang(req.acceptsLanguages());
@@ -412,7 +429,7 @@ app.post('/api/nickname', (req, res) => {
         req.session.activeGame = null;
         auth.setNickname(req.session.userId, req.body.nickname).then(() => {
             res.redirect('/');
-        });
+        }).catch(err => logger.error({ level: 'error', message: err }));
     } else {
         const locale = new Lang(req.acceptsLanguages());
 
@@ -460,7 +477,7 @@ app.get('/game', async (req, res) => {
                     t: (key) => { return locale.t(key) }
                 }
             });
-        });
+        }).catch(err => logger.error({ level: 'error', message: err }));
     } else {
         auth.getLanguage(req.session.userId).then(language => {
             var locale;
@@ -477,7 +494,7 @@ app.get('/game', async (req, res) => {
                     t: (key) => { return locale.t(key) }
                 }
             });
-        });
+        }).catch(err => logger.error({ level: 'error', message: err }));
     }
 });
 
@@ -508,7 +525,7 @@ io.on('connection', async (socket) => {
                         });
 
                         callback({ status: "ok", next: "done" });
-                    });
+                    }).catch(err => logger.error({ level: 'error', message: err }));
 
                     return;
                 }
@@ -533,7 +550,7 @@ io.on('connection', async (socket) => {
                     const locale = new Lang(session.langs);
 
                     callback({ success: false, error: locale.t("landing.Unknown error") });
-                    throw err;
+                    logger.error({ level: 'error', message: err });
                 });
             } else {
                 const locale = new Lang(session.langs);
@@ -548,7 +565,7 @@ io.on('connection', async (socket) => {
                     });
 
                     callback({ success: false, error: locale.t("landing.Wrong email address") });
-                });
+                }).catch(err => logger.error({ level: 'error', message: err }));
             }
         });
 
@@ -604,37 +621,43 @@ io.on('connection', async (socket) => {
                 callback(profile);
 
                 auth.setViewedNews(session.userId);
-            });
+            }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
         socket.on('get shop', (callback) => {
             auth.getShop().then(shopItems => {
                 callback(shopItems);
-            });
+            }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
         socket.on('buy shop item', (itemId, callback) => {
             auth.buyItem(session.userId, itemId).then(result => {
                 callback(result);
-            });
+            }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
         socket.on('my inventory', (callback) => {
             auth.getInventory(session.userId).then(items => {
                 callback(items);
-            });
+            }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
         socket.on('set theme', (themeId, callback) => {
             auth.setTheme(session.userId, themeId).then(themeBackground => {
                 callback(themeBackground);
-            });
+            }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
         socket.on('my theme', (callback) => {
             auth.getTheme(session.userId).then(themeBackground => {
                 callback(themeBackground);
-            });
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+
+        socket.on('set name style', (nameStyleId, callback) => {
+            auth.setNameStyle(session.userId, nameStyleId).then(success => {
+                callback(success);
+            }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
         socket.on('match list', (page, callback) => {
@@ -649,13 +672,13 @@ io.on('connection', async (socket) => {
                 }
 
                 callback(matchlist);
-            });
+            }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
         socket.on('match info', (match_id, callback) => {
             auth.getMatch(match_id).then(result => {
                 callback(result);
-            });
+            }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
         socket.on('locale options', (callback) => {
@@ -711,7 +734,7 @@ io.on('connection', async (socket) => {
             }
         });
 
-        socket.on('join lobby', (msg, callback) => {
+        socket.on('join lobby', async (msg, callback) => {
             if (io.sockets.adapter.rooms.get(msg) == null || io.sockets.adapter.rooms.get(msg).size > 1) {
                 callback({
                     status: "bad_id"
@@ -725,19 +748,25 @@ io.on('connection', async (socket) => {
                     });
                     return;
                 }
+
                 if (socket.rooms.size === 1) {
-                    io.to(msg).emit("joined", session.nickname); // Wyślij hostowi powiadomienie o dołączającym graczu
-                    // Zmienna opp zawiera socket hosta
+                    let oppNameStyle = await auth.getNameStyle(opp.session.userId);
+                    let userNameStyle = await auth.getNameStyle(session.userId);
+
+                    io.to(msg).emit("joined", session.nickname, userNameStyle); // Notify the host about the joining player
+                    // opp variable contains the host's socket
                     // let opp = io.sockets.sockets.get(io.sockets.adapter.rooms.get(msg).values().next().value);
                     let oppNickname = opp.request.session.nickname;
 
                     socket.join(msg); // Dołącz gracza do grupy
+
                     callback({
                         status: "ok",
-                        oppNickname: oppNickname,
+                        oppNickname,
+                        oppNameStyle,
                     }); // Wyślij dołączonemu graczowi odpowiedź
 
-                    // Teraz utwórz objekt partii w trakcie w bazie Redis
+                    // Teraz utwórz obiekt partii w trakcie w bazie Redis
                     const gameId = uuidv4();
                     redis.json.set(`game:${gameId}`, '$', {
                         type: 'pvp',
@@ -787,7 +816,7 @@ io.on('connection', async (socket) => {
                         oppReq.session.save();
                     });
 
-                    io.to(msg).emit("gameReady", gameId);
+                    io.to(msg).emit("game ready", gameId);
 
                     io.sockets.adapter.rooms.get(msg).forEach((sid) => {
                         const s = io.sockets.sockets.get(sid);
@@ -829,7 +858,7 @@ io.on('connection', async (socket) => {
                         break;
                 }
 
-                // Teraz utwórz objekt partii w trakcie w bazie Redis
+                // Teraz utwórz obiekt partii w trakcie w bazie Redis
                 const gameId = uuidv4();
                 redis.json.set(`game:${gameId}`, '$', {
                     type: 'pve',
@@ -870,7 +899,7 @@ io.on('connection', async (socket) => {
                     session.save();
                 });
 
-                socket.emit("gameReady", gameId);
+                socket.emit("game ready", gameId);
 
                 GInfo.timer(gameId, 60, () => {
                     AFKEnd(gameId);
@@ -892,6 +921,12 @@ io.on('connection', async (socket) => {
             }
         });
     } else if (session.nickname && playerGameData && ['pvp', 'pve'].includes(playerGameData.data.type)) { // User is either playing in PvP or PvE
+        socket.on('my theme', (callback) => {
+            auth.getTheme(session.userId).then(themeBackground => {
+                callback(themeBackground);
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+        
         socket.on('place ship', async (type, posX, posY, rot) => {
             const playerGame = await GInfo.getPlayerGameData(socket);
 

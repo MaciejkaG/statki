@@ -111,13 +111,19 @@
             "Theme packs modify the look of your Statki": "Theme packs modify the look of your Statki.",
 
             "Namestyles": "Name styles",
-            "Namestyles are visual modifications to your nickname visible to you and other players": "Namestyles are visual modifications to your nickname visible to you and other players."
+            "Namestyles are visual modifications to your nickname visible to you and other players": "Namestyles are visual modifications to your nickname visible to you and other players.",
+
+            "Statboxes": "Statboxes",
+            "Statboxes are lootboxes containing random items including XP boosts and cosmetic items": "Statboxes are lootboxes containing random items including XP boosts and cosmetic items."
         },
         "Inventory": {
             "Inventory": "Inventory",
             "Apply": "Apply",
+            "Reset theme": "Reset theme",
+            "Reset name style": "Reset name style",
 
             "Theme pack": "Theme pack",
+            "Name style": "Name style",
 
             "Nothing to see here": "Nothing to see here"
         },
@@ -133,7 +139,8 @@
             "See: Privacy policy for modifying or removing other account data": "See: Privacy policy for modifying or removing other account data."
         },
         "General": {
-            "Unknown error occured": "Unknown error occured",
+            "Operation failed": "Operation failed.",
+            "Unknown error occured": "Unknown error occured.",
             "Status:": "Status:",
             "News and changes": "News and changes",
 

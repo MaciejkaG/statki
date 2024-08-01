@@ -16,7 +16,16 @@
     left: 0;
     pointer-events: none;
     opacity: 0.6;
-    transition: opacity 2s;
+    transition: opacity 1s;
+}
+
+.username {
+    background: white;
+    background-clip: text !important;
+    color: transparent;
+
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
 }
 
 .tippyTemplate {
@@ -329,7 +338,7 @@ nav div {
     height: 5rem;
     overflow: hidden;
 
-    transition: height 0.5s;
+    transition: height 0.4s;
 }
 
 #profileView .matchList .match .xpincrease {
@@ -746,6 +755,26 @@ nav div {
     gap: 1rem;
 }
 
+#shopView .items .item .overlay .checkoutBox button.cancelCheckout {
+    border: 1px solid var(--danger);
+    color: var(--danger);
+}
+
+#shopView .items .item .overlay .checkoutBox button.cancelCheckout:hover {
+    color: white;
+    background-color: var(--danger);
+}
+
+#shopView .items .item .overlay .checkoutBox button.buyItem {
+    border: 1px solid var(--mark-ship-valid);
+    color: var(--mark-ship-valid);
+}
+
+#shopView .items .item .overlay .checkoutBox button.buyItem:hover {
+    color: black;
+    background-color: var(--mark-ship-valid);
+}
+
 #shopView .items .item.checkout .overlay {
     background-color: rgba(0, 0, 0, 0.6);
 }
@@ -773,15 +802,24 @@ nav div {
 }
 
 /* Inventory */
+#inventoryView .controls {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
 #inventoryView .items {
     display: flex;
-    width: 70vw;
+    width: 75vw;
     gap: 1rem;
+    margin: 2rem 0;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 #inventoryView .items .item {
     width: 25%;
+    min-width: 17rem;
     aspect-ratio: 2;
     background: var(--element-bg-alt);
     border-radius: 15px;
@@ -856,6 +894,33 @@ nav div {
 #inventoryView .items .item .options button:hover {
     color: black;
     background-color: var(--mark-ship-valid);
+}
+
+#inventoryView button {
+    border-radius: 15px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border: 1px solid white;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#inventoryView button.danger {
+    border: 1px solid var(--danger);
+    color: var(--danger);
+}
+
+#inventoryView button:hover {
+    color: black;
+    background-color: white;
+}
+
+#inventoryView button.danger:hover {
+    color: white;
+    background-color: var(--danger);
 }
 
 #inventoryView .items .item:hover .options  {

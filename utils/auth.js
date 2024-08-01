@@ -240,9 +240,9 @@ export class MailAuth {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             const query = `
-            SELECT nickname, viewed_news, xp, level, masts, account_creation FROM accounts WHERE user_id = ?;
+            SELECT a.nickname, a.viewed_news, a.xp, a.level, a.masts, a.account_creation, s.item_data FROM accounts a LEFT JOIN shop s ON s.item_id = a.active_name_style_item_id WHERE user_id = ?;
             SELECT ROUND((AVG(s.won)) * 100) AS winrate, COUNT(s.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(m.date) = YEAR(NOW()) AND MONTH(m.date) = MONTH(NOW())) THEN m.match_id END) AS monthly_matches FROM accounts a JOIN statistics s ON s.user_id = a.user_id JOIN matches m ON m.match_id = s.match_id WHERE a.user_id = ?;
-            SELECT statistics.match_id, accounts.nickname AS opponent, matches.match_type, statistics.won, matches.ai_type, matches.xp, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) WHERE statistics.user_id = ? ORDER BY matches.date DESC LIMIT 10;
+            SELECT statistics.match_id, accounts.nickname AS opponent, shop.item_data AS opponent_name_style, matches.match_type, statistics.won, matches.ai_type, matches.xp, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) LEFT JOIN shop ON accounts.active_name_style_item_id = shop.item_id WHERE statistics.user_id = ? ORDER BY matches.date DESC LIMIT 10;
             `;
             conn.query(query, [userId, userId, userId], async (error, response) => {
                 if (error) reject(error);
@@ -252,10 +252,17 @@ export class MailAuth {
                         return;
                     }
 
-                    const [[profile], [stats], matchHistory] = response;
+                    let [[profile], [stats], matchHistory] = response;
+
+                    matchHistory = matchHistory.map(match => ({
+                        ...match,
+                        opponent_name_style: match.opponent_name_style ? JSON.parse(match.opponent_name_style).nameStyle : null
+                    }));
 
                     profile.levelProgress = Math.floor(profile.xp / getXPForLevel(profile.level + 1) * 100);
                     profile.levelThreshold = getXPForLevel(profile.level + 1);
+                    profile.nameStyle = profile.item_data ? JSON.parse(profile.item_data).nameStyle : null;
+                    delete profile.item_data;
 
                     resolve({ profile, stats, matchHistory });
                 }
@@ -265,10 +272,56 @@ export class MailAuth {
         });
     }
 
+    getMatchList(userId, page) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            const limit = 10;
+            const offset = (page - 1) * limit;
+
+            const query = `
+            SELECT 
+                statistics.match_id, 
+                accounts.nickname AS opponent, 
+                shop.item_data AS opponent_name_style, 
+                matches.match_type, 
+                statistics.won, 
+                matches.ai_type, 
+                matches.xp, 
+                matches.duration, 
+                matches.date 
+            FROM statistics 
+            JOIN matches ON matches.match_id = statistics.match_id 
+            JOIN accounts ON accounts.user_id = 
+                (CASE 
+                    WHEN matches.host_id != statistics.user_id THEN matches.host_id 
+                    ELSE matches.guest_id 
+                END) 
+            LEFT JOIN shop ON accounts.active_name_style_item_id = shop.item_id
+            WHERE statistics.user_id = ? 
+            ORDER BY matches.date DESC 
+            LIMIT ? OFFSET ?;
+        `;
+
+            conn.query(query, [userId, limit, offset], (error, response) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    response = response.map(match => ({
+                        ...match,
+                        opponent_name_style: match.opponent_name_style ? JSON.parse(match.opponent_name_style).nameStyle : null
+                    }));
+
+                    resolve(response);
+                }
+                conn.end();
+            });
+        });
+    }
+
     getShop() {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            const query = `SELECT item_id, name, description, category, price, item_data FROM shop WHERE hidden = 0;`;
+            const query = `SELECT item_id, name, description, category, price, item_data FROM shop WHERE hidden = 0 ORDER BY price DESC;`;
             conn.query(query, async (error, response) => {
                 if (error) reject(error);
                 else {
@@ -295,13 +348,13 @@ export class MailAuth {
             const conn = mysql.createConnection(this.mysqlOptions);
             const query = `
             SELECT masts FROM accounts WHERE user_id = ?;
-            SELECT price, hidden, limit_to_one FROM shop WHERE item_id = ?;
+            SELECT price, limit_to_one FROM shop WHERE hidden = 0 AND item_id = ?;
             SELECT item_id FROM inventory WHERE user_id = ? AND item_id = ?;
             `;
             conn.query(query, [userId, itemId, userId, itemId], async (error, response) => {
                 if (error) reject(error);
                 else {
-                    if ((response[0].length === 0 || response[1].length === 0 || response[1][0].hidden) || (response[1][0].limit_to_one === 1 && response[2].length > 0)) {
+                    if ((response[0].length === 0 || response[1].length === 0) || (response[1][0].limit_to_one === 1 && response[2].length > 0)) {
                         resolve(false);
                         return;
                     }
@@ -328,7 +381,7 @@ export class MailAuth {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             const query = `
-            SELECT i.item_id, name, description, category, item_data FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.user_id = ?;
+            SELECT i.item_id, name, description, category, item_data FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.user_id = ? ORDER BY i.obtainment_date DESC;
             `;
             conn.query(query, [userId], async (error, response) => {
                 if (error) reject(error);
@@ -365,6 +418,19 @@ export class MailAuth {
     setTheme(userId, themeItemId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
+
+            if (themeItemId === null) {
+                conn.query('UPDATE accounts SET active_theme_item_id = ? WHERE user_id = ?;', [null, userId], async (error) => {
+                    if (error) reject(error);
+                    else {
+                        conn.end();
+                        resolve(null);
+                    }
+                });
+
+                return;
+            }
+
             const query = `
             SELECT category, item_data FROM shop WHERE item_id = ?;
             `;
@@ -386,40 +452,54 @@ export class MailAuth {
         });
     }
 
-    getMatchList(userId, page) {
+    setNameStyle(userId, nameStyleId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            const limit = 10;
-            const offset = (page - 1) * limit;
+
+            if (nameStyleId === null) {
+                conn.query('UPDATE accounts SET active_name_style_item_id = ? WHERE user_id = ?;', [null, userId], async (error) => {
+                    if (error) reject(error);
+                    else {
+                        conn.end();
+                        resolve(true);
+                    }
+                });
+
+                return;
+            }
 
             const query = `
-            SELECT 
-                statistics.match_id, 
-                accounts.nickname AS opponent, 
-                matches.match_type, 
-                statistics.won, 
-                matches.ai_type, 
-                matches.xp, 
-                matches.duration, 
-                matches.date 
-            FROM statistics 
-            JOIN matches ON matches.match_id = statistics.match_id 
-            JOIN accounts ON accounts.user_id = 
-                (CASE 
-                    WHEN matches.host_id != statistics.user_id THEN matches.host_id 
-                    ELSE matches.guest_id 
-                END) 
-            WHERE statistics.user_id = ? 
-            ORDER BY matches.date DESC 
-            LIMIT ? OFFSET ?;
-        `;
-
-            conn.query(query, [userId, limit, offset], (error, response) => {
-                if (error) {
-                    reject(error);
+            SELECT category FROM shop WHERE item_id = ?;
+            `;
+            conn.query(query, [nameStyleId], async (error, response) => {
+                if (error) reject(error);
+                else if (response[0].category === 'name_style') {
+                    conn.query('UPDATE accounts SET active_name_style_item_id = ? WHERE user_id = ?;', [nameStyleId, userId], async (error) => {
+                        if (error) reject(error);
+                        else {
+                            conn.end();
+                            resolve(true);
+                        }
+                    });
                 } else {
-                    resolve(response);
+                    conn.end();
+                    resolve(false);
                 }
+            });
+        });
+    }
+
+    getNameStyle(userId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            const query = `
+            SELECT a.active_name_style_item_id, s.item_data FROM accounts a JOIN shop s ON a.active_name_style_item_id = s.item_id WHERE user_id = ?;
+            `;
+            conn.query(query, [userId], async (error, response) => {
+                if (error) reject(error);
+                else if (response[0]) resolve(JSON.parse(response[0].item_data).nameStyle);
+                else resolve(null);
+
                 conn.end();
             });
         });

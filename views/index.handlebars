@@ -109,7 +109,7 @@
                 <h2>{{ t 'menu.PvP/Loading.Wait' }}</h2>
                 <h3>{{ t 'menu.PvP/Loading.You will be redirected soon' }}</h3>
                 <h3>{{ t 'menu.PvP/Loading.Opponent:' }}</h3>
-                <h4 id="oppNameField"></h4>
+                <h4 id="oppNameField" class="username"></h4>
             </div>
         </div>
     </div>
@@ -117,7 +117,7 @@
 
 <div class="container" id="profileView" data-path="/profile">
     <div class="profile">
-        <h1 class="nickname">{{ t 'menu.Profile.Loading' }}</h1>
+        <h1 class="nickname username">{{ t 'menu.Profile.Loading' }}</h1>
         <div class="accountinfo">
             <div class="levelContainer" id="levelcontainer">
                 <span id="level">0</span>
@@ -152,10 +152,17 @@
         <div class="items" id="themepacks">
             
         </div>
+
         <h2>{{ t 'menu.Shop.Namestyles' }}</h2>
         <p>{{ t 'menu.Shop.Namestyles are visual modifications to your nickname visible to you and other players' }}</p>
         <div class="items" id="namestyles">
             
+        </div>
+
+        <h2>{{ t 'menu.Shop.Statboxes' }}</h2>
+        <p>{{ t 'menu.Shop.Statboxes are lootboxes containing random items including XP boosts and cosmetic items' }}</p>
+        <div class="items" id="statboxes">
+
         </div>
     </div>
 </div>
@@ -163,6 +170,10 @@
 <div class="container" id="inventoryView" data-path="/inventory">
     <div class="main">
         <h1>{{ t 'menu.Inventory.Inventory' }}</h1>
+        <div class="controls">
+            <button class="danger" onclick="applyTheme(null)">{{ t 'menu.Inventory.Reset theme' }}</button>
+            <button class="danger" onclick="applyNameStyle(null)">{{ t 'menu.Inventory.Reset name style' }}</button>
+        </div>
         <div class="items" id="inventoryitems">
             
         </div>
@@ -190,6 +201,7 @@
 
 <script>
     window.locale = {
+        "Operation failed": "{{ t 'menu.General.Operation failed' }}",
         "Unknown error occured": "{{ t 'menu.General.Unknown error occured' }}",
         "Status:": "{{ t 'menu.General.Status:' }}",
         "Victory": "{{ t 'menu.Profile.Victory' }}",
@@ -224,6 +236,7 @@
 
         "Apply": "{{ t 'menu.Inventory.Apply' }}",
         "Theme pack": "{{ t 'menu.Inventory.Theme pack' }}",
+        "Name style": "{{ t 'menu.Inventory.Name style' }}",
         "Nothing to see here": "{{ t 'menu.Inventory.Nothing to see here' }}"
     };
 </script>

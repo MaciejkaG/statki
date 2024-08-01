@@ -12,6 +12,11 @@ var misses = 0;
 
 var lastTimeClick = 0;
 
+socket.emit('my theme', (theme) => {
+    console.log('Received selected theme. Applying now.');
+    $('#themeBackground').css('background-image', theme);
+});
+
 if ($(window).width() <= 820) {
     tippy('#board .field', {
         allowHTML: true,
