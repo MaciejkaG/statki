@@ -412,15 +412,16 @@ socket.emit('my theme', (theme) => {
 function applyTheme(themeId) {
     lockUI(true);
     socket.emit('set theme', themeId, (response) => {
-        lockUI(false);
         if (response) {
             $('#themeBackground').css('opacity', '0');
             setTimeout(() => {
                 $('#themeBackground').css('background-image', response);
                 $('#themeBackground').css('opacity', '0.6');
+                lockUI(false);
             }, 1000);
         } else if (response === null && themeId === null) {
             $('#themeBackground').css('opacity', '0');
+            lockUI(false);
         } else {
             Toastify({
                 text: window.locale['Operation failed'],
@@ -431,6 +432,7 @@ function applyTheme(themeId) {
                 stopOnFocus: true,
                 className: "bshipstoast",
             }).showToast();
+            lockUI(false);
         }
     });
 }
