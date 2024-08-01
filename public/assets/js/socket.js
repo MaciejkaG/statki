@@ -301,7 +301,7 @@ function buyShopItem(el, price, itemId) {
         if (result) {
             reloadInventory();
 
-            increaseDisplayedMasts(-20000);
+            increaseDisplayedMasts(-price);
             $(el).closest('.item').addClass('finished');
 
             setTimeout(() => {
