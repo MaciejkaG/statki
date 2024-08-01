@@ -396,7 +396,7 @@ export class MailAuth {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             const query = `
-            SELECT i.inventory_item_id, i.item_id, name, description, category, item_data FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.user_id = ? ORDER BY s.category ASC, i.obtainment_date DESC;
+            SELECT i.inventory_item_id, i.item_id, s.name, s.description, s.category, s.item_data FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.user_id = ? ORDER BY s.category ASC, s.name ASC, i.obtainment_date DESC;
             `;
             conn.query(query, [userId], async (error, response) => {
                 if (error) reject(error);
