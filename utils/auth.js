@@ -21,12 +21,12 @@ export class MailAuth {
             port: options.port ? options.port : "465",
             secure: options.secure ? options.secure : true,
             auth: {
-                user: options.user ? options.user : "root",
+                user: options.user,
                 pass: options.pass,
             },
         });
 
-        this.mailFrom = `"Statki" <${options.getMatchListuser}>`
+        this.mailFrom = `"Statki" <${options.user}>`
     }
 
     async timer(tId, time, callback) {
