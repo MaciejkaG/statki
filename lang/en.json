@@ -87,6 +87,7 @@
         },
         "Profile": {
             "Loading": "Loading...",
+            "XP Boost active": "XP Boost active",
             "Player since:": "Player since:",
             "Victory": "Victory",
             "Defeat": "Defeat",
@@ -119,11 +120,16 @@
         "Inventory": {
             "Inventory": "Inventory",
             "Apply": "Apply",
+            "Open": "Open",
+            "Use": "Use",
             "Reset theme": "Reset theme",
             "Reset name style": "Reset name style",
 
+            "You receive:": "You receive:",
+
             "Theme pack": "Theme pack",
             "Name style": "Name style",
+            "XP Boost": "XP Boost",
 
             "Nothing to see here": "Nothing to see here"
         },

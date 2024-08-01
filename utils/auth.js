@@ -240,7 +240,7 @@ export class MailAuth {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             const query = `
-            SELECT a.nickname, a.viewed_news, a.xp, a.level, a.masts, a.account_creation, s.item_data FROM accounts a LEFT JOIN shop s ON s.item_id = a.active_name_style_item_id WHERE user_id = ?;
+            SELECT a.nickname, a.viewed_news, a.xp, a.level, CASE WHEN xp_boost_until > NOW() THEN 1 ELSE 0 END AS xp_boost_active, a.masts, a.account_creation, s.item_data FROM accounts a LEFT JOIN shop s ON s.item_id = a.active_name_style_item_id WHERE user_id = ?;
             SELECT ROUND((AVG(s.won)) * 100) AS winrate, COUNT(s.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(m.date) = YEAR(NOW()) AND MONTH(m.date) = MONTH(NOW())) THEN m.match_id END) AS monthly_matches FROM accounts a JOIN statistics s ON s.user_id = a.user_id JOIN matches m ON m.match_id = s.match_id WHERE a.user_id = ?;
             SELECT statistics.match_id, accounts.nickname AS opponent, shop.item_data AS opponent_name_style, matches.match_type, statistics.won, matches.ai_type, matches.xp, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) LEFT JOIN shop ON accounts.active_name_style_item_id = shop.item_id WHERE statistics.user_id = ? ORDER BY matches.date DESC LIMIT 10;
             `;
@@ -381,7 +381,7 @@ export class MailAuth {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             const query = `
-            SELECT i.item_id, name, description, category, item_data FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.user_id = ? ORDER BY i.obtainment_date DESC;
+            SELECT i.inventory_item_id, i.item_id, name, description, category, item_data FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.user_id = ? ORDER BY i.obtainment_date DESC;
             `;
             conn.query(query, [userId], async (error, response) => {
                 if (error) reject(error);
@@ -469,11 +469,11 @@ export class MailAuth {
             }
 
             const query = `
-            SELECT category FROM shop WHERE item_id = ?;
+            SELECT category FROM shop WHERE category = 'name_style' AND item_id = ?;
             `;
             conn.query(query, [nameStyleId], async (error, response) => {
                 if (error) reject(error);
-                else if (response[0].category === 'name_style') {
+                else if (response.length !== 0) {
                     conn.query('UPDATE accounts SET active_name_style_item_id = ? WHERE user_id = ?;', [nameStyleId, userId], async (error) => {
                         if (error) reject(error);
                         else {
@@ -501,6 +501,106 @@ export class MailAuth {
                 else resolve(null);
 
                 conn.end();
+            });
+        });
+    }
+
+    openLootbox(userId, lootboxId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+
+            let query = `
+            SELECT s.category FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.inventory_item_id = ? AND s.category = 'lootbox';
+            SELECT s.item_id, name, description, category, item_data FROM shop s LEFT JOIN inventory i ON s.item_id = i.item_id AND i.user_id = ? WHERE (i.item_id IS NULL OR s.limit_to_one = 0) AND s.lootbox_droppable = 1 ORDER BY UUID();
+            `;
+            conn.query(query, [lootboxId, userId], async (error, response) => {
+                if (error) reject(error);
+                else if (response[0].length > 0) {
+                    shuffle(response[1]);
+
+                    const getDrop = () => {
+                        const randomNumber = Math.random();
+
+                        let nameStyleIndex = response[1].findIndex(item => item.category === 'name_style');
+                        let themeIndex = response[1].findIndex(item => item.category === 'theme_pack');
+
+                        if (randomNumber < 0.1 && nameStyleIndex !== -1) {
+                            return nameStyleIndex;
+                        } else if (randomNumber < 0.2 && themeIndex !== -1) {
+                            return themeIndex;
+                        } else {
+                            return response[1].findIndex(item => item.category === 'xp_boost');
+                        }
+                    }
+
+                    query = `
+                    DELETE FROM inventory WHERE inventory_item_id = ?;
+                    INSERT INTO inventory(item_id, user_id) VALUES (?, ?);
+                    `;
+
+                    const drop = getDrop();
+
+                    conn.query(query, [lootboxId, response[1][drop].item_id, userId], async (error) => {
+                        if (error) reject(error);
+                        else {
+                            conn.end();
+
+                            delete response[1][drop].item_id;
+                            resolve({ ...response[1][drop], item_data: JSON.parse(response[1][drop].item_data) });
+                        }
+                    });
+                } else {
+                    conn.end();
+                    resolve(false);
+                }
+            });
+        });
+    }
+
+    useXPBoost(userId, itemId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+
+            let query = `
+            SELECT s.category, s.item_data FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.inventory_item_id = ? AND s.category = 'xp_boost';
+            SELECT CASE WHEN xp_boost_until < NOW() THEN NULL ELSE xp_boost_until END xp_boost_until FROM accounts WHERE user_id = ?;
+            `;
+            conn.query(query, [itemId, userId], async (error, response) => {
+                if (error) reject(error);
+                else if (response[0].length > 0 && response[1].length > 0 && !response[1][0].xp_boost_until) {
+                    let interval;
+                    let itemData;
+
+                    try {
+                        itemData = JSON.parse(response[0][0].item_data);
+
+                        if (itemData.boostInterval) interval = itemData.boostInterval;
+                        else {
+                            resolve(false);
+                            return;
+                        }
+                    } catch (err) {
+                        resolve(false);
+                        return;
+                    }
+                    
+                    query = `
+                    DELETE FROM inventory WHERE inventory_item_id = ?;
+                    UPDATE accounts SET xp_boost_until = DATE_ADD(NOW(), INTERVAL ${interval}) WHERE user_id = ?;
+                    `
+
+                    conn.query(query, [itemId, userId], async (error) => {
+                        if (error) reject(error);
+                        else {
+                            conn.end();
+                            
+                            resolve(true);
+                        }
+                    });
+                } else {
+                    conn.end();
+                    resolve(false);
+                }
             });
         });
     }
@@ -597,13 +697,19 @@ export class MailAuth {
     addXP(userId, amount) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
-            conn.query('SELECT xp, level FROM accounts WHERE user_id = ?;', [userId], (err, results) => {
+            conn.query('SELECT xp, level, CASE WHEN xp_boost_until > NOW() THEN 1 ELSE 0 END AS xp_boost_active FROM accounts WHERE user_id = ?;', [userId], (err, results) => {
                 amount = Math.floor(amount);
 
                 if (err) return reject(err);
                 if (results.length === 0) return reject('Player not found');
 
-                let { xp, level } = results[0];
+                let { xp, level, xp_boost_active } = results[0];
+
+                if (xp_boost_active) {
+                    console.log('a');
+                    amount *= 2;
+                }
+
                 xp += amount;
 
                 let nextLevelXP = getXPForLevel(level + 1);
@@ -622,7 +728,7 @@ export class MailAuth {
 
                 conn.query('UPDATE accounts SET xp = ?, level = ?, masts = masts + ? WHERE user_id = ?;', [xp, level, mastsEarned, userId], (err, results) => {
                     if (err) return reject(err);
-                    resolve({ xp, level });
+                    resolve(amount);
                 });
             });
         });
@@ -637,11 +743,14 @@ function getXPForLevel(level) {
     return 500 + 11 * (level - 1);
 }
 
-function calculateLevel(xp) {
-    let level = 1;
-    while (xp >= getXPForLevel(level + 1)) {
-        level++;
-        xp -= getXPForLevel(level);
+function shuffle(array) {
+    let currentIndex = array.length;
+
+    while (currentIndex != 0) {
+        let randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
     }
-    return level;
 }

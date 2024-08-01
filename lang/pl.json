@@ -87,6 +87,7 @@
         },
         "Profile": {
             "Loading": "Wczytywanie...",
+            "XP Boost active": "Doładowanie XP aktywne",
             "Player since:": "Gracz od:",
             "Victory": "Zwycięstwo",
             "Defeat": "Porażka",
@@ -115,16 +116,21 @@
             "Namestyles are visual modifications to your nickname visible to you and other players": "Style nazw zmieniają wygląd Twojego nicku. Zmiany są widoczne zarówno dla Ciebie jak i innych graczy.",
 
             "Statboxes": "Statboxy",
-            "Statboxes are lootboxes containing random items including XP boosts and cosmetic items": "Statboxy to lootboxy zawierające losowe przedmioty w tym dopalacze do XP oraz elementy kosmetyczne."
+            "Statboxes are lootboxes containing random items including XP boosts and cosmetic items": "Statboxy to lootboxy zawierające losowe przedmioty w tym doładowania do XP oraz elementy kosmetyczne."
         },
         "Inventory": {
             "Inventory": "Ekwipunek",
             "Apply": "Użyj",
+            "Open": "Otwórz",
+            "Use": "Użyj",
             "Reset theme": "Zresetuj motyw",
             "Reset name style": "Zresetuj styl nazwy",
 
+            "You receive:": "Otrzymujesz:",
+
             "Theme pack": "Paczka motywu",
             "Name style": "Styl nazwy",
+            "XP Boost": "Doładowanie XP",
 
             "Nothing to see here": "Nic tu nie ma"
         },

@@ -660,6 +660,18 @@ io.on('connection', async (socket) => {
             }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
+        socket.on('open lootbox', (lootboxId, callback) => {
+            auth.openLootbox(session.userId, lootboxId).then(drop => {
+                callback(drop);
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+
+        socket.on('use xp boost', (itemId, callback) => {
+            auth.useXPBoost(session.userId, itemId).then(result => {
+                callback(result);
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+
         socket.on('match list', (page, callback) => {
             if (typeof page !== 'number' && 1 > page) {
                 return;
@@ -1237,11 +1249,12 @@ io.on('connection', async (socket) => {
                             socket.emit("game finished", 0, guestNickname);
 
                             const playerStats = playerGame.data.boards[0].stats;
-                            const xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty);
+                            let xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
+                            xp = await auth.addXP(session.userId, xp);
                             auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 1, difficulty, xp);
-                            auth.addXP(session.userId, xp);
+                            
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);
@@ -1296,12 +1309,11 @@ io.on('connection', async (socket) => {
                             socket.emit("game finished", 1, guestNickname);
 
                             const playerStats = playerGame.data.boards[0].stats;
-                            const xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty);
+                            let xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
+                            xp = await auth.addXP(session.userId, xp);
                             auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pve", session.userId, '77777777-77777777-77777777-77777777', playerGame.data.boards, 0, difficulty, xp);
-
-                            auth.addXP(session.userId, xp);
 
                             GInfo.resetTimer(playerGame.id);
                             endGame(playerGame.id);

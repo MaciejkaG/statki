@@ -1,19 +1,30 @@
 <div class="newsModalContainer" id="newsModalContainer">
     <div class="newsModal">
         <h2>{{ t 'menu.General.News and changes' }}</h2>
-        <h1>The 0.8.0-0.9.0 patchnotes</h1>
+        <h1>The 0.11.0 patchnotes</h1>
         <div class="actualText">
-            <h3>0.8.0</h3>
-            <p>This update we focused on security. Some backend packages that caused vulnerabilities (as stated in the outage notice) were updated and we introduced a disposable e-mail detection system that will prevent users from creating zombie accounts with those e-mails. We also deleted multiple (over 15) accounts that were already using temporary e-mails.</p>
-            <p>The security chanes are not all though, as you've probably noticed already we added a fresh news screen that will automatically pop up on login if you haven't read the latest updates. If you accidentaly closed the news popup or want to view it again, you can open it again from the settings menu.</p>
-            <p>There also was a major bug that caused a game to sometimes randomly crash. That was because the random ship layout algorithm would start by placing single-masted ships, then two-masted etc. and it sometimes ran into one certain layout that made it impossible to place a four-masted ship on it. A human player could also reproduce that layout manually. I reversed the algorithm and the game now forces players to place a four-masted ship before placing any other type.</p>
-            <p>We also updated the Terms of Service and Privacy Policy of the website that you can always find in the settings. You should also receive an e-mail notice if you haven't already.</p>
-            <p>Now time for the biggest change: Overkill difficulty! Yes, I finally managed to get to work and finish the last AI algorithm. It's extremely hard but winnable, although you would need 100% accuracy to beat it. Good luck!</p>
-            <p>Additionally, in 0.8.1 I remastered the animations in the main menu and improved overall design and clarity of the website + fixed multiple bugs.</p>
+            <p>I will try to write this briefly as I'm after two 12 hour coding marathons, so basically I added XP and levels that you can gain by playing PvE (Vs. AI) and a currency that you can earn by leveling up - masts. There is also a shop where you can spend masts on various items including Theme packs, Nickname styles and Statboxes. For more info on the available cosmetics go to the shop by clicking on the pink masts logo in the top right hand corner of the screen.</p>
+            <p>You can apply your cosmetics in your inventory (hover over your nickname in the top right hand corner, click 'Inventory'). Your inventory also allows you to open Statboxes and activate temporary XP Boosts.</p>
+            <p>Statboxes have a chance of dropping a cosmetic item you don't already owm, but they mostly drop XP Boosts of random durations. XP Boosts double your XP gain temporarily.</p>
+            <p>I will now be working on improving the overall user experience and implementing a guest mode, to let people play Vs. AI without creating an account. I also plan on introducing more Statboxes and new cosmetics and am open for your ideas. If you have a good idea for expanding the Statki cosmetics/loot, message <a href="mailto:biz@mcjk.cc">biz@mcjk.cc</a></p>
+            <p>Well, seems like I still ended up writing 4 paragraphs...</p>
+        </div>
+    </div>
+</div>
 
-            <h3>0.9.0</h3>
-            <p>It's a big and long awaited update. Match statistics are finally here! You can view them even for your previous matches by clicking on a match in your match history on your profile.</p>
-            <p>I've also added infinite scrolling to the match list on the profile page and improved responsiveness of the profile page. Infinite scrolling lets you view your ENTIRE match history instead of just the recent 10.</p>
+<div class="lootboxOpenContainer" id="lootboxOpenContainer">
+    <div class="lootboxModal">
+        <h1>{{ t 'menu.Inventory.You receive:' }}</h1>
+
+        <div class="item" id="droppedItem" style="--gradient-colors: ;--background:;">
+            <div class="background"></div>
+            <div class="overlay">
+                <div class="overlayBase">
+                    <h2 id="droppedItemType"></h2>
+                    <h1 id="droppedItemName"></h1>
+                    <p id="droppedItemDescription"></p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -127,6 +138,7 @@
                     </div>
                 </div>
             </div>
+            <span id="xpbooststatus">{{ t 'menu.Profile.XP Boost active' }}</span>
             <div>
                 <span>{{ t 'menu.Profile.Player since:' }} </span>
                 <span id="playerSince">-</span><br>
@@ -235,8 +247,11 @@
 
 
         "Apply": "{{ t 'menu.Inventory.Apply' }}",
+        "Open": "{{ t 'menu.Inventory.Open' }}",
+        "Use": "{{ t 'menu.Inventory.Use' }}",
         "Theme pack": "{{ t 'menu.Inventory.Theme pack' }}",
         "Name style": "{{ t 'menu.Inventory.Name style' }}",
+        "XP Boost": "{{ t 'menu.Inventory.XP Boost' }}",
         "Nothing to see here": "{{ t 'menu.Inventory.Nothing to see here' }}"
     };
 </script>

@@ -106,6 +106,10 @@ socket.emit("my profile", (profile) => {
 
     $('.nickname.username').css('background', profile.profile.nameStyle);
 
+    if (profile.profile.xp_boost_active) {
+        $('#xpbooststatus').css('display', 'initial');
+    }
+
     tippy('#levelcontainer', {
         theme: 'dark',
         followCursor: 'horizontal',
@@ -302,7 +306,7 @@ function buyShopItem(el, price, itemId) {
 
             setTimeout(() => {
                 $(el).closest('.item').removeClass('finished checkout');
-            }, 3000);
+            }, 1500);
         } else {
             cantBuy();
         }
@@ -355,6 +359,36 @@ function reloadInventory() {
                         </div>
                     `;
                     break;
+
+                case 'lootbox':
+                    itemHTML = `
+                        <div class="item">
+                            <div class="options">
+                                <button onclick="openLootbox('${item.inventory_item_id}')">${window.locale['Open']}</button>
+                            </div>
+                            <div class="content">
+                                <h2>Statbox</h2>
+                                <h1>${item.name}</h1>
+                                <span>${item.description}</span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'xp_boost':
+                    itemHTML = `
+                        <div class="item">
+                            <div class="options">
+                                <button onclick="useXPBoost('${item.inventory_item_id}')">${window.locale['Use']}</button>
+                            </div>
+                            <div class="content">
+                                <h2>${window.locale['XP Boost']}</h2>
+                                <h1>${item.name}</h1>
+                                <span>${item.description}</span>
+                            </div>
+                        </div>
+                    `;
+                    break;
             }
 
             itemsHTML += itemHTML;
@@ -378,19 +412,18 @@ socket.emit('my theme', (theme) => {
 function applyTheme(themeId) {
     lockUI(true);
     socket.emit('set theme', themeId, (response) => {
+        lockUI(false);
         if (response) {
             $('#themeBackground').css('opacity', '0');
             setTimeout(() => {
                 $('#themeBackground').css('background-image', response);
                 $('#themeBackground').css('opacity', '0.6');
-                lockUI(false);
             }, 1000);
         } else if (response === null && themeId === null) {
             $('#themeBackground').css('opacity', '0');
-            lockUI(false);
         } else {
             Toastify({
-                text: window.location['Operation failed'],
+                text: window.locale['Operation failed'],
                 duration: 5000,
                 newWindow: true,
                 gravity: "bottom",
@@ -405,13 +438,80 @@ function applyTheme(themeId) {
 function applyNameStyle(nameStyleId) {
     lockUI(true);
     socket.emit('set name style', nameStyleId, (response) => {
+        lockUI(false);
         if (response) {
             window.location.href = '/profile';
-        } else if (response === null && nameStyleId === null) {
-            lockUI(false);
+        } else if (response === null && nameStyleId === null) {}
+        else {
+            Toastify({
+                text: window.locale['Operation failed'],
+                duration: 5000,
+                newWindow: true,
+                gravity: "bottom",
+                position: "right",
+                stopOnFocus: true,
+                className: "bshipstoast",
+            }).showToast();
+        }
+    });
+}
+
+function openLootbox(lootboxId) {
+    lockUI(true);
+    socket.emit('open lootbox', lootboxId, (response) => {
+        lockUI(false);
+        if (response) {
+            $('#droppedItem').css({
+                '--gradient-colors': response.item_data.gradientColors,
+                '--background': response.item_data.background
+            });
+
+            let itemType;
+            switch (response.category) {
+                case 'theme_pack':
+                    itemType = window.locale['Theme pack'];
+                    break;
+
+                case 'name_style':
+                    itemType = window.locale['Name style'];
+                    break;
+
+                case 'xp_boost':
+                    itemType = window.locale['XP boost'];
+                    break;
+            }
+
+            $('#droppedItemType').html(itemType);
+            $('#droppedItemName').html(response.name);
+            $('#droppedItemDescription').html(response.description);
+
+            openLootboxModal();
+            reloadInventory();
+        } else if (response === null && lootboxId === null) {} 
+        else {
+            Toastify({
+                text: window.locale['Operation failed'],
+                duration: 5000,
+                newWindow: true,
+                gravity: "bottom",
+                position: "right",
+                stopOnFocus: true,
+                className: "bshipstoast",
+            }).showToast();
+        }
+    });
+}
+
+function useXPBoost(itemId) {
+    lockUI(true);
+    socket.emit('use xp boost', itemId, (response) => {
+        lockUI(false);
+        if (response) {
+            reloadInventory();
+            $('#xpbooststatus').css('display', 'initial');
         } else {
             Toastify({
-                text: window.location['Operation failed'],
+                text: window.locale['Operation failed'],
                 duration: 5000,
                 newWindow: true,
                 gravity: "bottom",
@@ -436,6 +536,24 @@ function closeNewsModal() {
 function openNewsModal() {
     $('.newsModalContainer').removeClass('unactive');
     $('.newsModalContainer').addClass('active');
+}
+
+document.getElementById('lootboxOpenContainer').addEventListener('click', function (event) {
+    if (event.target === event.currentTarget) {
+        closeLootboxModal();
+    }
+});
+
+function closeLootboxModal() {
+    $('#lootboxOpenContainer').addClass('unactive');
+    setTimeout(() => {
+        $('#lootboxOpenContainer').removeClass('active unactive');
+    }, 300);
+}
+
+function openLootboxModal() {
+    $('#lootboxOpenContainer').removeClass('unactive');
+    $('#lootboxOpenContainer').addClass('active');
 }
 
 socket.emit("whats my nick", (myNickname) => {
