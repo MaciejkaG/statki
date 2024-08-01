@@ -98,6 +98,31 @@
             "No matches played": "Nie zagrano żadnych meczy",
             "Thats all of your matches Theres nothing more to see here": "To wszystkie Twoje mecze. Nic już tu nie ma."
         },
+        "Shop": {
+            "Shop": "Sklep",
+
+            "Are you sure you want to buy this?": "Na pewno chcesz to kupić?",
+            "This will cost you": "To będzie Cię kosztować",
+            "masts": "masztów",
+            "Cancel": "Anuluj",
+            "Confirm": "Potwierdź",
+            "You cannot buy this item": "Nie możesz kupić tego przedmiotu.",
+
+            "Theme packs": "Paczki motywów",
+            "Theme packs modify the look of your Statki": "Paczki motywów zmieniają wygląd Twoich Statków.",
+
+            "Namestyles": "Style nazw",
+            "Namestyles are visual modifications to your nickname visible to you and other players": "Style nazw zmieniają wygląd Twojego nicku. Zmiany są widoczne zarówno dla Ciebie jak i innych graczy."
+        },
+        "Inventory": {
+            "Inventory": "Ekwipunek",
+
+            "Apply": "Użyj",
+
+            "Theme pack": "Paczka motywu",
+
+            "Nothing to see here": "Nic tu nie ma"
+        },
         "Settings": {
             "General": "Ogólne",
             "Account": "Konto",
@@ -113,6 +138,10 @@
             "Unknown error occured": "Wystąpił nieznany błąd",
             "Status:": "Status:",
             "News and changes": "Nowości i zmiany",
+
+            "My profile": "Mój profil",
+            "Inventory": "Ekwipunek",
+
             "These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!": "To są maszty, waluta zdobywana poprzez zdobywanie większych poziomów. Wkrótce wypuścimy sklep który pozwoli Ci spersonalizować Statki na swój sposób!"
         }
     },

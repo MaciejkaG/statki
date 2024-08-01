@@ -265,6 +265,127 @@ export class MailAuth {
         });
     }
 
+    getShop() {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            const query = `SELECT item_id, name, description, category, price, item_data FROM shop WHERE hidden = 0;`;
+            conn.query(query, async (error, response) => {
+                if (error) reject(error);
+                else {
+                    if (response[0].length === 0) {
+                        reject(0);
+                        return;
+                    }
+
+                    const items = response.map(item => ({
+                        ...item,
+                        item_data: JSON.parse(item.item_data)
+                    }));
+
+                    resolve(items);
+                }
+
+                conn.end();
+            });
+        });
+    }
+
+    buyItem(userId, itemId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            const query = `
+            SELECT masts FROM accounts WHERE user_id = ?;
+            SELECT price, hidden, limit_to_one FROM shop WHERE item_id = ?;
+            SELECT item_id FROM inventory WHERE user_id = ? AND item_id = ?;
+            `;
+            conn.query(query, [userId, itemId, userId, itemId], async (error, response) => {
+                if (error) reject(error);
+                else {
+                    if ((response[0].length === 0 || response[1].length === 0 || response[1][0].hidden) || (response[1][0].limit_to_one === 1 && response[2].length > 0)) {
+                        resolve(false);
+                        return;
+                    }
+
+                    let [[{ masts }], [{ price }]] = response;
+
+                    if (masts < price) {
+                        resolve(false);
+                        return;
+                    }
+
+                    conn.query('INSERT INTO inventory(item_id, user_id) VALUES (?, ?);UPDATE accounts SET masts = masts - ? WHERE user_id = ?;', [itemId, userId, price, userId], async(error) => {
+                        if (error) reject(error);
+                        else resolve(true);
+                    });
+                }
+
+                conn.end();
+            });
+        });
+    }
+
+    getInventory(userId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            const query = `
+            SELECT i.item_id, name, description, category, item_data FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.user_id = ?;
+            `;
+            conn.query(query, [userId], async (error, response) => {
+                if (error) reject(error);
+                else {
+                    const items = response.map(item => ({
+                        ...item,
+                        item_data: JSON.parse(item.item_data)
+                    }));
+
+                    resolve(items);
+                };
+
+                conn.end();
+            });
+        });
+    }
+
+    getTheme(userId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            const query = `
+            SELECT a.active_theme_item_id, s.item_data FROM accounts a JOIN shop s ON a.active_theme_item_id = s.item_id WHERE user_id = ?;
+            `;
+            conn.query(query, [userId], async (error, response) => {
+                if (error) reject(error);
+                else if (response[0]) resolve(JSON.parse(response[0].item_data).background);
+                else resolve(null);
+
+                conn.end();
+            });
+        });
+    }
+
+    setTheme(userId, themeItemId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            const query = `
+            SELECT category, item_data FROM shop WHERE item_id = ?;
+            `;
+            conn.query(query, [themeItemId], async (error, response) => {
+                if (error) reject(error);
+                else if (response[0].category === 'theme_pack') {
+                    conn.query('UPDATE accounts SET active_theme_item_id = ? WHERE user_id = ?;', [themeItemId, userId], async (error) => {
+                        if (error) reject(error);
+                        else {
+                            conn.end();
+                            resolve(JSON.parse(response[0].item_data).background);
+                        }
+                    });
+                } else {
+                    conn.end();
+                    resolve(false);
+                }
+            });
+        });
+    }
+
     getMatchList(userId, page) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
@@ -407,6 +528,7 @@ export class MailAuth {
 
                 let nextLevelXP = getXPForLevel(level + 1);
                 let mastsEarned = 0;
+
                 while (xp >= nextLevelXP) {
                     level++;
                     xp -= nextLevelXP;

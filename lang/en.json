@@ -97,6 +97,30 @@
             "No matches played": "No matches played",
             "Thats all of your matches Theres nothing more to see here": "That's all of your matches. There's nothing more to see here."
         },
+        "Shop": {
+            "Shop": "Shop",
+
+            "Are you sure you want to buy this?": "Are you sure you want to buy this?",
+            "This will cost you": "This will cost you",
+            "masts": "masts",
+            "Cancel": "Cancel",
+            "Confirm": "Confirm",
+            "You cannot buy this item": "You cannot buy this item.",
+
+            "Theme packs": "Theme packs",
+            "Theme packs modify the look of your Statki": "Theme packs modify the look of your Statki.",
+
+            "Namestyles": "Name styles",
+            "Namestyles are visual modifications to your nickname visible to you and other players": "Namestyles are visual modifications to your nickname visible to you and other players."
+        },
+        "Inventory": {
+            "Inventory": "Inventory",
+            "Apply": "Apply",
+
+            "Theme pack": "Theme pack",
+
+            "Nothing to see here": "Nothing to see here"
+        },
         "Settings": {
             "General": "General",
             "Account": "Account",
@@ -112,6 +136,10 @@
             "Unknown error occured": "Unknown error occured",
             "Status:": "Status:",
             "News and changes": "News and changes",
+
+            "My profile": "My profile",
+            "Inventory": "Inventory",
+
             "These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!": "These are masts, a currency obtainable through leveling up. Soon we will launch a masts shop that will let you customise your Statki experience!"
         }
     },

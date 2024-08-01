@@ -12,6 +12,19 @@ tippy('#shopButton', {
     content: window.locale['These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!']
 });
 
+tippy('#profileButton', {
+    placement: 'bottom',
+    theme: 'translucent',
+    animation: 'scale-subtle',
+    allowHTML: true,
+    arrow: false,
+    interactive: true,
+    content: `
+    <span onclick="switchView('profileView')">${window.locale['My profile']}</span><br>
+    <span onclick="switchView('inventoryView')">${window.locale['Inventory']}</span>
+    `
+});
+
 // Handling server-sent events
 socket.on("joined", (nick) => {
     returnLock = false;
@@ -69,6 +82,8 @@ $("#languages").on("change", function() {
     });
 });
 
+var currentMasts = 0;
+
 socket.emit("my profile", (profile) => {
     console.log("Received user data. UID:", profile.uid);
     console.log("Profile data:", profile);
@@ -85,7 +100,8 @@ socket.emit("my profile", (profile) => {
 
     $("#xpbar").css('width', `${profile.profile.levelProgress}%`);
     $("#level").html(profile.profile.level);
-    $("#masts").html(profile.profile.masts);
+    $("#masts").html(profile.profile.masts.toLocaleString(undefined));
+    currentMasts = profile.profile.masts;
 
     tippy('#levelcontainer', {
         theme: 'dark',
@@ -176,6 +192,166 @@ $(window).scroll(function () {
 function showMatchInfo(matchId) {
     socket.emit('match info', matchId, (matchInfo) => {
         console.log(matchInfo);
+    });
+}
+
+socket.emit('get shop', (shopItems) => {
+    console.log(`Received shop data.`);
+    console.log('Shop items data:', shopItems);
+
+    for (let i = 0; i < shopItems.length; i++) {
+        const item = shopItems[i];
+
+        const itemHTML = `
+            <div class="item" style="--gradient-colors: ${item.item_data.gradientColors};--background:${item.item_data.background};">
+                <div class="background"></div>
+                <div class="overlay">
+                    <div class="finishBox">
+                        <img src="/assets/img/check-circle.svg" alt="Item bought!">
+                    </div>
+                    <div class="checkoutBox">
+                        <h2>${window.locale['Are you sure you want to buy this?']}</h2>
+                        <span>${window.locale['This will cost you']} <span class="masts"><img src="/assets/img/masts-logo.png" alt="Masts" style="height: 0.9em;"> ${item.price.toLocaleString(undefined)} ${window.locale['masts']}</span></span>
+                        <div>
+                            <button class="cancelCheckout">${window.locale['Cancel']}</button>
+                            <button onclick="buyShopItem(this, ${item.price}, ${item.item_id})">${window.locale['Confirm']}</button>
+                        </div>
+                    </div>
+                    <div class="overlayBase">
+                        <h1>${item.name}</h1>
+                        <p>${item.description}</p>
+                    </div>
+                    <div class="overlayBase">
+                        <button class="startCheckout">
+                            <img src="/assets/img/shopping-cart.svg" alt="Shopping cart icon">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        switch (item.category) {
+            case 'theme_pack':
+                document.getElementById('themepacks').innerHTML += itemHTML;
+                break;
+
+            case 'name_style':
+                document.getElementById('namestyles').innerHTML += itemHTML;
+                break;
+        }
+    }
+
+    $('.cancelCheckout').on('click', function () {
+        $(this).closest('.item').removeClass('checkout');
+    });
+
+    $('.startCheckout').on('click', function () {
+        $('.item').removeClass('checkout');
+        $(this).closest('.item').addClass('checkout');
+    });
+
+    console.log(`Shop items received and processed successfully.`);
+});
+
+function buyShopItem(el, price, itemId) {
+    const cantBuy = () => {
+        $(el).closest('.item').removeClass('finished checkout');
+
+        Toastify({
+            text: window.locale['You cannot buy this item'],
+            duration: 5000,
+            newWindow: true,
+            gravity: "bottom",
+            position: "right",
+            stopOnFocus: true,
+            className: "bshipstoast",
+        }).showToast();
+    };
+
+    if (currentMasts < price) {
+        cantBuy();
+        return;
+    }
+
+    lockUI(true);
+    socket.emit("buy shop item", itemId, (result) => {
+        if (result) {
+            reloadInventory();
+
+            increaseDisplayedMasts(-20000);
+            $(el).closest('.item').addClass('finished');
+
+            setTimeout(() => {
+                $(el).closest('.item').removeClass('finished checkout');
+            }, 3000);
+        } else {
+            cantBuy();
+        }
+
+        lockUI(false);
+    });
+}
+
+reloadInventory();
+
+function reloadInventory() {
+    socket.emit('my inventory', (items) => {
+        console.log(`Received inventory data.`);
+        console.log('Inventory items data:', items);
+
+        let itemsHTML = '';
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            let itemHTML;
+
+            switch (item.category) {
+                case 'theme_pack':
+                    itemHTML = `
+                        <div class="item">
+                            <div class="options">
+                                <button onclick="applyTheme(${item.item_id})">${window.locale['Apply']}</button>
+                            </div>
+                            <div class="content">
+                                <h2>${window.locale['Theme pack']}</h2>
+                                <h1>${item.name}</h1>
+                                <span>${item.description}</span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+
+            itemsHTML += itemHTML;
+        }
+
+        if (itemsHTML.length === 0) {
+            itemsHTML = `<h1>${window.locale['Nothing to see here']}</h1>`;
+        }
+
+        $('#inventoryitems').html(itemsHTML);
+
+        console.log(`Inventory items received and processed successfully.`);
+    });
+}
+
+socket.emit('my theme', (theme) => {
+    console.log('Received selected theme. Applying now.');
+    $('#themeBackground').css('background-image', theme);
+});
+
+function applyTheme(themeId) {
+    lockUI(true);
+    socket.emit('set theme', themeId, (response) => {
+        if (response) {
+            $('#themeBackground').css('opacity', '0');
+            setTimeout(() => {
+                $('#themeBackground').css('background-image', response);
+                $('#themeBackground').css('opacity', '0.6');
+                lockUI(false);
+            }, 2000);
+        }
     });
 }
 
@@ -323,3 +499,23 @@ pveForm.addEventListener('submit', (e) => {
 // if (isInStandaloneMode()) {
 //     alert("Thanks for using the PWA!");
 // }
+
+function increaseDisplayedMasts(increaseBy) {
+    const obj = document.getElementById('masts');
+    const start = currentMasts;
+    const end = start + increaseBy;
+    const duration = 1000;
+
+    currentMasts = end;
+
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString(undefined);
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}

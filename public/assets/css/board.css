@@ -20,10 +20,17 @@
     --dynamic: rgb(83, 83, 245);
     --danger: rgb(230, 73, 73);
     --important: rgb(203, 50, 241);
-    --masts-color: rgb(216, 210, 59);
+
+    --masts-color: rgb(212, 70, 231);
+    --masts-color-accent: rgb(162, 47, 177);
 
     --accent-bg: rgba(255, 255, 255, 0.1);
     --accent-main: rgba(255, 255, 255, 0.2);
+
+    --element-bg: rgba(0, 0, 0, 0.4);
+    --element-bg-alt: rgba(16, 16, 16, 0.6);
+
+    --inventory-item: #101010;
 
     color: rgb(136, 136, 136)
 }
@@ -38,6 +45,10 @@ body {
     font-family: 'Lato', sans-serif;
     transition: opacity 0.3s ease;
     animation: fadeIn 1 0.3s ease;
+}
+
+button {
+    font-family: 'Lato', sans-serif;
 }
 
 @keyframes fadeIn {

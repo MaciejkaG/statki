@@ -18,10 +18,9 @@
     </div>
 </div>
 
-<nav><span onclick="switchView('settingsView')" class="item" style="text-align: left;">{{ t 'menu.navbar.Settings' }}</span><span onclick="switchView('mainMenuView')" class="item" style="text-align: center;">{{ t 'menu.navbar.Main menu' }}</span> <div class="item"><span id="profileButton" onclick="switchView('profileView')">{{ t 'menu.navbar.Profile' }}</span><span id="shopButton"><img src="/assets/img/mast-logo (1).png" alt="Masts" style="height: 1em;"><span id="masts">0</span></span></div></nav>
+<nav><span onclick="switchView('settingsView')" class="item" style="text-align: left;">{{ t 'menu.navbar.Settings' }}</span><span onclick="switchView('mainMenuView')" class="item" style="text-align: center;">{{ t 'menu.navbar.Main menu' }}</span> <div class="item"><span id="profileButton">{{ t 'menu.navbar.Profile' }}</span><span id="shopButton" onclick="switchView('shopView')"><img src="/assets/img/masts-logo.png" alt="Masts" style="height: 0.9em;"><span id="masts">0</span></span></div></nav>
 <div class="container" id="mainMenuView" data-path="/">
     <div>
-        
         <h2>{{ t 'menu.index.Select game mode' }}</h2>
         <div class="modes">
             <div onclick="switchView('pvpMenuView')">
@@ -145,6 +144,31 @@
     </div>
 </div>
 
+<div class="container" id="shopView" data-path="/shop">
+    <div class="main">
+        <h1>{{ t 'menu.Shop.Shop' }}</h1>
+        <h2>{{ t 'menu.Shop.Theme packs' }}</h2>
+        <p>{{ t 'menu.Shop.Theme packs modify the look of your Statki' }}</p>
+        <div class="items" id="themepacks">
+            
+        </div>
+        <h2>{{ t 'menu.Shop.Namestyles' }}</h2>
+        <p>{{ t 'menu.Shop.Namestyles are visual modifications to your nickname visible to you and other players' }}</p>
+        <div class="items" id="namestyles">
+            
+        </div>
+    </div>
+</div>
+
+<div class="container" id="inventoryView" data-path="/inventory">
+    <div class="main">
+        <h1>{{ t 'menu.Inventory.Inventory' }}</h1>
+        <div class="items" id="inventoryitems">
+            
+        </div>
+    </div>
+</div>
+
 <div class="container" id="settingsView" data-path="/settings">
     <div>
         <h1>{{ t 'menu.Settings.Settings' }}</h1>
@@ -174,6 +198,9 @@
         "No matches played": "{{ t 'menu.Profile.No matches played' }}",
         "Thats all of your matches Theres nothing more to see here": "{{ t 'menu.Profile.Thats all of your matches Theres nothing more to see here' }}",
 
+        "My profile": "{{ t 'menu.General.My profile' }}",
+        "Inventory": "{{ t 'menu.General.Inventory' }}",
+
         "Reconnecting": "{{ t 'errors.Reconnecting' }}",
         "Reconnected": "{{ t 'errors.Reconnected' }}",
         "Reconnection error occured": "{{ t 'errors.Reconnection error occured' }}",
@@ -185,7 +212,19 @@
         "Smart description": "{{ t 'menu.PvE.difficulty.Smart.description' }}",
         "Overkill description": "{{ t 'menu.PvE.difficulty.Overkill.description' }}",
 
-        "These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!": "{{ t 'menu.General.These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!' }}"
+        "These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!": "{{ t 'menu.General.These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!' }}",
+
+        "Are you sure you want to buy this?": "{{ t 'menu.Shop.Are you sure you want to buy this?' }}",
+        "This will cost you": "{{ t 'menu.Shop.This will cost you' }}",
+        "masts": "{{ t 'menu.Shop.masts' }}",
+        "Cancel": "{{ t 'menu.Shop.Cancel' }}",
+        "Confirm": "{{ t 'menu.Shop.Confirm' }}",
+        "You cannot buy this item": "{{ t 'menu.Shop.You cannot buy this item' }}",
+
+
+        "Apply": "{{ t 'menu.Inventory.Apply' }}",
+        "Theme pack": "{{ t 'menu.Inventory.Theme pack' }}",
+        "Nothing to see here": "{{ t 'menu.Inventory.Nothing to see here' }}"
     };
 </script>
 <script src="/assets/js/spa_lib.js"></script>

@@ -1,6 +1,22 @@
+::-webkit-scrollbar {
+    display: none;
+}
+
 .container {
     display: none;
     transition: opacity 0.175s;
+}
+
+#themeBackground {
+    position: fixed;
+    z-index: -1;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 2s;
 }
 
 .tippyTemplate {
@@ -81,7 +97,7 @@ nav div {
 #mainMenuView .modes div {
     height: 10rem;
     width: 10rem;
-    background-color: black;
+    background-color: var(--element-bg);
     border: solid 1px white;
     border-radius: 15px;
     padding: 0.5rem 1rem;
@@ -106,7 +122,7 @@ nav div {
 #pvpMenuView .modes div {
     height: 10rem;
     width: 10rem;
-    background-color: black;
+    background-color: var(--element-bg);
     border: solid 1px white;
     border-radius: 15px;
     padding: 0.5rem 1rem;
@@ -130,7 +146,7 @@ nav div {
 
 #pvpCreateView .modes div {
     width: 15rem;
-    background-color: black;
+    background-color: var(--element-bg);
     border: solid 1px white;
     border-radius: 15px;
     user-select: none;
@@ -141,7 +157,7 @@ nav div {
 }
 
 #pvpCreateView input, #pvpCreateView button {
-    background-color: black;
+    background-color: var(--element-bg);
     color: white;
     border-radius: 15px;
     border: 1px solid white;
@@ -174,7 +190,7 @@ nav div {
 #pvpJoinView .modes div {
     height: 7rem;
     width: 15rem;
-    background-color: black;
+    background-color: var(--element-bg);
     border: solid 1px white;
     border-radius: 15px;
     user-select: none;
@@ -188,7 +204,7 @@ nav div {
 }
 
 #pvpJoinView form input {
-    background-color: black;
+    background-color: var(--element-bg);
     color: white;
     border-radius: 15px;
     border: 1px solid white;
@@ -220,7 +236,7 @@ nav div {
 #preparingGame .modes div {
     height: 13rem;
     width: 11rem;
-    background-color: black;
+    background-color: var(--element-bg);
     border: solid 1px white;
     border-radius: 15px;
     user-select: none;
@@ -305,7 +321,7 @@ nav div {
 }
 
 #profileView .matchList .match {
-    background-color: rgba(24, 24, 24, 1);
+    background-color: var(--element-bg-alt);
     border-radius: 15px;
     cursor: pointer;
     padding: 0.7rem;
@@ -313,7 +329,7 @@ nav div {
     height: 5rem;
     overflow: hidden;
 
-    transition: height 0.3s;
+    transition: height 0.5s;
 }
 
 #profileView .matchList .match .xpincrease {
@@ -386,7 +402,7 @@ nav div {
     padding: 0.5rem 1rem;
     padding: 0.5rem 2rem;
     font-size: 1rem;
-    background-color: black;
+    background-color: var(--element-bg);
     border: solid 1px white;
     color: white;
     border-radius: 15px;
@@ -413,7 +429,7 @@ nav div {
 }
 
 #settingsView button {
-    background-color: black;
+    background-color: var(--element-bg);
     color: white;
     border-radius: 15px;
     border: 1px solid white;
@@ -456,7 +472,7 @@ nav div {
 #vsAiView .modes div {
     /* height: 7rem; */
     width: 15rem;
-    background-color: black;
+    background-color: var(--element-bg);
     border: solid 1px white;
     border-radius: 15px;
     user-select: none;
@@ -470,7 +486,7 @@ nav div {
 }
 
 #vsAiView form input {
-    background-color: black;
+    background-color: var(--element-bg);
     color: white;
     border-radius: 15px;
     border: 1px solid white;
@@ -495,11 +511,356 @@ nav div {
     padding: 0.5rem 1rem;
     padding: 0.5rem 2rem;
     font-size: 1rem;
-    background-color: black;
+    background-color: var(--element-bg);
     border: solid 1px white;
     color: white;
     border-radius: 15px;
     outline: none;
+}
+
+/* Shop */
+#shopView .items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 60rem;
+    gap: 1rem;
+    margin: 3rem 0;
+}
+
+#shopView .items .item {
+    width: calc(33% - 2rem);
+    /* height: 10rem; */
+    aspect-ratio: 1.8;
+    background-color: var(--ship-miss);
+    border-radius: 15px;
+    /* overflow: hidden; */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-direction: column-reverse;
+    transition: transform 0.3s ease-in-out;
+}
+
+@keyframes glowAnimation {
+    from {
+        background-position: 0%;
+    }
+
+    to {
+        background-position: 100%;
+    }
+}
+
+#shopView .items .item:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    /* background: linear-gradient(90deg, rgba(119, 31, 235, 0.7), rgba(3, 20, 175, 0.7), rgba(16, 92, 155, 0.7)); */
+    background-image: linear-gradient(90deg, var(--gradient-colors));
+    background-size: 300%;
+    z-index: -1;
+    transition: filter 0.75s ease-in-out, opacity 0.5s ease-in-out;
+    filter: blur(0px) brightness(125%);
+    opacity: 0;
+
+    animation: glowAnimation infinite ease-in-out alternate 4s;
+}
+
+/* #shopView .items .item:hover {
+    transform: translateY(-0.3rem);
+} */
+
+#shopView .items {
+    user-select: none;
+}
+
+#shopView .items .item:hover:before,
+#shopView .items .item.checkout:before {
+    filter: blur(25px);
+    opacity: 1;
+}
+
+#shopView .items .item .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--background);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    z-index: 0;
+    border-radius: 15px;
+}
+
+#shopView .items .item .overlay {
+    height: 40%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    z-index: 1;
+    display: flex;
+    padding: 0.5rem 0.75rem;
+    box-sizing: border-box;
+    border-radius: 15px;
+    transition: height 0.3s, background-color 0.3s ease-in-out;
+}
+
+#shopView .items .item:hover .overlay {
+    height: 60%;
+}
+
+#shopView .items .item .overlay .overlayBase {
+    flex: 1;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    transition: opacity 0.2s;
+}
+
+#shopView .items .item .overlay .overlayBase h1 {
+    font-size: 1rem;
+    margin: 0;
+}
+
+#shopView .items .item .overlay .overlayBase p {
+    margin: 0;
+    font-size: 0.7rem;
+    text-wrap: nowrap;
+}
+
+#shopView .items .item .overlay .overlayBase:last-child button {
+    margin-left: auto;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 15px;
+    background-color: white;
+    border: none;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 1px 1px white, 0 0 0 1px var(--masts-color-accent);
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+}
+
+#shopView .items .item .overlay .overlayBase:last-child button:hover {
+    box-shadow: 0 0 5px 1px white, 0 0 10px 2px var(--masts-color-accent);
+}
+
+#shopView .items .item.checkout .overlay {
+    height: 100%;
+}
+
+#shopView .items .item .overlay .checkoutBox {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 15px;
+    z-index: 2;
+    transition: opacity 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 1rem;
+    box-sizing: border-box;
+    text-align: center;
+    gap: 0.5rem;
+}
+
+#shopView .items .item .overlay .finishBox {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 15px;
+    z-index: 3;
+    transition: opacity 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#shopView .items .item .overlay .checkoutBox * {
+    margin: 0;
+}
+
+#shopView .items .item .overlay .checkoutBox h2 {
+    font-size: 0.9rem;
+}
+
+#shopView .items .item .overlay .checkoutBox span {
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+#shopView .items .item .overlay .checkoutBox span.masts {
+    font-size: 0.8rem;
+    color: var(--masts-color);
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
+#shopView .items .item .overlay .checkoutBox button {
+    border-radius: 15px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid white;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#shopView .items .item .overlay .checkoutBox button:hover {
+    color: black;
+    background-color: white;
+}
+
+#shopView .items .item .overlay .checkoutBox div {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+#shopView .items .item.checkout .overlay {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+#shopView .items .item.checkout .overlay div {
+    opacity: 0;
+}
+
+#shopView .items .item.checkout .overlay .checkoutBox {
+    opacity: 1;
+    pointer-events: initial;
+}
+
+#shopView .items .item.checkout .overlay .checkoutBox div {
+    opacity: 1;
+}
+
+#shopView .items .item.finished .overlay .checkoutBox {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#shopView .items .item.finished .overlay .finishBox {
+    opacity: 1;
+}
+
+/* Inventory */
+#inventoryView .items {
+    display: flex;
+    width: 70vw;
+    gap: 1rem;
+    justify-content: center;
+}
+
+#inventoryView .items .item {
+    width: 25%;
+    aspect-ratio: 2;
+    background: var(--element-bg-alt);
+    border-radius: 15px;
+    overflow: hidden;
+
+    position: relative;
+
+    user-select: none;
+}
+
+#inventoryView .items .item .content {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 1rem;
+    box-sizing: border-box;
+    height: 100%;
+    z-index: 1;
+}
+
+#inventoryView .items .item .content * {
+    margin: 0;
+}
+
+#inventoryView .items .item .content h2 {
+    font-size: 1rem;
+}
+
+#inventoryView .items .item .content h1 {
+    font-size: 1.5rem;
+}
+
+#inventoryView .items .item .content span {
+    font-size: 0.8rem;
+}
+
+#inventoryView .items .item .options {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    backdrop-filter: blur(20px);
+
+    transition: opacity 0.3s;
+}
+
+#inventoryView .items .item .options button {
+    border-radius: 15px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--mark-ship-valid);
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    color: var(--mark-ship-valid);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#inventoryView .items .item .options button:hover {
+    color: black;
+    background-color: var(--mark-ship-valid);
+}
+
+#inventoryView .items .item:hover .options  {
+    opacity: 1;
+    pointer-events: initial;
 }
 
 .newsModalContainer {
@@ -526,7 +887,7 @@ nav div {
 .newsModalContainer .newsModal {
     width: 30rem;
     max-width: 90%;
-    background: black;
+    background-color: var(--element-bg);
     border: solid 1px white;
     height: 85%;
 

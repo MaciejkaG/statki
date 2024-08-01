@@ -599,11 +599,41 @@ io.on('connection', async (socket) => {
         });
 
         socket.on('my profile', (callback) => {
-            auth.getProfile(session.userId).then((profile) => {
+            auth.getProfile(session.userId).then(profile => {
                 profile.uid = session.userId;
                 callback(profile);
 
                 auth.setViewedNews(session.userId);
+            });
+        });
+
+        socket.on('get shop', (callback) => {
+            auth.getShop().then(shopItems => {
+                callback(shopItems);
+            });
+        });
+
+        socket.on('buy shop item', (itemId, callback) => {
+            auth.buyItem(session.userId, itemId).then(result => {
+                callback(result);
+            });
+        });
+
+        socket.on('my inventory', (callback) => {
+            auth.getInventory(session.userId).then(items => {
+                callback(items);
+            });
+        });
+
+        socket.on('set theme', (themeId, callback) => {
+            auth.setTheme(session.userId, themeId).then(themeBackground => {
+                callback(themeBackground);
+            });
+        });
+
+        socket.on('my theme', (callback) => {
+            auth.getTheme(session.userId).then(themeBackground => {
+                callback(themeBackground);
             });
         });
 
@@ -1325,7 +1355,7 @@ async function finishPrepPhase(socket, playerGame) {
     return true;
 }
 
-async function placeAIShips(socket, playerGame) {
+async function placeAIShips(socket) {
     await GInfo.depleteShips(socket, 1);
 }
 

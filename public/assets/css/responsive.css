@@ -27,6 +27,14 @@
     #matchView .matchup h1 {
         font-size: 1.5rem;
     }
+
+    #shopView .items {
+        width: 90vw;
+    }
+
+    #shopView .items .item {
+        width: calc(50% - 2rem);
+    }
 }
 
 @media only screen and (max-width: 995px) {
@@ -67,11 +75,14 @@
     #profileView .matchList .match .statsButton {
         font-size: 1.3rem;
     }
+
+    #shopView .items .item {
+        width: 100%;
+    }
 }
 
 @media only screen and (max-width: 580px) {
     #profileView .matchList .match:hover {
         height: 16rem;
     }
-    
 }
