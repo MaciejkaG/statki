@@ -1260,7 +1260,7 @@ io.on('connection', async (socket) => {
 
                             const playerStats = playerGame.data.boards[0].stats;
                             const opponentStats = playerGame.data.boards[1].stats;
-                            let xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, opponentStats.sunkShips, playerGame.data.difficulty);
+                            let xp = calculateXP(playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, opponentStats.sunkShips, playerGame.data.difficulty);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
                             xp = await auth.addXP(session.userId, xp);
@@ -1321,7 +1321,7 @@ io.on('connection', async (socket) => {
 
                             const playerStats = playerGame.data.boards[0].stats;
                             const opponentStats = playerGame.data.boards[1].stats;
-                            let xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, opponentStats.sunkShips, playerGame.data.difficulty);
+                            let xp = calculateXP(playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, opponentStats.sunkShips, playerGame.data.difficulty);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
                             xp = await auth.addXP(session.userId, xp);
