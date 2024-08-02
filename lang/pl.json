@@ -117,7 +117,8 @@
             "Namestyles are visual modifications to your nickname visible to you and other players": "Style nazw zmieniają wygląd Twojego nicku. Zmiany są widoczne zarówno dla Ciebie jak i innych graczy.",
 
             "Statboxes": "Statboxy",
-            "Statboxes are lootboxes containing random items including XP boosts and cosmetic items": "Statboxy to lootboxy zawierające losowe przedmioty w tym doładowania do XP oraz elementy kosmetyczne."
+            "Statboxes are lootboxes containing random items including XP boosts and cosmetic items": "Statboxy to lootboxy zawierające losowe przedmioty w tym doładowania do XP oraz elementy kosmetyczne.",
+            "Statboxes may contain items not available for purchase in the shop": "Statboxy mogą zawierać przedmioty niedostępne do zakupu w sklepie."
         },
         "Inventory": {
             "Inventory": "Ekwipunek",
@@ -155,7 +156,7 @@
             "My profile": "Mój profil",
             "Inventory": "Ekwipunek",
 
-            "These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!": "To są maszty, waluta zdobywana poprzez zdobywanie większych poziomów. Wkrótce wypuścimy sklep który pozwoli Ci spersonalizować Statki na swój sposób!"
+            "These are masts, a currency you can earn by leveling up (by playing Vs AI games) Click on the masts icon to open the shop!": "To są maszty, waluta zdobywana poprzez zdobywanie poziomów (przez granie w trybie Vs. AI). Kliknij ikonę masztów aby otworzyć sklep!"
         }
     },
 

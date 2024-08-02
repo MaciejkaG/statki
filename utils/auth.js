@@ -525,12 +525,25 @@ export class MailAuth {
             const conn = mysql.createConnection(this.mysqlOptions);
 
             let query = `
-            SELECT s.category FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.inventory_item_id = ? AND s.category = 'lootbox';
+            SELECT s.item_data FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.user_id = ? AND i.inventory_item_id = ? AND s.category = 'lootbox';
             SELECT s.item_id, name, description, category, item_data FROM shop s LEFT JOIN inventory i ON s.item_id = i.item_id AND i.user_id = ? WHERE (i.item_id IS NULL OR s.limit_to_one = 0) AND s.lootbox_droppable = 1 ORDER BY UUID();
             `;
-            conn.query(query, [lootboxId, userId], async (error, response) => {
+            conn.query(query, [userId, lootboxId, userId], async (error, response) => {
                 if (error) reject(error);
                 else if (response[0].length > 0) {
+                    let allowedLootCategories;
+                    try {
+                        allowedLootCategories = JSON.parse(response[0][0].item_data).lootCategories;
+                        if (allowedLootCategories.constructor !== Array) {
+                            throw new Error(); // I don't need to include a message as this error is going to be handled anyway.
+                        }
+                    } catch (err) {
+                        resolve(false);
+                        return;
+                    }
+
+                    response[1] = response[1].filter(item => allowedLootCategories.includes(item.category));
+
                     shuffle(response[1]);
 
                     const getDrop = () => {
@@ -724,8 +737,8 @@ export class MailAuth {
                     nextLevelXP = getXPForLevel(level + 1);
 
                     // Levelup rewards in masts (ingame currency)
-                    if (level % 50 === 0)      mastsEarned += 5000;
-                    else if (level % 10 === 0) mastsEarned += 2000;
+                    if (level % 25 === 0)      mastsEarned += 5000;
+                    else if (level % 5 === 0) mastsEarned += 1500;
                     else                       mastsEarned += 500;
                 }
 

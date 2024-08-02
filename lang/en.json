@@ -116,7 +116,8 @@
             "Namestyles are visual modifications to your nickname visible to you and other players": "Namestyles are visual modifications to your nickname visible to you and other players.",
 
             "Statboxes": "Statboxes",
-            "Statboxes are lootboxes containing random items including XP boosts and cosmetic items": "Statboxes are lootboxes containing random items including XP boosts and cosmetic items."
+            "Statboxes are lootboxes containing random items including XP boosts and cosmetic items": "Statboxes are lootboxes containing random items including XP boosts and cosmetic items.",
+            "Statboxes may contain items not available for purchase in the shop": "Statboxes may contain items not available for purchase in the shop."
         },
         "Inventory": {
             "Inventory": "Inventory",
@@ -154,7 +155,7 @@
             "My profile": "My profile",
             "Inventory": "Inventory",
 
-            "These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!": "These are masts, a currency obtainable through leveling up. Soon we will launch a masts shop that will let you customise your Statki experience!"
+            "These are masts, a currency you can earn by leveling up (by playing Vs AI games) Click on the masts icon to open the shop!": "These are masts, a currency you can earn by leveling up (by playing Vs. AI games). Click on the masts icon to open the shop!"
         }
     },
 

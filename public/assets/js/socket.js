@@ -9,7 +9,7 @@ tippy('#shopButton', {
     theme: 'dark',
     followCursor: 'horizontal',
     animation: 'scale-subtle',
-    content: window.locale['These are masts, a currency obtainable through leveling up Soon we will launch a masts shop that will let you customise your Statki experience!']
+    content: window.locale['These are masts, a currency you can earn by leveling up (by playing Vs AI games) Click on the masts icon to open the shop!']
 });
 
 tippy('#profileButton', {
@@ -404,7 +404,7 @@ function reloadInventory() {
         }
 
         if (itemsHTML.length === 0) {
-            itemsHTML = `<h1>${window.locale['Nothing to see here']}</h1>`;
+            itemsHTML = `<h2>${window.locale['Nothing to see here']}</h2>`;
         }
 
         $('#inventoryitems').html(itemsHTML);

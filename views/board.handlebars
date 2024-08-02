@@ -31,9 +31,9 @@
                 <span class="break"></span>
                 <div class="controls">
                     <h2>{{ t 'board.Controls' }}</h2>
-                    <h3 class="controlsOwnBoard"><span class="important">S</span> {{ t 'board.Change ship' }}</h3>
-                    <h3 class="controlsOwnBoard"><span class="important">R</span> {{ t 'board.Rotate ship' }}</h3>
-                    <h3 class="boardSwitch"><span class="important">B</span> {{ t 'board.Change boards' }}</h3>
+                    <h3 class="controlsOwnBoard" onclick="switchShips()"><span class="important">S</span> {{ t 'board.Change ship' }}</h3>
+                    <h3 class="controlsOwnBoard" onclick="switchRotation()"><span class="important">R</span> {{ t 'board.Rotate ship' }}</h3>
+                    <h3 class="boardSwitch" onclick="switchBoards()"><span class="important">B</span> {{ t 'board.Change boards' }}</h3>
                 </div>
                 <div class="mobileControls">
                     <button class="controlsOwnBoard" onclick="switchShips()">{{ t 'board.Change ship' }}</button>
