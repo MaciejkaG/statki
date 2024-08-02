@@ -450,6 +450,48 @@ export class MailAuth {
         });
     }
 
+    getDropRates() {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            const query = `
+            SELECT name, item_data FROM shop WHERE category = 'lootbox';
+            `;
+            conn.query(query, async (error, response) => {
+                if (error) reject(error);
+                else {
+                    const items = response.map(item => {
+                        const newItem = {
+                            ...item,
+                            drop_rates: JSON.parse(item.item_data).loot.sort((a, b) => a.chance - b.chance)
+                        };
+                        delete newItem.item_data;
+                        return newItem;
+                    });
+
+                    for (let i = 0; i < items.length; i++) {
+                        const item = items[i];
+                        
+                        let chancesSum = 0;
+                        for (let j = 0; j < item.drop_rates.length; j++) {
+                            const itemCategory = item.drop_rates[j];
+                            
+                            const initChance = itemCategory.chance;
+                            
+                            itemCategory.chance -= chancesSum;
+                            itemCategory.chance *= 100;
+
+                            chancesSum += initChance;
+                        }
+                    }
+
+                    resolve(items);
+                };
+
+                conn.end();
+            });
+        });
+    }
+
     getTheme(userId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);

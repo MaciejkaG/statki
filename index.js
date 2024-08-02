@@ -649,6 +649,12 @@ io.on('connection', async (socket) => {
             }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
+        socket.on('get drop rates', (callback) => {
+            auth.getDropRates().then(items => {
+                callback(items);
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+
         socket.on('set theme', (themeId, callback) => {
             auth.setTheme(session.userId, themeId).then(themeBackground => {
                 callback(themeBackground);

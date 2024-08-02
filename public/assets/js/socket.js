@@ -343,7 +343,7 @@ function reloadInventory() {
                     itemHTML = `
                         <div class="item">
                             <div class="options">
-                                <button onclick="applyTheme(${item.item_id})">${window.locale['Apply']}</button>
+                                <button class="positive" onclick="applyTheme(${item.item_id})">${window.locale['Apply']}</button>
                             </div>
                             <div class="content">
                                 <h2>${window.locale['Theme pack']}</h2>
@@ -358,7 +358,7 @@ function reloadInventory() {
                     itemHTML = `
                         <div class="item">
                             <div class="options">
-                                <button onclick="applyNameStyle(${item.item_id})">${window.locale['Apply']}</button>
+                                <button class="positive" onclick="applyNameStyle(${item.item_id})">${window.locale['Apply']}</button>
                             </div>
                             <div class="content">
                                 <h2>${window.locale['Name style']}</h2>
@@ -373,7 +373,8 @@ function reloadInventory() {
                     itemHTML = `
                         <div class="item">
                             <div class="options">
-                                <button onclick="openLootbox('${item.inventory_item_id}')">${window.locale['Open']}</button>
+                                <button class="positive" onclick="openLootbox('${item.inventory_item_id}')">${window.locale['Open']}</button>
+                                <button onclick="switchView('dropRatesView')">${window.locale['Drop rates']}</button>
                             </div>
                             <div class="content">
                                 <h2>Statbox</h2>
@@ -388,7 +389,7 @@ function reloadInventory() {
                     itemHTML = `
                         <div class="item">
                             <div class="options">
-                                <button onclick="useXPBoost('${item.inventory_item_id}')">${window.locale['Use']}</button>
+                                <button class="positive" onclick="useXPBoost('${item.inventory_item_id}')">${window.locale['Use']}</button>
                             </div>
                             <div class="content">
                                 <h2>${window.locale['XP Boost']}</h2>
@@ -412,6 +413,26 @@ function reloadInventory() {
         console.log(`Inventory items received and processed successfully.`);
     });
 }
+
+socket.emit("get drop rates", (items) => {
+    console.log(items);
+
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        
+        let itemHTML = `<h2>Statbox: ${item.name}</h2><p><ul>`;
+
+        for (let j = 0; j < item.drop_rates.length; j++) {
+            const itemCategory = item.drop_rates[j];
+            
+            itemHTML += `<li>${itemCategoryLocalised(itemCategory.category)}: ${itemCategory.chance}%</li>`;
+        }
+
+        itemHTML += `</ul></p>`;
+
+        document.getElementById('dropRates').innerHTML += itemHTML;
+    }
+});
 
 socket.emit('my theme', (theme) => {
     console.log('Received selected theme. Applying now.');
@@ -477,20 +498,7 @@ function openLootbox(lootboxId) {
                 '--background': response.item_data.background
             });
 
-            let itemType;
-            switch (response.category) {
-                case 'theme_pack':
-                    itemType = window.locale['Theme pack'];
-                    break;
-
-                case 'name_style':
-                    itemType = window.locale['Name style'];
-                    break;
-
-                case 'xp_boost':
-                    itemType = window.locale['XP boost'];
-                    break;
-            }
+            let itemType = itemCategoryLocalised(response.category);
 
             $('#droppedItemType').html(itemType);
             $('#droppedItemName').html(response.name);
@@ -519,24 +527,7 @@ socket.on('gift received', (giftData, giftMessage) => {
         '--background': giftData.item_data.background
     });
 
-    let itemType;
-    switch (giftData.category) {
-        case 'theme_pack':
-            itemType = window.locale['Theme pack'];
-            break;
-
-        case 'name_style':
-            itemType = window.locale['Name style'];
-            break;
-
-        case 'xp_boost':
-            itemType = window.locale['XP boost'];
-            break;
-
-        case 'lootbox':
-            itemType = 'Statbox';
-            break;
-    }
+    let itemType = itemCategoryLocalised(giftData.category);
 
     $('#giftItemType').html(itemType);
     $('#giftItemName').html(giftData.name);
@@ -771,4 +762,15 @@ function increaseDisplayedMasts(increaseBy) {
         }
     };
     window.requestAnimationFrame(step);
+}
+
+function itemCategoryLocalised(category) {
+    const itemCategoriesLocalised = {
+        theme_pack: window.locale['Theme pack'],
+        name_style: window.locale['Name style'],
+        xp_boost: window.locale['XP Boost'],
+        lootbox: 'Statbox'
+    }
+
+    return itemCategoriesLocalised[category];
 }

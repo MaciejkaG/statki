@@ -128,6 +128,9 @@
             "Reset theme": "Zresetuj motyw",
             "Reset name style": "Zresetuj styl nazwy",
 
+            "Drop rates": "Szanse dropów",
+            "Chances dont matter if you own all unique items of a certain category In this case the algorithm chooses the first category under the one picked that you can (still) get items from": "Szanse nie grają roli jeżeli posiadasz wszystkie niepowtarzalne przedmioty danej kategorii. W tym przypadku algorytm wybiera pierwszą kategorię pod wylosowaną z której (nadal) możesz zdobyć jakikolwiek przedmiot.",
+
             "You receive:": "Otrzymujesz:",
             "You received a gift": "Otrzymujesz prezent!",
 

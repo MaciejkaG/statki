@@ -912,6 +912,8 @@ nav div {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 
     backdrop-filter: blur(20px);
 
@@ -925,15 +927,25 @@ nav div {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid var(--mark-ship-valid);
-    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid white;
+    background-color: var(--element-bg);
     backdrop-filter: blur(20px);
-    color: var(--mark-ship-valid);
+    color: white;
     cursor: pointer;
     transition: all 0.3s;
 }
 
+#inventoryView .items .item .options button.positive {
+    border: 1px solid var(--mark-ship-valid);
+    color: var(--mark-ship-valid);
+}
+
 #inventoryView .items .item .options button:hover {
+    color: black;
+    background-color: white;
+}
+
+#inventoryView .items .item .options button.positive:hover {
     color: black;
     background-color: var(--mark-ship-valid);
 }
@@ -943,7 +955,7 @@ nav div {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
     border: 1px solid white;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: var(--element-bg);
     backdrop-filter: blur(20px);
     color: white;
     cursor: pointer;
@@ -968,6 +980,15 @@ nav div {
 #inventoryView .items .item:hover .options  {
     opacity: 1;
     pointer-events: initial;
+}
+
+/* Drop rates view */
+#dropRatesView .main #dropRates {
+    text-align: left;
+}
+
+#dropRatesView .main {
+    max-width: 40rem;
 }
 
 /* News modal */

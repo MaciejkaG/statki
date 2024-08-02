@@ -127,6 +127,9 @@
             "Reset theme": "Reset theme",
             "Reset name style": "Reset name style",
 
+            "Drop rates": "Drop rates",
+            "Chances dont matter if you own all unique items of a certain category In this case the algorithm chooses the first category under the one picked that you can (still) get items from": "Chances don't matter if you own all unique items of a certain category. In this case the algorithm chooses the first category under the one picked that you can (still) get items from.",
+
             "You receive:": "You receive:",
             "You received a gift": "You receive a gift!",
 
