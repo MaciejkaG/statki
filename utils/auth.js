@@ -468,20 +468,23 @@ export class MailAuth {
                         return newItem;
                     });
 
+                    // Iterate each box from the shop table
                     for (let i = 0; i < items.length; i++) {
-                        const item = items[i];
-                        
-                        let chancesSum = 0;
-                        for (let j = 0; j < item.drop_rates.length; j++) {
-                            const itemCategory = item.drop_rates[j];
-                            
-                            const initChance = itemCategory.chance;
-                            
-                            itemCategory.chance -= chancesSum;
-                            itemCategory.chance *= 100;
+                        // Ensure the drop rates of each item category are sorted in ascending order
+                        items[i].drop_rates.sort((a, b) => a.chance - b.chance);
 
-                            chancesSum += initChance;
-                        }
+                        // Declare the drop chance of the previous item (but 0 for now)
+                        let previousChance = 0;
+                        items[i].drop_rates = items[i].drop_rates.map(item => {
+                            // Calculate the chance based on the chance of the previous item and multiply by 100 to turn a fraction into percentage + floor the result to avoid repeating decimals
+                            const chance = Math.floor((item.chance - previousChance) * 100);
+                            // Set previousChance to the current chance for the next category
+                            previousChance = item.chance;
+                            return {
+                                category: item.category,
+                                chance
+                            };
+                        });
                     }
 
                     resolve(items);
