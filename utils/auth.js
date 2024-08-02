@@ -567,48 +567,73 @@ export class MailAuth {
             conn.query(query, [userId, lootboxId, userId], async (error, response) => {
                 if (error) reject(error);
                 else if (response[0].length > 0) {
-                    let allowedLootCategories;
+                    // let allowedLootCategories;
+                    // try {
+                    //     allowedLootCategories = JSON.parse(response[0][0].item_data).lootCategories;
+                    //     if (allowedLootCategories.constructor !== Array) {
+                    //         throw new Error(); // I don't need to include a message as this error is going to be handled anyway.
+                    //     }
+                    // } catch (err) {
+                    //     resolve(false);
+                    //     return;
+                    // }
+
+                    // response[1] = response[1].filter(item => allowedLootCategories.includes(item.category));
+
+                    // We first shuffle all the possible items.
+                    shuffle(response[1]);
+
+                    // Then we get the box's possible loot categories (along with drop chances per category)
+                    let loot;
                     try {
-                        allowedLootCategories = JSON.parse(response[0][0].item_data).lootCategories;
-                        if (allowedLootCategories.constructor !== Array) {
-                            throw new Error(); // I don't need to include a message as this error is going to be handled anyway.
+                        loot = JSON.parse(response[0][0].item_data).loot;
+                        if (loot.constructor !== Array) {
+                            throw new Error(); // We don't need to include a message as this error is going to be handled anyway.
                         }
                     } catch (err) {
                         resolve(false);
                         return;
                     }
 
-                    response[1] = response[1].filter(item => allowedLootCategories.includes(item.category));
-
-                    shuffle(response[1]);
-
                     const getDrop = () => {
+                        // Sort the possible item categories by drop chance in an ascending order
+                        loot.sort((a, b) => a.chance - b.chance);
+
                         const randomNumber = Math.random();
 
-                        let nameStyleIndex = response[1].findIndex(item => item.category === 'name_style');
-                        let themeIndex = response[1].findIndex(item => item.category === 'theme_pack');
+                        // Iterate item categories that are allowed to drop from the box. (We are iterating from the least possible drops, because we sorted that array earlier)
+                        for (const itemType of loot) {
+                            // Pick the first item of the type and get it's index.
+                            // Even though it's the first item from the top, the response[1] array (containing possible items) has been shuffled previously.
+                            let foundItem = response[1].findIndex(shopItem => shopItem.category === itemType.category);
 
-                        if (randomNumber < 0.1 && nameStyleIndex !== -1) {
-                            return nameStyleIndex;
-                        } else if (randomNumber < 0.2 && themeIndex !== -1) {
-                            return themeIndex;
-                        } else {
-                            return response[1].findIndex(item => item.category === 'xp_boost');
+                            // If randomNumber is smaller than item.chance - which is the drop chance of an item from the box - and a random item from this category has been found in unowned/repeatable items.
+                            if (randomNumber < itemType.chance && foundItem !== -1) {
+                                // Return the found item's index
+                                return foundItem;
+                            }
                         }
+
+                        // If after iterating all the possible item categories, the function still hasn't returned for some reason, return an XP Boost.
+                        return response[1].findIndex(item => item.category === 'xp_boost');
                     }
 
+                    // Define a query: Delete the lootbox's record and insert the dropped item into the user's inventory instead.
                     query = `
                     DELETE FROM inventory WHERE inventory_item_id = ?;
                     INSERT INTO inventory(item_id, user_id) VALUES (?, ?);
                     `;
 
+                    // Pick a random item.
                     const drop = getDrop();
 
+                    // Execute the query.
                     conn.query(query, [lootboxId, response[1][drop].item_id, userId], async (error) => {
                         if (error) reject(error);
                         else {
                             conn.end();
 
+                            // Parse the JSON data contained in a LONGTEXT as a JSON object and resolve the promise.
                             delete response[1][drop].item_id;
                             resolve({ ...response[1][drop], item_data: JSON.parse(response[1][drop].item_data) });
                         }
