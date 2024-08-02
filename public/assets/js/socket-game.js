@@ -220,9 +220,9 @@ var updateTimer = setInterval(() => {
     }
 }, 250);
 
-socket.on("game finished", (winnerIdx, oppName) => {
+socket.on("game finished", (winnerIdx, oppName, oppNameStyle) => {
     socket.disconnect();
-    $("#opponent").html(`Vs. <span class="important">${oppName}</span>`);
+    $("#opponent").html(`Vs. <span class="important username" style="${oppNameStyle ? 'background: ' + oppNameStyle : ''}">${oppName}</span>`);
 
     if (winnerIdx === playerIdx) {
         $("#state").html(locale["Victory"]);
@@ -272,6 +272,18 @@ socket.on('turn update', (turnData) => {
         myTurn = turnData.turn === playerIdx;
         turnData.turn === playerIdx ? $("#whosTurn").html(window.locale["Your turn"]) : $("#whosTurn").html(window.locale["Opponents turn"]);
         $(".boardSwitch").css("opacity", 1);
+
+        if (turnData.turn === playerIdx) {
+            Toastify({
+                text: window.locale['Your turn'],
+                duration: 5000,
+                newWindow: true,
+                gravity: "bottom",
+                position: "right",
+                stopOnFocus: true,
+                className: "bshipstoast",
+            }).showToast();
+        }
     }
 
     timerDestination = turnData.timerToUTC;

@@ -1132,8 +1132,11 @@ io.on('connection', async (socket) => {
                             let hostNickname = hostSocket.session.nickname;
                             let guestNickname = guestSocket.session.nickname;
 
-                            hostSocket.emit("game finished", !enemyIdx ? 1 : 0, guestNickname);
-                            guestSocket.emit("game finished", !enemyIdx ? 1 : 0, hostNickname);
+                            let hostNameStyle = await auth.getNameStyle(hostSocket.session.userId);
+                            let guestNameStyle = await auth.getNameStyle(guestSocket.session.userId);
+
+                            hostSocket.emit("game finished", !enemyIdx ? 1 : 0, guestNickname, guestNameStyle);
+                            guestSocket.emit("game finished", !enemyIdx ? 1 : 0, hostNickname, hostNameStyle);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
                             auth.saveMatch(playerGame.id, (new Date).getTime() / 1000 - playerGame.data.startTs, "pvp", hostSocket.session.userId, guestSocket.session.userId, playerGame.data.boards, enemyIdx ? 1 : 0);

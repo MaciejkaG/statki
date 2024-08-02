@@ -52,6 +52,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    box-shadow: none;
 }
 
 nav {
@@ -163,6 +164,10 @@ nav div {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+}
+
+#pvpCreateView .modes div h1 {
+    margin-top: 0;
 }
 
 #pvpCreateView input, #pvpCreateView button {
@@ -288,7 +293,8 @@ nav div {
 
 #xpbooststatus {
     display: none;
-    color: var(--mark-ship-valid)
+    color: var(--mark-ship-valid);
+    user-select: none;
 }
 
 #profileView .progress-container {

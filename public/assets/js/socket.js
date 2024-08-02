@@ -106,8 +106,17 @@ socket.emit("my profile", (profile) => {
 
     $('.nickname.username').css('background', profile.profile.nameStyle);
 
-    if (profile.profile.xp_boost_active) {
+    if (profile.profile.xp_boost_until) {
         $('#xpbooststatus').css('display', 'initial');
+
+        options = { hour: '2-digit', minute: '2-digit', time: 'numeric', weekday: 'long', month: 'long', day: 'numeric' };
+
+        tippy('#xpbooststatus', {
+            theme: 'dark',
+            followCursor: 'horizontal',
+            animation: 'scale-subtle',
+            content: `${window.locale['Until:']} ${new Date(profile.profile.xp_boost_until).toLocaleDateString(undefined, options) }`
+        });
     }
 
     tippy('#levelcontainer', {
