@@ -655,7 +655,7 @@ nav div {
 
 #shopView .items .item .overlay .overlayBase,
 .lootboxModal .item .overlayBase {
-    flex: 1;
+    flex: 6;
     text-align: left;
     display: flex;
     flex-direction: column;
@@ -680,6 +680,10 @@ nav div {
     margin: 0;
     font-size: 0.7rem;
     text-wrap: nowrap;
+}
+
+#shopView .items .item .overlay .overlayBase:last-child {
+    flex: 1;
 }
 
 #shopView .items .item .overlay .overlayBase:last-child button {
