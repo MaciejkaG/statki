@@ -1259,7 +1259,8 @@ io.on('connection', async (socket) => {
                             socket.emit("game finished", 0, guestNickname);
 
                             const playerStats = playerGame.data.boards[0].stats;
-                            let xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty);
+                            const opponentStats = playerGame.data.boards[1].stats;
+                            let xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, opponentStats.sunkShips, playerGame.data.difficulty);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
                             xp = await auth.addXP(session.userId, xp);
@@ -1319,7 +1320,8 @@ io.on('connection', async (socket) => {
                             socket.emit("game finished", 1, guestNickname);
 
                             const playerStats = playerGame.data.boards[0].stats;
-                            let xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, playerGame.data.difficulty);
+                            const opponentStats = playerGame.data.boards[1].stats;
+                            let xp = calculateXP(playerStats.shots, playerStats.hits / playerStats.shots * 100, playerStats.sunkShips, opponentStats.sunkShips, playerGame.data.difficulty);
 
                             playerGame = await GInfo.getPlayerGameData(socket);
                             xp = await auth.addXP(session.userId, xp);
@@ -1460,26 +1462,37 @@ function checkFlag(key) {
     }
 }
 
-function calculateXP(shots, accuracy, shipsSunk, difficulty) {
+function calculateXP(accuracy, shipsSunk, shipsLost, difficulty) {
     let difficultyMultiplier;
 
     switch (difficulty) {
-        case 0: // simple
+        case 0:
+            difficultyMultiplier = 1;
+            break;
+        case 1:
             difficultyMultiplier = 2;
             break;
-
-        case 1: // smart
-            difficultyMultiplier = 4;
+        case 2:
+            difficultyMultiplier = 20;
             break;
-
-        case 2: // overkill
-            difficultyMultiplier = 40;
-            break;
-    
         default:
-            return 0;
-            break;
+            difficultyMultiplier = 1; // Default to 1 if an invalid difficulty is passed
     }
 
-    return Math.floor(shots / 2 * accuracy * shipsSunk * 1.5 * difficultyMultiplier / 100);
+    // Calculate base XP
+    let baseXP = (shipsSunk * 80) - (shipsLost * 40);
+
+    // Calculate accuracy bonus
+    let accuracyBonus = (accuracy / 100) * 80; // Adjusted to fit the average target
+
+    // Total XP before applying the difficulty multiplier
+    let totalXP = (baseXP + accuracyBonus) / 1.5;
+
+    // Apply difficulty multiplier
+    totalXP *= difficultyMultiplier;
+
+    // Round down to the nearest integer
+    totalXP = Math.floor(totalXP);
+
+    return totalXP;
 }

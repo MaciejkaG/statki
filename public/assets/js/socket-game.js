@@ -161,6 +161,7 @@ socket.on("shot missed", (victimIdx, posX, posY) => {
 });
 
 socket.on("ship sunk", (victimIdx, ship) => {
+    let multips;
     switch (ship.rot) {
         case 0:
             multips = [1, 0];
@@ -179,18 +180,20 @@ socket.on("ship sunk", (victimIdx, ship) => {
             break;
     }
 
+    console.log(ship.rot);
+
     let l = ship.type + 1;
     if (victimIdx === playerIdx) {
         for (let i = 0; i < l; i++) {
             setTimeout(() => {
                 bsc.setField(ship.posX + multips[0] * i, ship.posY + multips[1] * i, "sunken");
-            }, i * 150);
+            }, i * 150 + 50);
         }
     } else {
         for (let i = 0; i < l; i++) {
             setTimeout(() => {
                 bsc.setFieldEnemy(ship.posX + multips[0] * i, ship.posY + multips[1] * i, "sunken");
-            }, i * 150);
+            }, i * 150 + 50);
         }
 
         shipsSunk[ship.type]++;
@@ -276,7 +279,7 @@ socket.on('turn update', (turnData) => {
         if (turnData.turn === playerIdx) {
             Toastify({
                 text: window.locale['Your turn'],
-                duration: 5000,
+                duration: 2000,
                 newWindow: true,
                 gravity: "bottom",
                 position: "right",

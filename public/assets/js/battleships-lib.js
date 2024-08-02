@@ -22,7 +22,6 @@ class Battleships {
     }
 
     getField(x, y) {
-        console.log(x, y);
         if (0 <= x && x < this.boardSize && 0 <= y && y <= this.boardSize) {
             return $(`#board .row:nth-child(${y + 1}) .field:nth-child(${x + 1})`);
         } else {
@@ -31,7 +30,6 @@ class Battleships {
     }
 
     getFieldSecondary(x, y) {
-        console.log(x, y);
         if (0 <= x && x < this.boardSize && 0 <= y && y < this.boardSize) {
             return $(`#secondaryBoard .row:nth-child(${y + 1}) .field:nth-child(${x + 1})`);
         } else {
