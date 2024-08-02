@@ -128,6 +128,7 @@
             "Reset name style": "Reset name style",
 
             "You receive:": "You receive:",
+            "You received a gift": "You receive a gift!",
 
             "Theme pack": "Theme pack",
             "Name style": "Name style",
@@ -154,6 +155,9 @@
 
             "My profile": "My profile",
             "Inventory": "Inventory",
+
+            "Thanks for playing Statki!": "Thanks for playing Statki!",
+            "Thanks for playing Statki and reaching level 2!": "Thanks for playing Statki and reaching level 2!",
 
             "These are masts, a currency you can earn by leveling up (by playing Vs AI games) Click on the masts icon to open the shop!": "These are masts, a currency you can earn by leveling up (by playing Vs. AI games). Click on the masts icon to open the shop!"
         }

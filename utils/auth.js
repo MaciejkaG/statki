@@ -392,6 +392,42 @@ export class MailAuth {
         });
     }
 
+     giftItem(userId, itemId) {
+        return new Promise(async (resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            conn.query('INSERT INTO inventory(item_id, user_id) VALUES (?, ?);', [itemId, userId], async (error) => {
+                if (error) reject(error);
+                else {
+                    resolve(true);
+
+                    await this.redis.set(`giftId:${userId}`, itemId);
+                };
+            });
+        });
+    }
+
+    getGiftNotificationItem(userId) {
+        return new Promise(async (resolve, reject) => {
+            const itemId = await this.redis.get(`giftId:${userId}`);
+
+            if (itemId == null) {
+                resolve(null);
+                return;
+            }
+
+            await this.redis.del(`giftId:${userId}`);
+
+            const conn = mysql.createConnection(this.mysqlOptions);
+            conn.query('SELECT item_id, name, description, category, item_data FROM shop WHERE item_id = ?;', [itemId], async (error, response) => {
+                if (error) reject(error);
+                else {
+                    resolve({ ...response[0], item_data: JSON.parse(response[0].item_data) });
+                    return;
+                };
+            });
+        });
+    }
+
     getInventory(userId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
@@ -526,7 +562,7 @@ export class MailAuth {
 
             let query = `
             SELECT s.item_data FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.user_id = ? AND i.inventory_item_id = ? AND s.category = 'lootbox';
-            SELECT s.item_id, name, description, category, item_data FROM shop s LEFT JOIN inventory i ON s.item_id = i.item_id AND i.user_id = ? WHERE (i.item_id IS NULL OR s.limit_to_one = 0) AND s.lootbox_droppable = 1 ORDER BY UUID();
+            SELECT s.item_id, s.name, s.description, s.category, s.item_data FROM shop s LEFT JOIN inventory i ON s.item_id = i.item_id AND i.user_id = ? WHERE (i.item_id IS NULL OR s.limit_to_one = 0) AND s.lootbox_droppable = 1 ORDER BY UUID();
             `;
             conn.query(query, [userId, lootboxId, userId], async (error, response) => {
                 if (error) reject(error);
@@ -740,6 +776,11 @@ export class MailAuth {
                     if (level % 25 === 0)      mastsEarned += 5000;
                     else if (level % 5 === 0) mastsEarned += 1500;
                     else                       mastsEarned += 500;
+
+                    if (level === 2) { // If player has leveled up to level 2, send them a welcome gift :D
+                        this.giftItem(userId, 11);
+                        // 11 is the ID of a Three-masted Statbox in the shop.
+                    }
                 }
 
                 conn.query('UPDATE accounts SET xp = ?, level = ?, masts = masts + ? WHERE user_id = ?;', [xp, level, mastsEarned, userId], (err, results) => {

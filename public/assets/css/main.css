@@ -1063,9 +1063,9 @@ nav div {
     display: none;
 }
 
-/* Lootbox opening modal */
+/* Lootbox/gift opening modal */
 
-.lootboxOpenContainer {
+.newItemContainer {
     position: fixed;
     width: 100%;
     height: 100%;
@@ -1086,15 +1086,16 @@ nav div {
     transition: opacity 0.3s;
 }
 
-.lootboxOpenContainer .lootboxModal {
+.newItemContainer .lootboxModal {
     max-width: 90%;
     background-color: var(--element-bg-alt);
     border: solid 1px white;
-    width: 25rem;
+    width: 30rem;
 
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
 
     padding: 1.5rem 2rem;
     box-sizing: border-box;
@@ -1105,25 +1106,30 @@ nav div {
     transition: transform 0.3s;
 }
 
-.lootboxOpenContainer .lootboxModal h1 {
+.newItemContainer .lootboxModal h1 {
+    margin: 0;
+    margin-bottom: 1.5rem;
+}
+
+.newItemContainer .lootboxModal p {
     margin: 0;
     margin-bottom: 2rem;
 }
 
-.lootboxOpenContainer.active {
+.newItemContainer.active {
     pointer-events: initial;
     opacity: 1;
 }
 
-.lootboxOpenContainer.active .lootboxModal {
+.newItemContainer.active .lootboxModal {
     transform: translateY(0%);
 }
 
-.lootboxOpenContainer.unactive .lootboxModal {
+.newItemContainer.unactive .lootboxModal {
     transform: translateY(-10%);
 }
 
-.lootboxOpenContainer.unactive {
+.newItemContainer.unactive {
     pointer-events: none;
     opacity: 0;
 }

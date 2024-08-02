@@ -939,6 +939,14 @@ io.on('connection', async (socket) => {
                 io.to(socket.rooms[1]).emit("player left");
             }
         });
+
+        let giftItem = await auth.getGiftNotificationItem(session.userId);
+
+        if (giftItem) {
+            const locale = new Lang(session.langs);
+
+            socket.emit('gift received', giftItem, locale.t('menu.General.Thanks for playing Statki and reaching level 2!'));
+        }
     } else if (session.nickname && playerGameData && ['pvp', 'pve'].includes(playerGameData.data.type)) { // User is either playing in PvP or PvE
         socket.on('my theme', (callback) => {
             auth.getTheme(session.userId).then(themeBackground => {
@@ -1473,20 +1481,20 @@ function calculateXP(accuracy, shipsSunk, shipsLost, difficulty) {
             difficultyMultiplier = 2;
             break;
         case 2:
-            difficultyMultiplier = 20;
+            difficultyMultiplier = 10;
             break;
         default:
             difficultyMultiplier = 1; // Default to 1 if an invalid difficulty is passed
     }
 
     // Calculate base XP
-    let baseXP = (shipsSunk * 80) - (shipsLost * 40);
+    let baseXP = (shipsSunk) / (shipsLost / 2) * 20;
 
     // Calculate accuracy bonus
-    let accuracyBonus = (accuracy / 100) * 80; // Adjusted to fit the average target
+    let accuracyBonus = accuracy * 3; // Adjusted to fit the average target
 
     // Total XP before applying the difficulty multiplier
-    let totalXP = (baseXP + accuracyBonus) / 1.5;
+    let totalXP = (baseXP + accuracyBonus);
 
     // Apply difficulty multiplier
     totalXP *= difficultyMultiplier;

@@ -12,7 +12,7 @@
     </div>
 </div>
 
-<div class="lootboxOpenContainer" id="lootboxOpenContainer">
+<div class="newItemContainer" id="lootboxOpenContainer">
     <div class="lootboxModal">
         <h1>{{ t 'menu.Inventory.You receive:' }}</h1>
 
@@ -23,6 +23,24 @@
                     <h2 id="droppedItemType"></h2>
                     <h1 id="droppedItemName"></h1>
                     <p id="droppedItemDescription"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="newItemContainer" id="giftContainer">
+    <div class="lootboxModal">
+        <h1>{{ t 'menu.Inventory.You received a gift' }}</h1>
+        <p id="giftMessage"></p>
+
+        <div class="item" id="giftItem" style="--gradient-colors: ;--background:;">
+            <div class="background"></div>
+            <div class="overlay">
+                <div class="overlayBase">
+                    <h2 id="giftItemType"></h2>
+                    <h1 id="giftItemName"></h1>
+                    <p id="giftItemDescription"></p>
                 </div>
             </div>
         </div>

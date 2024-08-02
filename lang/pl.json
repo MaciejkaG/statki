@@ -129,6 +129,7 @@
             "Reset name style": "Zresetuj styl nazwy",
 
             "You receive:": "Otrzymujesz:",
+            "You received a gift": "Otrzymujesz prezent!",
 
             "Theme pack": "Paczka motywu",
             "Name style": "Styl nazwy",
@@ -155,6 +156,9 @@
 
             "My profile": "Mój profil",
             "Inventory": "Ekwipunek",
+
+            "Thanks for playing Statki!": "Dzięki za granie w Statki!",
+            "Thanks for playing Statki and reaching level 2!": "Dzięki za granie w Statki i osiąganie 2 poziomu!",
 
             "These are masts, a currency you can earn by leveling up (by playing Vs AI games) Click on the masts icon to open the shop!": "To są maszty, waluta zdobywana poprzez zdobywanie poziomów (przez granie w trybie Vs. AI). Kliknij ikonę masztów aby otworzyć sklep!"
         }

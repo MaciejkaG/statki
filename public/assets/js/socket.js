@@ -513,6 +513,41 @@ function openLootbox(lootboxId) {
     });
 }
 
+socket.on('gift received', (giftData, giftMessage) => {
+    $('#giftItem').css({
+        '--gradient-colors': giftData.item_data.gradientColors,
+        '--background': giftData.item_data.background
+    });
+
+    let itemType;
+    switch (giftData.category) {
+        case 'theme_pack':
+            itemType = window.locale['Theme pack'];
+            break;
+
+        case 'name_style':
+            itemType = window.locale['Name style'];
+            break;
+
+        case 'xp_boost':
+            itemType = window.locale['XP boost'];
+            break;
+
+        case 'lootbox':
+            itemType = 'Statbox';
+            break;
+    }
+
+    $('#giftItemType').html(itemType);
+    $('#giftItemName').html(giftData.name);
+    $('#giftItemDescription').html(giftData.description);
+
+    $('#giftMessage').html(giftMessage);
+
+    openGiftModal();
+    reloadInventory();
+});
+
 function useXPBoost(itemId) {
     lockUI(true);
     socket.emit('use xp boost', itemId, (response) => {
@@ -534,6 +569,8 @@ function useXPBoost(itemId) {
     });
 }
 
+// Nope. I am not proud of the following 37 lines of repeating code, but they definitely work!
+
 document.getElementById('newsModalContainer').addEventListener('click', function (event) {
     if (event.target === event.currentTarget) {
         closeNewsModal();
@@ -552,6 +589,24 @@ function openNewsModal() {
 document.getElementById('lootboxOpenContainer').addEventListener('click', function (event) {
     if (event.target === event.currentTarget) {
         closeLootboxModal();
+    }
+});
+
+function closeGiftModal() {
+    $('#giftContainer').addClass('unactive');
+    setTimeout(() => {
+        $('#giftContainer').removeClass('active unactive');
+    }, 300);
+}
+
+function openGiftModal() {
+    $('#giftContainer').removeClass('unactive');
+    $('#giftContainer').addClass('active');
+}
+
+document.getElementById('giftContainer').addEventListener('click', function (event) {
+    if (event.target === event.currentTarget) {
+        closeGiftModal();
     }
 });
 
