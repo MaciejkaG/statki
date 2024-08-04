@@ -256,7 +256,7 @@ export class MailAuth {
             const conn = mysql.createConnection(this.mysqlOptions);
             const query = `
             SELECT a.nickname, a.viewed_news, a.xp, a.level, a.xp_boost_until, a.masts, a.account_creation, s.item_data FROM accounts a LEFT JOIN shop s ON s.item_id = a.active_name_style_item_id WHERE user_id = ?;
-            SELECT ROUND((AVG(s.won)) * 100) AS winrate, COUNT(s.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(m.date) = YEAR(NOW()) AND MONTH(m.date) = MONTH(NOW())) THEN m.match_id END) AS monthly_matches FROM accounts a JOIN statistics s ON s.user_id = a.user_id JOIN matches m ON m.match_id = s.match_id WHERE a.user_id = ?;
+            SELECT ROUND((AVG(CASE WHEN (YEAR(m.date) = YEAR(NOW()) AND MONTH(m.date) = MONTH(NOW())) THEN s.won END)) * 100) AS winrate_month, COUNT(s.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(m.date) = YEAR(NOW()) AND MONTH(m.date) = MONTH(NOW())) THEN m.match_id END) AS monthly_matches FROM accounts a JOIN statistics s ON s.user_id = a.user_id JOIN matches m ON m.match_id = s.match_id WHERE a.user_id = ?;
             SELECT statistics.match_id, accounts.nickname AS opponent, shop.item_data AS opponent_name_style, matches.match_type, statistics.won, matches.ai_type, matches.xp, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) LEFT JOIN shop ON accounts.active_name_style_item_id = shop.item_id WHERE statistics.user_id = ? ORDER BY matches.date DESC LIMIT 10;
             `;
             conn.query(query, [userId, userId, userId], async (error, response) => {
