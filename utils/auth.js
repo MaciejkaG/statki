@@ -842,10 +842,11 @@ export class MailAuth {
                     xp -= nextLevelXP;
                     nextLevelXP = getXPForLevel(level + 1);
 
-                    // Levelup rewards in masts (ingame currency)
-                    if (level % 25 === 0)      mastsEarned += 5000;
-                    else if (level % 5 === 0) mastsEarned += 1500;
-                    else                       mastsEarned += 500;
+                    // Levelup rewards in masts (ingame currency) or Statboxes
+                    if (level % 25 === 0)         mastsEarned += 5000;
+                    else if (level % 10 === 0)    this.giftItem(userId, 11); // 11 is the ID of a Three-masted Statbox in the shop.
+                    else if (level % 5 === 0)     mastsEarned += 1500;
+                    else                          mastsEarned += 500;
 
                     if (level === 2) { // If player has leveled up to level 2, send them a welcome gift :D
                         this.giftItem(userId, 11);
