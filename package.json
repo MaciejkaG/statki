@@ -1,6 +1,6 @@
 {
   "name": "statki",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "description": "Backend do gry w statki",
   "main": "index.js",
   "type": "module",
