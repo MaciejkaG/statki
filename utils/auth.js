@@ -255,7 +255,7 @@ export class MailAuth {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             const query = `
-            SELECT a.nickname, a.viewed_news, a.xp, a.level, (CASE WHEN a.xp_boost_until > CURRENT_TIMESTAMP() THEN a.xp_boost_until ELSE NULL END), a.masts, a.account_creation, s.item_data FROM accounts a LEFT JOIN shop s ON s.item_id = a.active_name_style_item_id WHERE user_id = ?;
+            SELECT a.nickname, a.viewed_news, a.xp, a.level, (CASE WHEN a.xp_boost_until > CURRENT_TIMESTAMP() THEN a.xp_boost_until ELSE NULL END) AS xp_boost_until, a.masts, a.account_creation, s.item_data FROM accounts a LEFT JOIN shop s ON s.item_id = a.active_name_style_item_id WHERE user_id = ?;
             SELECT ROUND((AVG(CASE WHEN (YEAR(m.date) = YEAR(NOW()) AND MONTH(m.date) = MONTH(NOW())) THEN s.won END)) * 100) AS winrate_month, COUNT(s.match_id) AS alltime_matches, COUNT(CASE WHEN (YEAR(m.date) = YEAR(NOW()) AND MONTH(m.date) = MONTH(NOW())) THEN m.match_id END) AS monthly_matches FROM accounts a JOIN statistics s ON s.user_id = a.user_id JOIN matches m ON m.match_id = s.match_id WHERE a.user_id = ?;
             SELECT statistics.match_id, accounts.nickname AS opponent, shop.item_data AS opponent_name_style, matches.match_type, statistics.won, matches.ai_type, matches.xp, matches.duration, matches.date FROM statistics JOIN matches ON matches.match_id = statistics.match_id JOIN accounts ON accounts.user_id = (CASE WHEN matches.host_id != statistics.user_id THEN matches.host_id ELSE matches.guest_id END) LEFT JOIN shop ON accounts.active_name_style_item_id = shop.item_id WHERE statistics.user_id = ? ORDER BY matches.date DESC LIMIT 10;
             `;
@@ -697,7 +697,7 @@ export class MailAuth {
 
             let query = `
             SELECT s.category, s.item_data FROM inventory i JOIN shop s ON i.item_id = s.item_id WHERE i.inventory_item_id = ? AND s.category = 'xp_boost';
-            SELECT (CASE WHEN a.xp_boost_until > CURRENT_TIMESTAMP() THEN a.xp_boost_until ELSE NULL END) FROM accounts a WHERE user_id = ?;
+            SELECT (CASE WHEN a.xp_boost_until > CURRENT_TIMESTAMP() THEN a.xp_boost_until ELSE NULL END) AS xp_boost_until FROM accounts a WHERE user_id = ?;
             `;
             conn.query(query, [itemId, userId], async (error, response) => {
                 if (error) reject(error);
@@ -721,7 +721,7 @@ export class MailAuth {
                     query = `
                     DELETE FROM inventory WHERE inventory_item_id = ?;
                     UPDATE accounts SET xp_boost_until = DATE_ADD(NOW(), INTERVAL ${interval}) WHERE user_id = ?;
-                    `
+                    `;
 
                     conn.query(query, [itemId, userId], async (error) => {
                         if (error) reject(error);
@@ -828,7 +828,6 @@ export class MailAuth {
                 let { xp, level, xp_boost_active } = results[0];
 
                 if (xp_boost_active) {
-                    console.log('a');
                     amount *= 2;
                 }
 
