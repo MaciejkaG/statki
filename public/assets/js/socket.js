@@ -546,6 +546,7 @@ function useXPBoost(itemId) {
         if (response) {
             reloadInventory();
             $('#xpbooststatus').css('display', 'initial');
+            switchView('profileView');
         } else {
             Toastify({
                 text: window.locale['Operation failed'],
