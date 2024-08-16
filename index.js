@@ -65,7 +65,7 @@ const redis = createClient();
 redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
 
-const prefixes = ["game:*", "timer:*", "loginTimer:*"];
+const prefixes = ["game:*", "timer:*", "loginTimer:*", "codeAuth:*"];
 
 prefixes.forEach(prefix => {
     redis.eval(`for _,k in ipairs(redis.call('keys', '${prefix}')) do redis.call('del', k) end`, 0);
