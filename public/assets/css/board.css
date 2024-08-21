@@ -70,12 +70,12 @@ h1,h2,h3,h4,h5,h6 {
     bottom: 5px;
     left: 5px;
     color: rgb(255, 80, 80);
-    font-size: 9px;
+    font-size: 7px;
     pointer-events: none;
     user-select: none;
     z-index: 999;
-    font-family: "IBM Plex Mono", monospace;
-    font-weight: 400;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 300;
 }
 
 .board {
