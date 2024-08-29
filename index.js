@@ -951,7 +951,7 @@ io.on('connection', async (socket) => {
         if (giftItem) {
             const locale = new Lang(session.langs);
 
-            socket.emit('gift received', giftItem, locale.t('menu.General.Thanks for playing Statki and reaching level 2!'));
+            socket.emit('gift received', giftItem, locale.t('menu.General.Thanks for playing Statki!'));
         }
     } else if (session.nickname && playerGameData && ['pvp', 'pve'].includes(playerGameData.data.type)) { // User is either playing in PvP or PvE
         socket.on('my theme', (callback) => {
