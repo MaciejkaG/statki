@@ -121,7 +121,7 @@ export class GameInfo {
         const availableShips = getShipsAvailable(playerShips);
 
         const boardRender = [];
-        const subtrahents = [[0, 0], [0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [-1, -1], [1, -1], [-1, 1]];
+        const subtrahends = [[0, 0], [0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [-1, -1], [1, -1], [-1, 1]];
 
         for (let i = 0; i < 10; i++) {
             var array = [];
@@ -153,9 +153,9 @@ export class GameInfo {
             }
 
             for (let i = 0; i <= ship.type; i++) {
-                for (let l = 0; l < subtrahents.length; l++) {
-                    const idxX = ship.posX - subtrahents[l][0] + multips[0] * i;
-                    const idxY = ship.posY - subtrahents[l][1] + multips[1] * i;
+                for (let l = 0; l < subtrahends.length; l++) {
+                    const idxX = ship.posX - subtrahends[l][0] + multips[0] * i;
+                    const idxY = ship.posY - subtrahends[l][1] + multips[1] * i;
                     if (!(idxX < 0 || idxX > 9 || idxY < 0 || idxY > 9)) {
                         boardRender[idxX][idxY] = true;
                     }
@@ -211,9 +211,9 @@ export class GameInfo {
                 }
 
                 for (let k = 0; k <= i; k++) {
-                    for (let l = 0; l < subtrahents.length; l++) {
-                        const idxX = rPos.posX - subtrahents[l][0] + multips[0] * k;
-                        const idxY = rPos.posY - subtrahents[l][1] + multips[1] * k;
+                    for (let l = 0; l < subtrahends.length; l++) {
+                        const idxX = rPos.posX - subtrahends[l][0] + multips[0] * k;
+                        const idxY = rPos.posY - subtrahends[l][1] + multips[1] * k;
                         if (!(idxX < 0 || idxX > 9 || idxY < 0 || idxY > 9)) {
                             boardRender[idxX][idxY] = true;
                         }
@@ -252,7 +252,7 @@ export class GameInfo {
 
         let playerBoard = await this.redis.json.get(key, { path: `.boards[${enemyIdx}]` });
 
-        let shot = playerBoard.shots.find((shot) => shot.posX === posX && shot.posY === posY);
+        let shot = playerBoard.shots.some((shot) => shot.posX === posX && shot.posY === posY);
         if (shot) {
             return { status: -1 }
         }
@@ -305,7 +305,7 @@ export class GameInfo {
                 if (ship.hits.includes(false) && ship.hits.includes(true)) {
                     // Iterate through ships
                     for (let fieldIdx = 0; fieldIdx < ship.hits.length; fieldIdx++) {
-                        // If the ship we're currently iterating has been hit...
+                        // If the field we're currently iterating has been hit...
                         if (ship.hits[fieldIdx]) {
                             let multips;
 
@@ -331,20 +331,20 @@ export class GameInfo {
                             let hitFieldX = clamp(ship.posX + multips[0] * fieldIdx, 0, 9);
                             let hitFieldY = clamp(ship.posY + multips[1] * fieldIdx, 0, 9);
 
-                            // subtrahents array contains sets of difference factors from the hit field.
+                            // subtrahends array contains sets of difference factors from the hit field.
                             // We will use them to target fields around the field that was already hit
                             // They are similar to the ones used in validateShipPosition(), but shorter
                             // This is because we do not want to target fields that touch corners with our hit field, but the ones that touch with sides
-                            let subtrahents = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+                            let subtrahends = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 
                             // Shuffle them, so they are later iterated in random order
-                            shuffle(subtrahents);
+                            shuffle(subtrahends);
 
-                            // Iterate through all subtrahents
-                            for (let j = 0; j < subtrahents.length; j++) {
-                                const subs = subtrahents[j];
+                            // Iterate through all subtrahends
+                            for (let j = 0; j < subtrahends.length; j++) {
+                                const subs = subtrahends[j];
 
-                                // Calculate the target field based on the current set of subtrahents, then clamp it so it doesn't exceed board's boundaries
+                                // Calculate the target field based on the current set of subtrahends, then clamp it so it doesn't exceed board's boundaries
                                 let targetX = clamp(hitFieldX - subs[0], 0, 9);
                                 let targetY = clamp(hitFieldY - subs[1], 0, 9);
 
@@ -358,8 +358,8 @@ export class GameInfo {
                                     }
                                 }
 
-                                let shot = boards[0].shots.find((shot) => shot.posX === targetX && shot.posY === targetY);
-                                // If shot == null then the field with coordinates posX and posY was not shot at yet
+                                let shot = boards[0].shots.some((shot) => shot.posX === targetX && shot.posY === targetY);
+                                // If shot == false then the field with coordinates posX and posY was not shot at yet
 
                                 if (!shot) {
                                     // If the field has not been shot yet and it seems possible, try it!
@@ -380,7 +380,7 @@ export class GameInfo {
             while (!foundAppropriateTarget) { // As long as no appropriate target was found
                 [posX, posY] = [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)]; // Randomise another set of coordinates
 
-                let shot = boards[0].shots.find((shot) => shot.posX === posX && shot.posY === posY);
+                let shot = boards[0].shots.some((shot) => shot.posX === posX && shot.posY === posY);
                 // If shot == null then the field with coordinates posX and posY was not shot at yet
 
                 if (!shot) {
@@ -613,15 +613,15 @@ export function validateShipPosition(ships, type, posX, posY, rot) { // This fun
             return false; // Return false if the ship's field exceeds the boards bounderies
         }
 
-        // Set up subtrahents that we will use to calculate fields around the ship and check if they do not contain another ship to prevent ships from being placed next to each other
-        let subtrahents = [[0, 0], [0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [-1, -1], [1, -1], [-1, 1]];
+        // Set up subtrahends that we will use to calculate fields around the ship and check if they do not contain another ship to prevent ships from being placed next to each other
+        let subtrahends = [[0, 0], [0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [-1, -1], [1, -1], [-1, 1]];
 
-        // Iterate through each subtrahents set
-        for (let y = 0; y < subtrahents.length; y++) {
+        // Iterate through each subtrahends set
+        for (let y = 0; y < subtrahends.length; y++) {
 
             // Calculate the field's indexes
-            const idxX = posX - subtrahents[y][0] + multips[0] * x;
-            const idxY = posY - subtrahents[y][1] + multips[1] * x;
+            const idxX = posX - subtrahends[y][0] + multips[0] * x;
+            const idxY = posY - subtrahends[y][1] + multips[1] * x;
 
             // If the field's index does not exceed the boards boundaries, check whether it's set as true in the boardRender
             if (!(idxX < 0 || idxX > 9 || idxY < 0 || idxY > 9) && boardRender[idxX][idxY]) {
