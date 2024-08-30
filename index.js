@@ -1484,7 +1484,7 @@ function calculateXP(accuracy, shipsSunk, shipsLost, difficulty) {
             difficultyMultiplier = 1;
             break;
         case 1:
-            difficultyMultiplier = 2;
+            difficultyMultiplier = 3;
             break;
         case 2:
             difficultyMultiplier = 5;
