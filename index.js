@@ -425,6 +425,7 @@ app.post('/api/auth', async (req, res) => {
 
 app.post('/api/nickname', (req, res) => {
     if (loginState(req) == 2 && req.body.nickname != null && 3 <= req.body.nickname.length && req.body.nickname.length <= 16) {
+        req.body.nickname = escapeHTML(req.body.nickname); // Escape HTML from the nickname
         req.session.nickname = req.body.nickname;
         req.session.activeGame = null;
         auth.setNickname(req.session.userId, req.body.nickname).then(() => {
@@ -1509,4 +1510,13 @@ function calculateXP(accuracy, shipsSunk, shipsLost, difficulty) {
     totalXP = Math.floor(totalXP);
 
     return totalXP;
+}
+
+function escapeHTML(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
