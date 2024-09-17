@@ -1,8 +1,20 @@
-<div class="newsModalContainer" id="newsModalContainer">
-    <div class="newsModal">
-        <h2>{{ t 'menu.General.News and changes' }}</h2>
-        <h1>The 0.11.6 patchnotes</h1>
-        <div class="actualText">
+<section class="social">
+    <div class="collapsed">
+        <span class="el">Społecznościowe</span>
+        <span class="el">Brak nowych powiadomień</span>
+        <span class="el">Znajomi online: <span class="important">1</span></span>
+    </div>
+    <div class="expanded">
+        <h1>{{ t 'menu.Social.Social' }}</h1>
+    </div>
+</section>
+
+<div class="sitecontent">
+    <div class="newsModalContainer" id="newsModalContainer">
+        <div class="newsModal">
+            <h2>{{ t 'menu.General.News and changes' }}</h2>
+            <h1>The 0.11.6 patchnotes</h1>
+            <div class="actualText">
                 <p>This patch was quite simple, I focused on improving user experience and smoothness of the service.</p>
                 <h3>New themes</h3>
                 <p>This patch I've added two new themes to the shop: The dark Enigmatic fade and the noble Pink gold.</p>
@@ -12,241 +24,266 @@
                 <h3>Full change list</h3>
                 <ul>
                     <li>Added multiple new cosmatic items to the shop.</li>
-                    <li>Fixed the bug where a reward every 10 levels (Three-masted Statbox) was congratulating the player on reaching level 2.</li>
+                    <li>Fixed the bug where a reward every 10 levels (Three-masted Statbox) was congratulating the player on
+                        reaching level 2.</li>
                     <li>Increased the Smart difficulty XP multiplier from 2 to 3 (Simple has 1 while Overkill has 5)</li>
                     <li>Minor backend optimisation improvements.</li>
                 </ul>
-        </div>
-    </div>
-</div>
-
-<div class="newItemContainer" id="lootboxOpenContainer">
-    <div class="lootboxModal">
-        <h1>{{ t 'menu.Inventory.You receive:' }}</h1>
-
-        <div class="item" id="droppedItem" style="--gradient-colors: ;--background:;">
-            <div class="background"></div>
-            <div class="overlay">
-                <div class="overlayBase">
-                    <h2 id="droppedItemType"></h2>
-                    <h1 id="droppedItemName"></h1>
-                    <p id="droppedItemDescription"></p>
-                </div>
             </div>
         </div>
     </div>
-</div>
-
-<div class="newItemContainer" id="giftContainer">
-    <div class="lootboxModal">
-        <h1>{{ t 'menu.Inventory.You received a gift' }}</h1>
-        <p id="giftMessage"></p>
-
-        <div class="item" id="giftItem" style="--gradient-colors: ;--background:;">
-            <div class="background"></div>
-            <div class="overlay">
-                <div class="overlayBase">
-                    <h2 id="giftItemType"></h2>
-                    <h1 id="giftItemName"></h1>
-                    <p id="giftItemDescription"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<nav><span onclick="switchView('settingsView')" class="item" style="text-align: left;">{{ t 'menu.navbar.Settings' }}</span><span onclick="switchView('mainMenuView')" class="item" style="text-align: center;">{{ t 'menu.navbar.Main menu' }}</span> <div class="item"><span id="profileButton">{{ t 'menu.navbar.Profile' }}</span><span id="shopButton" onclick="switchView('shopView')"><img src="/assets/img/masts-logo.png" alt="Masts" style="height: 0.9em;"><span id="masts">0</span></span></div></nav>
-<div class="container" id="mainMenuView" data-path="/">
-    <div>
-        <h2>{{ t 'menu.index.Select game mode' }}</h2>
-        <div class="modes">
-            <div onclick="switchView('pvpMenuView')">
-                <h2>{{ t 'menu.index.PvP' }}</h2>
-                <p>{{ t 'menu.index.Play against another player' }}</p>
-            </div>
-            <div onclick="switchView('vsAiView')">
-                <h2>{{ t 'menu.index.Vs AI' }}</h2>
-                <p>{{ t 'menu.index.Play against the computer' }}</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="vsAiView" data-path="/pve">
-    <div>
-        <h2>{{ t 'menu.PvE.Create' }}</h2>
-        <h3>{{ t 'menu.PvE.Choose the difficulty mode' }}</h3>
-        <div class="modes">
-            <div>
-                <form action="#" id="pveCreateForm">
-                    <select name="difficulty" id="pveDifficulty">
-                        <option value="simple">Simple</option>
-                        <option value="smart">Smart</option>
-                        <option value="overkill">Overkill</option>
-                    </select>
-                    <p id="difficultyDescription">
-                        {{ t 'menu.PvE.difficulty.Simple.description' }}
-                    </p>
-                    <input type="submit" value="{{ t 'menu.PvE.Begin' }}">
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="pvpMenuView" data-path="/pvp">
-    <div>
-        <h2>{{ t 'menu.PvP.PvP' }}</h2>
-        <div class="modes">
-            <div id="createGameButton">
-                <h2>{{ t 'menu.PvP.Create' }}</h2>
-                <p>{{ t 'menu.PvP.Create your own room' }}</p>
-            </div>
-            <div onclick="switchView('pvpJoinView')">
-                <h2>{{ t 'menu.PvP.Join' }}</h2>
-                <p>{{ t 'menu.PvP.Join a room by a code' }}</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="pvpCreateView" data-path="/pvp/create" data-pathlock>
-    <div>
-        <h2>{{ t 'menu.PvP/Create.PvP / Create' }}</h2>
-        <div class="modes">
-            <div>
-                <h2>{{ t 'menu.PvP/Create.Room code:' }}</h2>
-                <input type="text" maxlength="6" readonly value="-" id="createGameCode">
-                <h3>{{ t 'menu.PvP/Create.Waiting for an opponent' }}</h3>
-                <button id="leaveGameButton">{{ t 'menu.PvP/Create.Leave the room' }}</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="pvpJoinView" data-path="/pvp/join">
-    <div>
-        <h2>{{ t 'menu.PvP/Join.PvP / Join' }}</h2>
-        <div class="modes">
-            <div>
-                <form action="#" id="pvpJoinForm">
-                    <input type="text" maxlength="6" id="pvpJoinCode" placeholder="{{ t 'menu.PvP/Join.Room code' }}" autocomplete="off">
-                    <input type="submit" value="{{ t 'menu.PvP/Join.Join' }}">
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="preparingGame" data-path="/pvp/prepairing" data-pathlock>
-    <div>
-        <h2>{{ t 'menu.PvP/Loading.PvP / Loading' }}</h2>
-        <div class="modes">
-            <div>
-                <h2>{{ t 'menu.PvP/Loading.Wait' }}</h2>
-                <h3>{{ t 'menu.PvP/Loading.You will be redirected soon' }}</h3>
-                <h3>{{ t 'menu.PvP/Loading.Opponent:' }}</h3>
-                <h4 id="oppNameField" class="username"></h4>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="profileView" data-path="/profile">
-    <div class="profile">
-        <h1 class="nickname username">{{ t 'menu.Profile.Loading' }}</h1>
-        <div class="accountinfo">
-            <div class="levelContainer" id="levelcontainer">
-                <span id="level">0</span>
-                <div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="xpbar" style="width: 0%;"></div>
+    
+    <div class="newItemContainer" id="lootboxOpenContainer">
+        <div class="lootboxModal">
+            <h1>{{ t 'menu.Inventory.You receive:' }}</h1>
+    
+            <div class="item" id="droppedItem" style="--gradient-colors: ;--background:;">
+                <div class="background"></div>
+                <div class="overlay">
+                    <div class="overlayBase">
+                        <h2 id="droppedItemType"></h2>
+                        <h1 id="droppedItemName"></h1>
+                        <p id="droppedItemDescription"></p>
                     </div>
                 </div>
             </div>
-            <span id="xpbooststatus">{{ t 'menu.Profile.XP Boost active' }}</span>
-            <div>
-                <span>{{ t 'menu.Profile.Player since:' }} </span>
-                <span id="playerSince">-</span><br>
+        </div>
+    </div>
+    
+    <div class="newItemContainer" id="giftContainer">
+        <div class="lootboxModal">
+            <h1>{{ t 'menu.Inventory.You received a gift' }}</h1>
+            <p id="giftMessage"></p>
+    
+            <div class="item" id="giftItem" style="--gradient-colors: ;--background:;">
+                <div class="background"></div>
+                <div class="overlay">
+                    <div class="overlayBase">
+                        <h2 id="giftItemType"></h2>
+                        <h1 id="giftItemName"></h1>
+                        <p id="giftItemDescription"></p>
+                    </div>
+                </div>
             </div>
-            
         </div>
     </div>
-    <div class="stats">
-        <div class="matchList"></div>
-        <div class="periodical">
-            <div class="stat"><h1 id="monthlyPlayed">-</h1><span>{{ t 'menu.Profile.matches played this month' }}</span></div>
-            <div class="stat"><h1 id="totalPlayed">-</h1><span>{{ t 'menu.Profile.total matches played' }}</span></div>
-            <div class="stat"><h1 id="winrate">-</h1><span>{{ t 'menu.Profile.winrate this month' }}</span></div>
+    
+    <nav>
+        <span onclick="switchView('settingsView')" class="item" style="text-align: left;">{{ t 'menu.navbar.Settings'}}</span>
+        <span onclick="switchView('mainMenuView')" class="item" style="text-align: center;">{{ t 'menu.navbar.Main menu'}}</span>
+        <div class="item">
+            <span id="profileButton">{{ t 'menu.navbar.Profile' }}</span>
+            <span id="shopButton" onclick="switchView('shopView')">
+                <img src="/assets/img/masts-logo.png" alt="Masts" style="height: 0.9em;">
+                <span id="masts">0</span>
+            </span>
+        </div>
+    </nav>
+    <div class="container" id="mainMenuView" data-path="/">
+        <div>
+            <h2>{{ t 'menu.index.Select game mode' }}</h2>
+            <div class="modes">
+                <div onclick="switchView('pvpMenuView')">
+                    <h2>{{ t 'menu.index.PvP' }}</h2>
+                    <p>{{ t 'menu.index.Play against another player' }}</p>
+                </div>
+                <div onclick="switchView('vsAiView')">
+                    <h2>{{ t 'menu.index.Vs AI' }}</h2>
+                    <p>{{ t 'menu.index.Play against the computer' }}</p>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-
-<div class="container" id="shopView" data-path="/shop">
-    <div class="main">
-        <h1>{{ t 'menu.Shop.Shop' }}</h1>
-        <h2>{{ t 'menu.Shop.Theme packs' }}</h2>
-        <p>{{ t 'menu.Shop.Theme packs modify the look of your Statki' }}</p>
-        <div class="items" id="themepacks">
-            
+    
+    <div class="container" id="vsAiView" data-path="/pve">
+        <div>
+            <h2>{{ t 'menu.PvE.Create' }}</h2>
+            <h3>{{ t 'menu.PvE.Choose the difficulty mode' }}</h3>
+            <div class="modes">
+                <div>
+                    <form action="#" id="pveCreateForm">
+                        <select name="difficulty" id="pveDifficulty">
+                            <option value="simple">Simple</option>
+                            <option value="smart">Smart</option>
+                            <option value="overkill">Overkill</option>
+                        </select>
+                        <p id="difficultyDescription">
+                            {{ t 'menu.PvE.difficulty.Simple.description' }}
+                        </p>
+                        <input type="submit" value="{{ t 'menu.PvE.Begin' }}">
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <h2>{{ t 'menu.Shop.Namestyles' }}</h2>
-        <p>{{ t 'menu.Shop.Namestyles are visual modifications to your nickname visible to you and other players' }}</p>
-        <div class="items" id="namestyles">
-            
+    </div>
+    
+    <div class="container" id="pvpMenuView" data-path="/pvp">
+        <div>
+            <h2>{{ t 'menu.PvP.PvP' }}</h2>
+            <div class="modes">
+                <div id="createGameButton">
+                    <h2>{{ t 'menu.PvP.Create' }}</h2>
+                    <p>{{ t 'menu.PvP.Create your own room' }}</p>
+                </div>
+                <div onclick="switchView('pvpJoinView')">
+                    <h2>{{ t 'menu.PvP.Join' }}</h2>
+                    <p>{{ t 'menu.PvP.Join a room by a code' }}</p>
+                </div>
+            </div>
         </div>
-
-        <h2>{{ t 'menu.Shop.Statboxes' }}</h2>
-        <p>
-            {{ t 'menu.Shop.Statboxes are lootboxes containing random items including XP boosts and cosmetic items' }}<br>
-            {{ t 'menu.Shop.Statboxes may contain items not available for purchase in the shop' }}
+    </div>
+    
+    <div class="container" id="pvpCreateView" data-path="/pvp/create" data-pathlock>
+        <div>
+            <h2>{{ t 'menu.PvP/Create.PvP / Create' }}</h2>
+            <div class="modes">
+                <div>
+                    <h2>{{ t 'menu.PvP/Create.Room code:' }}</h2>
+                    <input type="text" maxlength="6" readonly value="-" id="createGameCode">
+                    <h3>{{ t 'menu.PvP/Create.Waiting for an opponent' }}</h3>
+                    <button id="leaveGameButton">{{ t 'menu.PvP/Create.Leave the room' }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" id="pvpJoinView" data-path="/pvp/join">
+        <div>
+            <h2>{{ t 'menu.PvP/Join.PvP / Join' }}</h2>
+            <div class="modes">
+                <div>
+                    <form action="#" id="pvpJoinForm">
+                        <input type="text" maxlength="6" id="pvpJoinCode" placeholder="{{ t 'menu.PvP/Join.Room code' }}"
+                            autocomplete="off">
+                        <input type="submit" value="{{ t 'menu.PvP/Join.Join' }}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" id="preparingGame" data-path="/pvp/prepairing" data-pathlock>
+        <div>
+            <h2>{{ t 'menu.PvP/Loading.PvP / Loading' }}</h2>
+            <div class="modes">
+                <div>
+                    <h2>{{ t 'menu.PvP/Loading.Wait' }}</h2>
+                    <h3>{{ t 'menu.PvP/Loading.You will be redirected soon' }}</h3>
+                    <h3>{{ t 'menu.PvP/Loading.Opponent:' }}</h3>
+                    <h4 id="oppNameField" class="username"></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" id="profileView" data-path="/profile">
+        <div class="profile">
+            <h1 class="nickname username">{{ t 'menu.Profile.Loading' }}</h1>
+            <div class="accountinfo">
+                <div class="levelContainer" id="levelcontainer">
+                    <span id="level">0</span>
+                    <div>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="xpbar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <span id="xpbooststatus">{{ t 'menu.Profile.XP Boost active' }}</span>
+                <div>
+                    <span>{{ t 'menu.Profile.Player since:' }} </span>
+                    <span id="playerSince">-</span><br>
+                </div>
+    
+            </div>
+        </div>
+        <div class="stats">
+            <div class="matchList"></div>
+            <div class="periodical">
+                <div class="stat">
+                    <h1 id="monthlyPlayed">-</h1><span>{{ t 'menu.Profile.matches played this month' }}</span>
+                </div>
+                <div class="stat">
+                    <h1 id="totalPlayed">-</h1><span>{{ t 'menu.Profile.total matches played' }}</span>
+                </div>
+                <div class="stat">
+                    <h1 id="winrate">-</h1><span>{{ t 'menu.Profile.winrate this month' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" id="shopView" data-path="/shop">
+        <div class="main">
+            <h1>{{ t 'menu.Shop.Shop' }}</h1>
+            <h2>{{ t 'menu.Shop.Theme packs' }}</h2>
+            <p>{{ t 'menu.Shop.Theme packs modify the look of your Statki' }}</p>
+            <div class="items" id="themepacks">
+    
+            </div>
+    
+            <h2>{{ t 'menu.Shop.Namestyles' }}</h2>
+            <p>{{ t 'menu.Shop.Namestyles are visual modifications to your nickname visible to you and other players' }}</p>
+            <div class="items" id="namestyles">
+    
+            </div>
+    
+            <h2>{{ t 'menu.Shop.Statboxes' }}</h2>
+            <p>
+                {{ t 'menu.Shop.Statboxes are lootboxes containing random items including XP boosts and cosmetic items'
+                }}<br>
+                {{ t 'menu.Shop.Statboxes may contain items not available for purchase in the shop' }}
             </p>
-        <div class="items" id="statboxes">
-
+            <div class="items" id="statboxes">
+    
+            </div>
         </div>
     </div>
-</div>
-
-<div class="container" id="inventoryView" data-path="/inventory">
-    <div class="main">
-        <h1>{{ t 'menu.Inventory.Inventory' }}</h1>
-        <div class="controls">
-            <button class="danger" onclick="applyTheme(null)">{{ t 'menu.Inventory.Reset theme' }}</button>
-            <button class="danger" onclick="applyNameStyle(null)">{{ t 'menu.Inventory.Reset name style' }}</button>
-        </div>
-        <div class="items" id="inventoryitems">
-            
+    
+    <div class="container" id="inventoryView" data-path="/inventory">
+        <div class="main">
+            <h1>{{ t 'menu.Inventory.Inventory' }}</h1>
+            <div class="controls">
+                <button class="danger" onclick="applyTheme(null)">{{ t 'menu.Inventory.Reset theme' }}</button>
+                <button class="danger" onclick="applyNameStyle(null)">{{ t 'menu.Inventory.Reset name style' }}</button>
+            </div>
+            <div class="items" id="inventoryitems">
+    
+            </div>
         </div>
     </div>
-</div>
-
-<div class="container" id="dropRatesView" data-path="/drop-rates">
-    <div class="main">
-        <h1>{{ t 'menu.Inventory.Drop rates' }}</h1>
-        <div id="dropRates">
-
+    
+    <div class="container" id="dropRatesView" data-path="/drop-rates">
+        <div class="main">
+            <h1>{{ t 'menu.Inventory.Drop rates' }}</h1>
+            <div id="dropRates">
+    
+            </div>
+            <p>{{ t 'menu.Inventory.Chances dont matter if you own all unique items of a certain category In this case the
+                algorithm chooses the first category under the one picked that you can (still) get items from' }}</p>
         </div>
-        <p>{{ t 'menu.Inventory.Chances dont matter if you own all unique items of a certain category In this case the algorithm chooses the first category under the one picked that you can (still) get items from' }}</p>
     </div>
-</div>
-
-<div class="container" id="settingsView" data-path="/settings">
-    <div>
-        <h1>{{ t 'menu.Settings.Settings' }}</h1>
-        <h2>{{ t 'menu.Settings.General' }}</h2>
-        <label for="language">Language: </label>
-        <select name="language" id="languages">
-            
-        </select>
-
-        <h2>{{ t 'menu.Settings.Account' }}</h2>
-        <h3>{{ t 'menu.Settings.Current nickname:' }} <span class="nickname dynamic">{{ t 'menu.Profile.Loading' }}</span></h3>
-        <button onclick="window.location.href = '/nickname'">{{ t 'menu.Settings.Change nickname' }}</button>
-        <p style="font-size: 0.75rem;opacity: 0.6;">{{ t 'menu.Settings.See: Privacy policy for modifying or removing other account data' }}</p>
-        <h3 onclick="openNewsModal()" id="news">{{ t 'menu.Settings.Show news and changes' }}</h3>
-        <h3 id="logout">{{ t 'menu.Settings.Log out' }}</h3>
-        <p class="versionInfo">Statki ver. {{ ver }}<br>© 2024 mcjk<br><a href="/terms" target="_blank">{{ t 'landing.Terms of service' }}</a> / <a href="/privacy" target="_blank">{{ t 'landing.Privacy policy' }}</a></p>
+    
+    <div class="container" id="settingsView" data-path="/settings">
+        <div>
+            <h1>{{ t 'menu.Settings.Settings' }}</h1>
+            <h2>{{ t 'menu.Settings.General' }}</h2>
+            <label for="language">Language: </label>
+            <select name="language" id="languages">
+    
+            </select>
+    
+            <h2>{{ t 'menu.Settings.Account' }}</h2>
+            <h3>{{ t 'menu.Settings.Current nickname:' }} <span class="nickname dynamic">{{ t 'menu.Profile.Loading'
+                    }}</span></h3>
+            <button onclick="window.location.href = '/nickname'">{{ t 'menu.Settings.Change nickname' }}</button>
+            <p style="font-size: 0.75rem;opacity: 0.6;">{{ t 'menu.Settings.See: Privacy policy for modifying or removing
+                other account data' }}</p>
+            <h3 onclick="openNewsModal()" id="news">{{ t 'menu.Settings.Show news and changes' }}</h3>
+            <h3 id="logout">{{ t 'menu.Settings.Log out' }}</h3>
+            <p class="versionInfo">Statki ver. {{ ver }}<br>© 2024 mcjk<br><a href="/terms" target="_blank">{{ t
+                    'landing.Terms of service' }}</a> / <a href="/privacy" target="_blank">{{ t 'landing.Privacy policy'
+                    }}</a></p>
+        </div>
     </div>
 </div>
 
@@ -298,4 +335,5 @@
 </script>
 <script src="/assets/js/spa_lib.js"></script>
 <script src="/assets/js/socket.js"></script>
+<script src="/assets/js/social.js"></script>
 <script src="/assets/js/socket-err-handler.js"></script>

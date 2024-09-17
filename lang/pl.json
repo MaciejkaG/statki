@@ -33,10 +33,14 @@
     },
 
     "menu": {
+        "Social": {
+            "Social": "Społecznościowe"
+        },
         "navbar": {
             "Main menu": "Menu główne",
             "Profile": "Profil",
-            "Settings": "Ustawienia"
+            "Settings": "Ustawienia",
+            "Social": "Społecznościowe"
         },
         "index": {
             "Select game mode": "Wybierz tryb gry",

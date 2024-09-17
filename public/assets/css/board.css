@@ -36,6 +36,9 @@
 
     --inventory-item: #101010;
 
+    --social-tab-collapsed-width: 3rem;
+    --social-tab-expanded-width: 20rem;
+
     color: rgb(136, 136, 136)
 }
 

@@ -2,16 +2,101 @@
     display: none;
 }
 
+.sitecontent {
+    width: calc(100vw - var(--social-tab-collapsed-width));
+    height: 100vh;
+    position: absolute;
+    left: var(--social-tab-collapsed-width);
+    overflow: scroll;
+
+    transition: transform 0.5s, filter 0.5s;
+}
+
+.sitecontent::-webkit-scrollbar {
+    display: none;
+}
+
+.social {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: black;
+    width: var(--social-tab-collapsed-width);
+    height: 100vh;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.5);
+    z-index: 960;
+
+    display: flex;
+    gap: 1px;
+    overflow: hidden;
+
+    transition: width 0.5s, transform 0.5s;
+}
+
+.social:hover, .social:has(*:focus) {
+    width: calc(var(--social-tab-expanded-width) + var(--social-tab-collapsed-width));
+    transform: translateX(calc(var(--social-tab-collapsed-width) * -1));
+}
+
+.social:hover~.content, .social:has(*:focus)~.content {
+    transform: translateX(10rem);
+    filter: blur(10px) brightness(50%);
+    pointer-events: none;
+}
+
+.social:hover~#themeBackground {
+    opacity: .3;
+}
+
+.social .collapsed {
+    width: var(--social-tab-collapsed-width);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+.social .expanded,
+.social .collapsed {
+    height: 100%;
+}
+
+.social .expanded {
+    padding-left: 1rem;
+}
+
+.social .expanded h1 {
+    text-align: center;
+}
+
+.social .collapsed span.el {
+    transform: rotate(-90deg);
+    /* text-orientation: sideways; */
+    text-wrap: nowrap;
+    height: auto;
+    width: auto;
+    text-align: center;
+    transition: opacity 0.3s;
+
+    opacity: 0;
+}
+
+.social .collapsed span.el.active {
+    opacity: 1;
+}
+
 .container {
     display: none;
     transition: opacity 0.175s;
 }
 
 #themeBackground {
-    position: fixed;
+    position: absolute;
     z-index: -1;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     top: 0;
     left: 0;
     pointer-events: none;
@@ -72,6 +157,7 @@ nav span {
 
 nav .item {
     width: 12rem;
+    /* background-color: red; */
 }
 
 nav span:hover {
@@ -89,6 +175,13 @@ nav div {
     display: flex;
     align-items: center;
     gap: 1rem;
+}
+
+nav div:first-child {
+    justify-content: flex-start;
+}
+
+nav div:last-child {
     justify-content: end;
 }
 
@@ -1010,7 +1103,7 @@ nav div {
     justify-content: center;
     align-items: center;
 
-    z-index: 999;
+    z-index: 950;
 
     opacity: 0;
     pointer-events: none;
@@ -1103,7 +1196,7 @@ nav div {
     justify-content: center;
     align-items: center;
 
-    z-index: 999;
+    z-index: 950;
 
     opacity: 0;
     pointer-events: none;

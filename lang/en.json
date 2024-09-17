@@ -33,10 +33,14 @@
     },
 
     "menu": {
+        "Social": {
+            "Social": "Social"
+        },
         "navbar": {
             "Main menu": "Main menu",
             "Profile": "Profile",
-            "Settings": "Settings"
+            "Settings": "Settings",
+            "Social": "Social"
         },
         "index": {
             "Select game mode": "Select game mode",
