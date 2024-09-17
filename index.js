@@ -424,7 +424,7 @@ app.post('/api/auth', async (req, res) => {
 });
 
 app.post('/api/nickname', (req, res) => {
-    if (loginState(req) == 2 && req.body.nickname != null && 3 <= req.body.nickname.length && req.body.nickname.length <= 16) {
+    if (loginState(req) == 2 && req.body.nickname != null && 3 <= req.body.nickname.length && escapeHTML(req.body.nickname).length <= 16) {
         req.body.nickname = escapeHTML(req.body.nickname); // Escape HTML from the nickname
         req.session.nickname = req.body.nickname;
         req.session.activeGame = null;
