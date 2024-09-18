@@ -35,12 +35,12 @@
     transition: width 0.5s, transform 0.5s;
 }
 
-.social:hover, .social:has(*:focus) {
+.social , .social:hover, .social:has(*:focus) {
     width: calc(var(--social-tab-expanded-width) + var(--social-tab-collapsed-width));
     transform: translateX(calc(var(--social-tab-collapsed-width) * -1));
 }
 
-.social:hover~.content, .social:has(*:focus)~.content {
+.social:hover~.sitecontent, .social:has(*:focus)~.sitecontent {
     transform: translateX(10rem);
     filter: blur(10px) brightness(50%);
     pointer-events: none;
@@ -64,11 +64,8 @@
 }
 
 .social .expanded {
-    padding-left: 1rem;
-}
-
-.social .expanded h1 {
-    text-align: center;
+    padding: 0 1rem;
+    width: 100%;
 }
 
 .social .collapsed span.el {
@@ -85,6 +82,34 @@
 
 .social .collapsed span.el.active {
     opacity: 1;
+}
+
+.social .friendsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.social .friendsList .el {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    /* background-color: red; */
+}
+
+.social .friendsList .el .status {
+    display: flex;
+    justify-content: space-between;
+}
+
+.social .friendsList .el .status span:last-child {
+    opacity: 0.4;
+}
+
+.social .friendsList .el .status span.online {
+    opacity: 1;
+    color: var(--ship-valid);
 }
 
 .container {

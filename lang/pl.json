@@ -34,7 +34,8 @@
 
     "menu": {
         "Social": {
-            "Social": "Społecznościowe"
+            "Social": "Społecznościowe",
+            "Friends": "Znajomi"
         },
         "navbar": {
             "Main menu": "Menu główne",
