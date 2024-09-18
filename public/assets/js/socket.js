@@ -97,7 +97,7 @@ socket.emit("my profile", (profile) => {
     // Profile stats
     $("#monthlyPlayed").html(profile.stats.monthly_matches);
     $("#totalPlayed").html(profile.stats.alltime_matches);
-    $("#winrate").html(profile.stats.winrate != null ? `${profile.stats.winrate_month}%` : "-");
+    $("#winrate").html(profile.stats.winrate !== null ? `${profile.stats.winrate_month}%` : "-");
 
     $("#xpbar").css('width', `${profile.profile.levelProgress}%`);
     $("#level").html(profile.profile.level);

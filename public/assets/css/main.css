@@ -2,6 +2,10 @@
     display: none;
 }
 
+body {
+    overflow-x: hidden;
+}
+
 .sitecontent {
     width: calc(100vw - var(--social-tab-collapsed-width));
     height: 100vh;
@@ -35,7 +39,7 @@
     transition: width 0.5s, transform 0.5s;
 }
 
-.social , .social:hover, .social:has(*:focus) {
+.social:hover, .social:has(*:focus) {
     width: calc(var(--social-tab-expanded-width) + var(--social-tab-collapsed-width));
     transform: translateX(calc(var(--social-tab-collapsed-width) * -1));
 }
@@ -65,7 +69,7 @@
 
 .social .expanded {
     padding: 0 1rem;
-    width: 100%;
+    min-width: calc(var(--social-tab-expanded-width) - 2rem);
 }
 
 .social .collapsed span.el {
@@ -84,27 +88,80 @@
     opacity: 1;
 }
 
+.social .inviteFriends {
+    border-radius: 15px;
+    border: solid 1px white;
+    padding: .25rem 1rem;
+    padding-bottom: 1rem;
+}
+
+.social .inviteFriends h3 {
+    font-size: 1rem;
+}
+
+.social .inviteFriends span {
+    font-size: .8rem;
+}
+
+.social .inviteFriends img {
+    padding: .5rem;
+    background-color: white;
+    height: 8rem;
+    border-radius: 15px;
+    display: block;
+}
+
+.social .inviteFriends .qrContainer {
+    margin: 1rem 0;
+    display: flex;
+    gap: .5rem;
+}
+
+.social .inviteFriends .qrContainer div {
+    flex: 1;
+}
+
+.social .inviteFriends .qrContainer div button {
+    width: 100%;
+}
+
+.social .inviteFriends .qrContainer div span {
+    font-size: 0.8rem;
+}
+
 .social .friendsList {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: .5rem;
     width: 100%;
+    margin-top: 1rem;
 }
 
 .social .friendsList .el {
     display: flex;
-    width: 100%;
     flex-direction: column;
-    /* background-color: red; */
+    background-color: transparent;
+    border-radius: 15px;
+    padding: .75rem 1rem;
+    height: 1.2rem;
+    overflow: hidden;
+
+    transition: height 0.3s, background-color 0.3s;
+}
+
+.social .friendsList .el:hover {
+    height: 4rem;
+    background-color: var(--accent-bg);
 }
 
 .social .friendsList .el .status {
     display: flex;
     justify-content: space-between;
+    font-size: .9rem;
 }
 
 .social .friendsList .el .status span:last-child {
-    opacity: 0.4;
+    opacity: .4;
 }
 
 .social .friendsList .el .status span.online {
@@ -112,9 +169,49 @@
     color: var(--ship-valid);
 }
 
+.social .friendsList .el .buttons {
+    display: flex;
+    margin-top: 1rem;
+    gap: .25rem;
+}
+
+.social .friendsList .el button,
+.social .inviteFriends .qrContainer div button {
+    flex: 1;
+    border-radius: 15px;
+    padding: .3rem .75rem;
+    font-size: .7rem;
+    min-width: fit-content;
+    text-wrap: nowrap;
+    border: 1px solid white;
+    background-color: var(--element-bg);
+    backdrop-filter: blur(20px);
+    color: white;
+    cursor: pointer;
+    transition: color .3s, border .3s, background-color .3s;
+}
+
+.social .friendsList .el button.danger,
+.social .inviteFriends .qrContainer div button.danger {
+    border: 1px solid var(--danger);
+    color: var(--danger);
+}
+
+.social .friendsList .el button:hover,
+.social .inviteFriends .qrContainer div button:hover {
+    color: black;
+    background-color: white;
+}
+
+.social .friendsList .el button.danger:hover,
+.social .inviteFriends .qrContainer div button.danger:hover {
+    color: white;
+    background-color: var(--danger);
+}
+
 .container {
     display: none;
-    transition: opacity 0.175s;
+    transition: opacity .175s;
 }
 
 #themeBackground {

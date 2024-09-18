@@ -23,3 +23,29 @@ const cycleMessages = () => {
 
 cycleMessages();
 setInterval(cycleMessages, 5000);
+
+$('.social').hover(function() {
+    anime({
+        targets: ['.social .expanded h1', '.social .expanded .inviteFriends', '.social .expanded .friendsList .el'],
+        easing: 'easeOutQuint',
+        translateX: [100, 0],
+        opacity: [0, 1],
+        duration: 500,
+        delay: anime.stagger(150, { start: 200 })
+    });
+}, function () { }); // It needs the second function not to glitch for some reason
+
+const buttonsAnimation = {
+    easing: 'easeOutExpo',
+    translateY: [50, 0],
+    opacity: [0, 1],
+    duration: 500,
+    delay: anime.stagger(100)
+};
+
+$('.friendsList .el').hover(function(e) {
+    anime({
+        ...buttonsAnimation,
+        targets: e.target.querySelectorAll('.buttons button')
+    });
+}, function() {}); // Again, it needs the second function not to glitch for some reason
