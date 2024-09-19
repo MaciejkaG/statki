@@ -35,7 +35,16 @@
     "menu": {
         "Social": {
             "Social": "Social",
-            "Friends": "Friends"
+            "Friends": "Friends",
+
+            "No new notifications": "No new notifications",
+            "Friends online:": "Friends online:",
+
+            "addafriend": {
+                "Add a friend!": "Add a friend!",
+                "Your friend needs to scan this QR code or alternatively add you through your UID": "Your friend needs to scan this QR code or alternatively add you through your UID.",
+                "Scan a code": "Scan a code"
+            }
         },
         "navbar": {
             "Main menu": "Main menu",

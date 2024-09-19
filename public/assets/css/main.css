@@ -10,6 +10,7 @@ body {
     width: calc(100vw - var(--social-tab-collapsed-width));
     height: 100vh;
     position: absolute;
+    top: 0;
     left: var(--social-tab-collapsed-width);
     overflow: scroll;
 
@@ -24,7 +25,7 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    background-color: black;
+    background-color: var(--element-bg-alt);
     width: var(--social-tab-collapsed-width);
     height: 100vh;
     border-top-right-radius: 10px;
@@ -39,13 +40,13 @@ body {
     transition: width 0.5s, transform 0.5s;
 }
 
-.social:hover, .social:has(*:focus) {
+.social, .social:hover, .social:has(*:focus) {
     width: calc(var(--social-tab-expanded-width) + var(--social-tab-collapsed-width));
     transform: translateX(calc(var(--social-tab-collapsed-width) * -1));
 }
 
 .social:hover~.sitecontent, .social:has(*:focus)~.sitecontent {
-    transform: translateX(10rem);
+    transform: translateX(calc(var(--social-tab-expanded-width) / 2));
     filter: blur(10px) brightness(50%);
     pointer-events: none;
 }
@@ -55,7 +56,8 @@ body {
 }
 
 .social .collapsed {
-    width: var(--social-tab-collapsed-width);
+    min-width: var(--social-tab-collapsed-width);
+    max-width: var(--social-tab-collapsed-width);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -86,6 +88,23 @@ body {
 
 .social .collapsed span.el.active {
     opacity: 1;
+}
+
+.social .expanded h1 {
+    display: flex;
+    align-items: center;
+}
+
+.socialButton {
+    display: none;
+}
+
+#closeSocialTab {
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--danger);
+    padding: 0.5rem;
+    display: none;
 }
 
 .social .inviteFriends {
