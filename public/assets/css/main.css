@@ -40,7 +40,7 @@ body {
     transition: width 0.5s, transform 0.5s;
 }
 
-.social, .social:hover, .social:has(*:focus) {
+.social:hover, .social:has(*:focus) {
     width: calc(var(--social-tab-expanded-width) + var(--social-tab-collapsed-width));
     transform: translateX(calc(var(--social-tab-collapsed-width) * -1));
 }
