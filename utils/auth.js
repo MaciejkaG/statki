@@ -336,7 +336,7 @@ export class MailAuth {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             conn.query(`
-                SELECT friendship_id FROM friendships WHERE active = 1 AND (user1 = ? OR user2 = ?) OR (user2 = ? OR user1 = ?);
+                SELECT friendship_id FROM friendships WHERE active = 1 AND (user1 = ? AND user2 = ?) OR (user2 = ? AND user1 = ?);
             `, [userId, friendId, userId, friendId], async (error, [response]) => {
                 if (error) reject(error);
                 else {
