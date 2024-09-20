@@ -210,7 +210,9 @@ setInterval(updateFriendsList, 3000);
 
 socket.on('new message', (fromId, nickname, content) => {
     addMessage(fromId, true, content);
-    sendSocialToast('New message', '', nickname + ' ' + window.locale['just sent you a message! You can read it in the Social tab'])
+    if (fromId === activeChatFriendId) {
+        sendSocialToast('New message', '', nickname + ' ' + window.locale['just sent you a message! You can read it in the Social tab']);
+    }
 });
 
 // Some functions
@@ -295,11 +297,10 @@ function openChat(el) {
 
 function closeChat() {
     $('.chatBox').removeClass('active');
+    activeChatFriendId = null;
 }
 
 function addMessage(userId, incoming, content) {
-    // document.getElementById('chat').innerHTML += `<div class="wrapper"><p class="bubble ${incoming && 'incoming'}">${content}</p></div>`;
-
     const wrapper = document.createElement("div");
     wrapper.classList = 'wrapper';
 
@@ -367,7 +368,7 @@ function sendSocialToast(category, header, content) {
         duration: 7000,
         newWindow: true,
         gravity: "bottom",
-        position: "left",
+        position: "right",
         stopOnFocus: true,
         className: "bshipstoast",
     }).showToast();
