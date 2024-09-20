@@ -2,16 +2,359 @@
     display: none;
 }
 
+body {
+    overflow-x: hidden;
+}
+
+.sitecontent {
+    width: calc(100vw - var(--social-tab-collapsed-width));
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: var(--social-tab-collapsed-width);
+    overflow: scroll;
+
+    transition: transform 0.5s, filter 0.5s;
+}
+
+.sitecontent::-webkit-scrollbar {
+    display: none;
+}
+
+.social {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--element-bg-alt);
+    width: var(--social-tab-collapsed-width);
+    height: 100%;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.5);
+    z-index: 960;
+
+    display: flex;
+    gap: 1px;
+    overflow: hidden;
+
+    transition: width 0.5s, transform 0.5s;
+}
+
+.social:hover, .social:has(*:focus) {
+    width: calc(var(--social-tab-expanded-width) + var(--social-tab-collapsed-width));
+    transform: translateX(calc(var(--social-tab-collapsed-width) * -1));
+}
+
+.social:hover~.sitecontent, .social:has(*:focus)~.sitecontent {
+    transform: translateX(calc(var(--social-tab-expanded-width) / 2));
+    filter: blur(10px) brightness(50%);
+    pointer-events: none;
+}
+
+.social:hover~#themeBackground, .social:has(*:focus)~#themeBackground {
+    opacity: .3;
+}
+
+.social .collapsed {
+    min-width: var(--social-tab-collapsed-width);
+    max-width: var(--social-tab-collapsed-width);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+.social .expanded,
+.social .collapsed {
+    height: 100%;
+}
+
+.social .expanded {
+    padding: 0 1rem;
+    min-width: calc(var(--social-tab-expanded-width) - 2rem);
+    overflow-y: scroll;
+}
+
+.social .collapsed span.el {
+    transform: rotate(-90deg);
+    /* text-orientation: sideways; */
+    text-wrap: nowrap;
+    height: auto;
+    width: auto;
+    text-align: center;
+    transition: opacity 0.3s;
+
+    opacity: 0;
+}
+
+.social .collapsed span.el.active {
+    opacity: 1;
+}
+
+.social .expanded h1 {
+    display: flex;
+    align-items: center;
+}
+
+.socialButton {
+    display: none;
+}
+
+.closeX {
+    font-weight: 700;
+    color: var(--danger);
+    font-size: 1rem;
+    cursor: pointer;
+    user-select: none;
+    padding: 0.5rem;
+}
+
+#closeSocialTab {
+    margin-left: auto;
+    display: none;
+}
+
+.social .inviteFriends {
+    border-radius: 15px;
+    border: solid 1px white;
+    padding: .25rem 1rem;
+    padding-bottom: 1rem;
+}
+
+.social .inviteFriends h3 {
+    font-size: 1rem;
+}
+
+.social .inviteFriends span {
+    font-size: .8rem;
+}
+
+.social .inviteFriends img {
+    padding: .5rem;
+    background-color: white;
+    height: 8rem;
+    border-radius: 15px;
+    display: block;
+}
+
+.social .inviteFriends .qrContainer {
+    margin: 1rem 0;
+    display: flex;
+    gap: .5rem;
+}
+
+.social .inviteFriends .qrContainer div {
+    flex: 1;
+}
+
+.social .inviteFriends .qrContainer div button {
+    width: 100%;
+}
+
+.social .inviteFriends .qrContainer div span {
+    font-size: 0.8rem;
+}
+
+.social .friendsList {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.social .friendsList .el {
+    display: flex;
+    flex-direction: column;
+    background-color: transparent;
+    border-radius: 15px;
+    padding: .75rem 1rem;
+    height: 1.2rem;
+    overflow: hidden;
+
+    transition: height 0.3s, background-color 0.3s;
+}
+
+.social .friendsList .el:hover {
+    height: 3.5rem;
+    background-color: var(--accent-bg);
+}
+
+.social .friendsList .el .status {
+    display: flex;
+    justify-content: space-between;
+    font-size: .9rem;
+}
+
+.social .friendsList .el .status span:last-child {
+    opacity: .4;
+}
+
+.social .friendsList .el .status span {
+    font-weight: 500;
+}
+
+.social .friendsList .el .status span.online {
+    opacity: 1;
+    color: var(--ship-valid);
+}
+
+.social .friendsList .el .status span.ingame {
+    opacity: 1;
+    color: var(--dynamic);
+}
+
+.social .friendsList .el .buttons {
+    display: flex;
+    margin-top: 1rem;
+    gap: .25rem;
+}
+
+.social .friendsList .el button,
+.social .inviteFriends .qrContainer div button {
+    flex: 1;
+    border-radius: 15px;
+    padding: .3rem .75rem;
+    font-size: .6rem;
+    min-width: fit-content;
+    text-wrap: nowrap;
+    border: 1px solid white;
+    background-color: var(--element-bg);
+    backdrop-filter: blur(20px);
+    color: white;
+    cursor: pointer;
+    transition: color .3s, border .3s, background-color .3s;
+}
+
+.social .friendsList .el button.danger,
+.social .inviteFriends .qrContainer div button.danger {
+    border: 1px solid var(--danger);
+    color: var(--danger);
+}
+
+.social .friendsList .el button:hover,
+.social .inviteFriends .qrContainer div button:hover {
+    color: black;
+    background-color: white;
+}
+
+.social .friendsList .el button.danger:hover,
+.social .inviteFriends .qrContainer div button.danger:hover {
+    color: white;
+    background-color: var(--danger);
+}
+
+.chatBox {
+    position: absolute;
+    width: var(--social-tab-expanded-width);
+    padding: 0 1rem;
+    box-sizing: border-box;
+    z-index: 961;
+    left: var(--social-tab-collapsed-width);
+    background-color: var(--element-bg-alt);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.5);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    height: 90%;
+    bottom: -90%;
+    display: flex;
+    flex-direction: column;
+    transition: bottom  0.5s;
+}
+
+.chatBox.active {
+    bottom: 0;
+}
+
+.chatBox .chat {
+    flex: 1;
+}
+
+.chatBox .title {
+    font-weight: 600;
+    font-size: 1.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: .75rem 0;
+}
+
+.chatBox .title div {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.chatBox .title div span:first-child {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.chatBox textarea {
+    width: 100%;
+    resize: none;
+    border: solid 1px var(--mark-line);
+    outline: none;
+    background-color: var(--element-bg);
+    color: white;
+    border-radius: 10px;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    margin: 1rem 0;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.chat {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 .5rem;
+    box-sizing: border-box;
+    overflow-y: scroll;
+}
+
+.chat .wrapper {
+    display: flex;
+    justify-content: end;
+}
+
+.chat .wrapper:has(.bubble.incoming) {
+    justify-content: start;
+}
+
+.chat .wrapper.info {
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    text-align: center;
+    justify-content: center;
+}
+
+.chat .bubble {
+    background-color: var(--dynamic);
+    border-radius: 15px;
+    padding: .5rem;
+    font-size: .8rem;
+    max-width: 60%;
+    margin: 0;
+    overflow: hidden;
+}
+
+.chat .bubble.incoming {
+    background-color: var(--field);
+}
+
 .container {
     display: none;
-    transition: opacity 0.175s;
+    transition: opacity .175s;
 }
 
 #themeBackground {
-    position: fixed;
+    position: absolute;
     z-index: -1;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     top: 0;
     left: 0;
     pointer-events: none;
@@ -43,16 +386,36 @@
 }
 
 .bshipstoast {
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--element-bg-alt);
     backdrop-filter: blur(15px);
     color: white;
-    padding: 0.75rem 1rem;
+    padding: 1.2rem .8rem;
     border-radius: 15px;
-    border: solid 2px white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    border: solid 2px var(--mark-line);
     box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    text-align: left;
+    width: 20rem;
+    max-width: 85vw;
+}
+
+.bshipstoast * {
+    margin: 0;
+}
+
+.bshipstoast h1 {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.bshipstoast h2 {
+    color: var(--mark-spot);
+    font-weight: 500;
+    font-size: 0.9rem;
 }
 
 nav {
@@ -72,6 +435,7 @@ nav span {
 
 nav .item {
     width: 12rem;
+    /* background-color: red; */
 }
 
 nav span:hover {
@@ -89,6 +453,13 @@ nav div {
     display: flex;
     align-items: center;
     gap: 1rem;
+}
+
+nav div:first-child {
+    justify-content: flex-start;
+}
+
+nav div:last-child {
     justify-content: end;
 }
 
@@ -1010,7 +1381,7 @@ nav div {
     justify-content: center;
     align-items: center;
 
-    z-index: 999;
+    z-index: 950;
 
     opacity: 0;
     pointer-events: none;
@@ -1103,7 +1474,7 @@ nav div {
     justify-content: center;
     align-items: center;
 
-    z-index: 999;
+    z-index: 950;
 
     opacity: 0;
     pointer-events: none;

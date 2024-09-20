@@ -4,7 +4,7 @@
     }
 }
 
-@media only screen and (max-width: 1280px) {
+@media only screen and (max-width: 1279px) {
     #profileView .stats  {
         flex-direction: column-reverse;
     }
@@ -86,6 +86,60 @@
 
     #shopView .items .item {
         width: 100%;
+    }
+
+    :root {
+        --social-tab-collapsed-width: 0rem;
+    }
+
+    .socialButton {
+        display: initial;
+    }
+
+    .social .collapsed {
+        overflow: hidden;
+    }
+
+    .social .expanded {
+        min-width: calc(100vw - 2rem);
+    }
+
+    .chatBox {
+        width: calc(100vw);
+    }
+
+    .social:hover, .social:has(*:focus) {
+        width: var(--social-tab-collapsed-width);
+        transform: none;
+    }
+
+    .social:hover~.sitecontent, .social:has(*:focus)~.sitecontent {
+        transform: none;
+        filter: none;
+        pointer-events: initial;
+    }
+
+    .social.active {
+        width: calc(100vw + var(--social-tab-collapsed-width));
+        transform: translateX(calc(var(--social-tab-collapsed-width) * -1));
+    }
+
+    .social.active~.sitecontent {
+        transform: none;
+        filter: blur(10px) brightness(50%);
+        pointer-events: none;
+    }
+
+    .social:hover~#themeBackground {
+        opacity: .6;
+    }
+
+    .social.active~#themeBackground {
+        opacity: .3;
+    }
+
+    #closeSocialTab {
+        display: initial;
     }
 }
 

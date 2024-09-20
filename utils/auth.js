@@ -1,3 +1,5 @@
+// Don't get deceived by the name of this file, it actually contains most of the MySQL connecting stuff, like managing account data..
+
 import nodemailer from 'nodemailer';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -26,7 +28,7 @@ export class MailAuth {
             },
         });
 
-        this.mailFrom = `"Statki" <${options.user}>`
+        this.mailFrom = `"Statki" <${options.user}>`;
     }
 
     async timer(tId, time, callback) {
@@ -283,6 +285,79 @@ export class MailAuth {
                 }
 
                 conn.end();
+            });
+        });
+    }
+
+    getFriends(userId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            const query = `
+            SELECT (CASE WHEN user1 = ? THEN user2 ELSE user1 END) AS friend_id, a.nickname FROM friendships f JOIN accounts a ON (CASE WHEN f.user1 = ? THEN f.user2 ELSE user1 END) = a.user_id WHERE active = 1 AND (user1 = ? OR user2 = ?);
+            `;
+            conn.query(query, [userId, userId, userId, userId], async (error, response) => {
+                if (error) reject(error);
+                else {
+                    const updatedResponse = await Promise.all(
+                        response.map(async friendship => ({
+                            ...friendship,
+                            lastOnline: await this.getLastOnline(friendship.friend_id)
+                        }))
+                    );
+
+                    resolve(updatedResponse);
+                }
+
+                conn.end();
+            });
+        });
+    }
+
+    async getLastOnline(userId) {
+        // lastOnline contains a UTC timestamp in seconds of the last time the user was seen online.
+        const lastOnline = await this.redis.json.get(`lastOnline:${userId}`);
+
+        if (!lastOnline) {
+            return null;
+        }
+
+        const currentTime = Math.floor(new Date().getTime() / 1000); // Current time in seconds (UTC)
+        const secondsAgo = currentTime - lastOnline.timestamp; // How many seconds ago the user was last online
+
+        return { secondsAgo, activity: lastOnline.activity };
+    }
+
+    // This function updates user's online status.
+    async updateLastOnline(userId, inGame = false) {
+        await this.redis.json.set(`lastOnline:${userId}`, '$', { timestamp: Math.floor(new Date().getTime() / 1000), activity: inGame ? 'playing' : 'menu' });
+    }
+
+    getConversation(userId, friendId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            conn.query(`
+                SELECT friendship_id FROM friendships WHERE active = 1 AND (user1 = ? OR user2 = ?) OR (user2 = ? OR user1 = ?);
+            `, [userId, friendId, userId, friendId], async (error, [response]) => {
+                if (error) reject(error);
+                else {
+                    if (response === undefined) {
+                        resolve(null);
+                        return;
+                    }
+
+                    const friendshipId = response.friendship_id;
+
+                    conn.query(`
+                        SELECT sender, content, created_at FROM messages WHERE friendship_id = ? AND (sender = ? OR sender = ?) ORDER BY message_id ASC LIMIT 200;
+                    `, [friendshipId, userId, friendId], async (error, response) => {
+                        if (error) reject(error);
+                        else {
+                            resolve(response);
+                        }
+
+                        conn.end();
+                    });
+                }
             });
         });
     }
@@ -856,6 +931,19 @@ export class MailAuth {
                 conn.query('UPDATE accounts SET xp = ?, level = ?, masts = masts + ? WHERE user_id = ?;', [xp, level, mastsEarned, userId], (err, results) => {
                     if (err) return reject(err);
                     resolve(amount);
+                });
+            });
+        });
+    }
+
+    sendMessage(senderId, recipientId, messageContent) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            conn.query('SELECT friendship_id FROM friendships WHERE (user1 = ? OR user2 = ?) AND (user1 = ? OR user2 = ?);', [senderId, senderId, recipientId, recipientId], (err, [result]) => {
+                if (err) return reject(err);
+                conn.query('INSERT INTO messages(friendship_id, sender, content) VALUES (?, ?, ?);', [result.friendship_id, senderId, messageContent], (err) => {
+                    if (err) return reject(err);
+                    resolve();
                 });
             });
         });

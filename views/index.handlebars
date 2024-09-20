@@ -1,252 +1,300 @@
-<div class="newsModalContainer" id="newsModalContainer">
-    <div class="newsModal">
-        <h2>{{ t 'menu.General.News and changes' }}</h2>
-        <h1>The 0.11.6 patchnotes</h1>
-        <div class="actualText">
-                <p>This patch was quite simple, I focused on improving user experience and smoothness of the service.</p>
-                <h3>New themes</h3>
-                <p>This patch I've added two new themes to the shop: The dark Enigmatic fade and the noble Pink gold.</p>
-                <h3>New namestyles</h3>
-                <p>The shop also received two new namestyles: The enthusiastic Burning orange and the fairy Lavender.</p>
-                <p>All of the new cosmetics are also obtainable through Statboxes.</p>
-                <h3>Full change list</h3>
-                <ul>
-                    <li>Added multiple new cosmatic items to the shop.</li>
-                    <li>Fixed the bug where a reward every 10 levels (Three-masted Statbox) was congratulating the player on reaching level 2.</li>
-                    <li>Increased the Smart difficulty XP multiplier from 2 to 3 (Simple has 1 while Overkill has 5)</li>
-                    <li>Minor backend optimisation improvements.</li>
-                </ul>
-        </div>
+<section class="social">
+    <div class="collapsed">
+        <span class="el">{{ t 'menu.Social.Social' }}</span>
+        <span class="el">{{ t 'menu.Social.No new notifications' }}</span>
+        <span class="el">{{ t 'menu.Social.Friends online:' }} <span class="important" id="friendsOnline"></span></span>
     </div>
-</div>
-
-<div class="newItemContainer" id="lootboxOpenContainer">
-    <div class="lootboxModal">
-        <h1>{{ t 'menu.Inventory.You receive:' }}</h1>
-
-        <div class="item" id="droppedItem" style="--gradient-colors: ;--background:;">
-            <div class="background"></div>
-            <div class="overlay">
-                <div class="overlayBase">
-                    <h2 id="droppedItemType"></h2>
-                    <h1 id="droppedItemName"></h1>
-                    <p id="droppedItemDescription"></p>
-                </div>
-            </div>
+    <div class="expanded">
+        <div class="chatBox">
+            <h1 class="title">{{ t 'menu.Social.chat.Chat' }} <div><span id="chatFriendName"></span><span class="material-symbols-outlined closeX" onclick="closeChat()">close</span></div></h1>
+            <div class="chat" id="chat"></div>
+            <textarea id="messageBox" rows="3" placeholder="{{ t 'menu.Social.chat.Type your message here' }}"></textarea>
         </div>
-    </div>
-</div>
-
-<div class="newItemContainer" id="giftContainer">
-    <div class="lootboxModal">
-        <h1>{{ t 'menu.Inventory.You received a gift' }}</h1>
-        <p id="giftMessage"></p>
-
-        <div class="item" id="giftItem" style="--gradient-colors: ;--background:;">
-            <div class="background"></div>
-            <div class="overlay">
-                <div class="overlayBase">
-                    <h2 id="giftItemType"></h2>
-                    <h1 id="giftItemName"></h1>
-                    <p id="giftItemDescription"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<nav><span onclick="switchView('settingsView')" class="item" style="text-align: left;">{{ t 'menu.navbar.Settings' }}</span><span onclick="switchView('mainMenuView')" class="item" style="text-align: center;">{{ t 'menu.navbar.Main menu' }}</span> <div class="item"><span id="profileButton">{{ t 'menu.navbar.Profile' }}</span><span id="shopButton" onclick="switchView('shopView')"><img src="/assets/img/masts-logo.png" alt="Masts" style="height: 0.9em;"><span id="masts">0</span></span></div></nav>
-<div class="container" id="mainMenuView" data-path="/">
-    <div>
-        <h2>{{ t 'menu.index.Select game mode' }}</h2>
-        <div class="modes">
-            <div onclick="switchView('pvpMenuView')">
-                <h2>{{ t 'menu.index.PvP' }}</h2>
-                <p>{{ t 'menu.index.Play against another player' }}</p>
-            </div>
-            <div onclick="switchView('vsAiView')">
-                <h2>{{ t 'menu.index.Vs AI' }}</h2>
-                <p>{{ t 'menu.index.Play against the computer' }}</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="vsAiView" data-path="/pve">
-    <div>
-        <h2>{{ t 'menu.PvE.Create' }}</h2>
-        <h3>{{ t 'menu.PvE.Choose the difficulty mode' }}</h3>
-        <div class="modes">
-            <div>
-                <form action="#" id="pveCreateForm">
-                    <select name="difficulty" id="pveDifficulty">
-                        <option value="simple">Simple</option>
-                        <option value="smart">Smart</option>
-                        <option value="overkill">Overkill</option>
-                    </select>
-                    <p id="difficultyDescription">
-                        {{ t 'menu.PvE.difficulty.Simple.description' }}
-                    </p>
-                    <input type="submit" value="{{ t 'menu.PvE.Begin' }}">
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="pvpMenuView" data-path="/pvp">
-    <div>
-        <h2>{{ t 'menu.PvP.PvP' }}</h2>
-        <div class="modes">
-            <div id="createGameButton">
-                <h2>{{ t 'menu.PvP.Create' }}</h2>
-                <p>{{ t 'menu.PvP.Create your own room' }}</p>
-            </div>
-            <div onclick="switchView('pvpJoinView')">
-                <h2>{{ t 'menu.PvP.Join' }}</h2>
-                <p>{{ t 'menu.PvP.Join a room by a code' }}</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="pvpCreateView" data-path="/pvp/create" data-pathlock>
-    <div>
-        <h2>{{ t 'menu.PvP/Create.PvP / Create' }}</h2>
-        <div class="modes">
-            <div>
-                <h2>{{ t 'menu.PvP/Create.Room code:' }}</h2>
-                <input type="text" maxlength="6" readonly value="-" id="createGameCode">
-                <h3>{{ t 'menu.PvP/Create.Waiting for an opponent' }}</h3>
-                <button id="leaveGameButton">{{ t 'menu.PvP/Create.Leave the room' }}</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="pvpJoinView" data-path="/pvp/join">
-    <div>
-        <h2>{{ t 'menu.PvP/Join.PvP / Join' }}</h2>
-        <div class="modes">
-            <div>
-                <form action="#" id="pvpJoinForm">
-                    <input type="text" maxlength="6" id="pvpJoinCode" placeholder="{{ t 'menu.PvP/Join.Room code' }}" autocomplete="off">
-                    <input type="submit" value="{{ t 'menu.PvP/Join.Join' }}">
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="preparingGame" data-path="/pvp/prepairing" data-pathlock>
-    <div>
-        <h2>{{ t 'menu.PvP/Loading.PvP / Loading' }}</h2>
-        <div class="modes">
-            <div>
-                <h2>{{ t 'menu.PvP/Loading.Wait' }}</h2>
-                <h3>{{ t 'menu.PvP/Loading.You will be redirected soon' }}</h3>
-                <h3>{{ t 'menu.PvP/Loading.Opponent:' }}</h3>
-                <h4 id="oppNameField" class="username"></h4>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" id="profileView" data-path="/profile">
-    <div class="profile">
-        <h1 class="nickname username">{{ t 'menu.Profile.Loading' }}</h1>
-        <div class="accountinfo">
-            <div class="levelContainer" id="levelcontainer">
-                <span id="level">0</span>
+        <h1 class="mainTitle">{{ t 'menu.Social.Friends' }} <span class="material-symbols-outlined closeX" id="closeSocialTab" onclick="toggleSocialTabMobile()">close</span></h1>
+        <div class="inviteFriends">
+            <h3>{{ t 'menu.Social.addafriend.Add a friend!' }}</h3>
+            <span>{{ t 'menu.Social.addafriend.Your friend needs to scan this QR code or alternatively add you through your UID' }}</span>
+            <div class="qrContainer">
+                <img src="data:image/png;base64,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
+                " alt="QRcode">
                 <div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="xpbar" style="width: 0%;"></div>
+                    <button>{{ t 'menu.Social.addafriend.Scan a code' }}</button>
+                </div>
+            </div>
+            <span>UID: c231c4f7-e179-11ee-920b-fa163e32c013</span>
+            {{!-- <input type="text" name="" id="" placeholder="UID znajomego"> --}}
+        </div>
+        <div class="friendsList" id="friendsList"></div>
+    </div>
+</section>
+
+<div class="sitecontent">
+    <div class="newsModalContainer" id="newsModalContainer">
+        <div class="newsModal">
+            <h2>{{ t 'menu.General.News and changes' }}</h2>
+            <h1>The 0.12.0 patchnotes</h1>
+            <div class="actualText">
+                <p>This patch did not introduce the guest mode YET, but I've recently came up with another good idea for a feature - a friends and chat system. This update introduces a simple and unfinished version of it. So far you cannot do much, but I'm publishing this build just so I can test some minor features with my friends.</p>
+                <p>You can expect further changes and improvements to the Social system and I will post a specific change log later (likely after I finish this feature).</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="newItemContainer" id="lootboxOpenContainer">
+        <div class="lootboxModal">
+            <h1>{{ t 'menu.Inventory.You receive:' }}</h1>
+    
+            <div class="item" id="droppedItem" style="--gradient-colors: ;--background:;">
+                <div class="background"></div>
+                <div class="overlay">
+                    <div class="overlayBase">
+                        <h2 id="droppedItemType"></h2>
+                        <h1 id="droppedItemName"></h1>
+                        <p id="droppedItemDescription"></p>
                     </div>
                 </div>
             </div>
-            <span id="xpbooststatus">{{ t 'menu.Profile.XP Boost active' }}</span>
-            <div>
-                <span>{{ t 'menu.Profile.Player since:' }} </span>
-                <span id="playerSince">-</span><br>
+        </div>
+    </div>
+    
+    <div class="newItemContainer" id="giftContainer">
+        <div class="lootboxModal">
+            <h1>{{ t 'menu.Inventory.You received a gift' }}</h1>
+            <p id="giftMessage"></p>
+    
+            <div class="item" id="giftItem" style="--gradient-colors: ;--background:;">
+                <div class="background"></div>
+                <div class="overlay">
+                    <div class="overlayBase">
+                        <h2 id="giftItemType"></h2>
+                        <h1 id="giftItemName"></h1>
+                        <p id="giftItemDescription"></p>
+                    </div>
+                </div>
             </div>
-            
         </div>
     </div>
-    <div class="stats">
-        <div class="matchList"></div>
-        <div class="periodical">
-            <div class="stat"><h1 id="monthlyPlayed">-</h1><span>{{ t 'menu.Profile.matches played this month' }}</span></div>
-            <div class="stat"><h1 id="totalPlayed">-</h1><span>{{ t 'menu.Profile.total matches played' }}</span></div>
-            <div class="stat"><h1 id="winrate">-</h1><span>{{ t 'menu.Profile.winrate this month' }}</span></div>
+    
+    <nav>
+        <div class="item">
+            <span onclick="toggleSocialTabMobile()" class="socialButton">{{ t 'menu.navbar.Social' }}</span>
+            <span onclick="switchView('settingsView')">{{ t 'menu.navbar.Settings'}}</span>
+        </div>
+
+        <span onclick="switchView('mainMenuView')" class="item" style="text-align: center;">{{ t 'menu.navbar.Main menu'}}</span>
+        <div class="item">
+            <span id="profileButton">{{ t 'menu.navbar.Profile' }}</span>
+            <span id="shopButton" onclick="switchView('shopView')">
+                <img src="/assets/img/masts-logo.png" alt="Masts" style="height: 0.9em;">
+                <span id="masts">0</span>
+            </span>
+        </div>
+    </nav>
+    <div class="container" id="mainMenuView" data-path="/">
+        <div>
+            <h2>{{ t 'menu.index.Select game mode' }}</h2>
+            <div class="modes">
+                <div onclick="switchView('pvpMenuView')">
+                    <h2>{{ t 'menu.index.PvP' }}</h2>
+                    <p>{{ t 'menu.index.Play against another player' }}</p>
+                </div>
+                <div onclick="switchView('vsAiView')">
+                    <h2>{{ t 'menu.index.Vs AI' }}</h2>
+                    <p>{{ t 'menu.index.Play against the computer' }}</p>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-
-<div class="container" id="shopView" data-path="/shop">
-    <div class="main">
-        <h1>{{ t 'menu.Shop.Shop' }}</h1>
-        <h2>{{ t 'menu.Shop.Theme packs' }}</h2>
-        <p>{{ t 'menu.Shop.Theme packs modify the look of your Statki' }}</p>
-        <div class="items" id="themepacks">
-            
+    
+    <div class="container" id="vsAiView" data-path="/pve">
+        <div>
+            <h2>{{ t 'menu.PvE.Create' }}</h2>
+            <h3>{{ t 'menu.PvE.Choose the difficulty mode' }}</h3>
+            <div class="modes">
+                <div>
+                    <form action="#" id="pveCreateForm">
+                        <select name="difficulty" id="pveDifficulty">
+                            <option value="simple">Simple</option>
+                            <option value="smart">Smart</option>
+                            <option value="overkill">Overkill</option>
+                        </select>
+                        <p id="difficultyDescription">
+                            {{ t 'menu.PvE.difficulty.Simple.description' }}
+                        </p>
+                        <input type="submit" value="{{ t 'menu.PvE.Begin' }}">
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <h2>{{ t 'menu.Shop.Namestyles' }}</h2>
-        <p>{{ t 'menu.Shop.Namestyles are visual modifications to your nickname visible to you and other players' }}</p>
-        <div class="items" id="namestyles">
-            
+    </div>
+    
+    <div class="container" id="pvpMenuView" data-path="/pvp">
+        <div>
+            <h2>{{ t 'menu.PvP.PvP' }}</h2>
+            <div class="modes">
+                <div id="createGameButton">
+                    <h2>{{ t 'menu.PvP.Create' }}</h2>
+                    <p>{{ t 'menu.PvP.Create your own room' }}</p>
+                </div>
+                <div onclick="switchView('pvpJoinView')">
+                    <h2>{{ t 'menu.PvP.Join' }}</h2>
+                    <p>{{ t 'menu.PvP.Join a room by a code' }}</p>
+                </div>
+            </div>
         </div>
-
-        <h2>{{ t 'menu.Shop.Statboxes' }}</h2>
-        <p>
-            {{ t 'menu.Shop.Statboxes are lootboxes containing random items including XP boosts and cosmetic items' }}<br>
-            {{ t 'menu.Shop.Statboxes may contain items not available for purchase in the shop' }}
+    </div>
+    
+    <div class="container" id="pvpCreateView" data-path="/pvp/create" data-pathlock>
+        <div>
+            <h2>{{ t 'menu.PvP/Create.PvP / Create' }}</h2>
+            <div class="modes">
+                <div>
+                    <h2>{{ t 'menu.PvP/Create.Room code:' }}</h2>
+                    <input type="text" maxlength="6" readonly value="-" id="createGameCode">
+                    <h3>{{ t 'menu.PvP/Create.Waiting for an opponent' }}</h3>
+                    <button id="leaveGameButton">{{ t 'menu.PvP/Create.Leave the room' }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" id="pvpJoinView" data-path="/pvp/join">
+        <div>
+            <h2>{{ t 'menu.PvP/Join.PvP / Join' }}</h2>
+            <div class="modes">
+                <div>
+                    <form action="#" id="pvpJoinForm">
+                        <input type="text" maxlength="6" id="pvpJoinCode" placeholder="{{ t 'menu.PvP/Join.Room code' }}"
+                            autocomplete="off">
+                        <input type="submit" value="{{ t 'menu.PvP/Join.Join' }}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" id="preparingGame" data-path="/pvp/prepairing" data-pathlock>
+        <div>
+            <h2>{{ t 'menu.PvP/Loading.PvP / Loading' }}</h2>
+            <div class="modes">
+                <div>
+                    <h2>{{ t 'menu.PvP/Loading.Wait' }}</h2>
+                    <h3>{{ t 'menu.PvP/Loading.You will be redirected soon' }}</h3>
+                    <h3>{{ t 'menu.PvP/Loading.Opponent:' }}</h3>
+                    <h4 id="oppNameField" class="username"></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" id="profileView" data-path="/profile">
+        <div class="profile">
+            <h1 class="nickname username">{{ t 'menu.Profile.Loading' }}</h1>
+            <div class="accountinfo">
+                <div class="levelContainer" id="levelcontainer">
+                    <span id="level">0</span>
+                    <div>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="xpbar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <span id="xpbooststatus">{{ t 'menu.Profile.XP Boost active' }}</span>
+                <div>
+                    <span>{{ t 'menu.Profile.Player since:' }} </span>
+                    <span id="playerSince">-</span><br>
+                </div>
+    
+            </div>
+        </div>
+        <div class="stats">
+            <div class="matchList"></div>
+            <div class="periodical">
+                <div class="stat">
+                    <h1 id="monthlyPlayed">-</h1><span>{{ t 'menu.Profile.matches played this month' }}</span>
+                </div>
+                <div class="stat">
+                    <h1 id="totalPlayed">-</h1><span>{{ t 'menu.Profile.total matches played' }}</span>
+                </div>
+                <div class="stat">
+                    <h1 id="winrate">-</h1><span>{{ t 'menu.Profile.winrate this month' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" id="shopView" data-path="/shop">
+        <div class="main">
+            <h1>{{ t 'menu.Shop.Shop' }}</h1>
+            <h2>{{ t 'menu.Shop.Theme packs' }}</h2>
+            <p>{{ t 'menu.Shop.Theme packs modify the look of your Statki' }}</p>
+            <div class="items" id="themepacks">
+    
+            </div>
+    
+            <h2>{{ t 'menu.Shop.Namestyles' }}</h2>
+            <p>{{ t 'menu.Shop.Namestyles are visual modifications to your nickname visible to you and other players' }}</p>
+            <div class="items" id="namestyles">
+    
+            </div>
+    
+            <h2>{{ t 'menu.Shop.Statboxes' }}</h2>
+            <p>
+                {{ t 'menu.Shop.Statboxes are lootboxes containing random items including XP boosts and cosmetic items'
+                }}<br>
+                {{ t 'menu.Shop.Statboxes may contain items not available for purchase in the shop' }}
             </p>
-        <div class="items" id="statboxes">
-
+            <div class="items" id="statboxes">
+    
+            </div>
         </div>
     </div>
-</div>
-
-<div class="container" id="inventoryView" data-path="/inventory">
-    <div class="main">
-        <h1>{{ t 'menu.Inventory.Inventory' }}</h1>
-        <div class="controls">
-            <button class="danger" onclick="applyTheme(null)">{{ t 'menu.Inventory.Reset theme' }}</button>
-            <button class="danger" onclick="applyNameStyle(null)">{{ t 'menu.Inventory.Reset name style' }}</button>
-        </div>
-        <div class="items" id="inventoryitems">
-            
+    
+    <div class="container" id="inventoryView" data-path="/inventory">
+        <div class="main">
+            <h1>{{ t 'menu.Inventory.Inventory' }}</h1>
+            <div class="controls">
+                <button class="danger" onclick="applyTheme(null)">{{ t 'menu.Inventory.Reset theme' }}</button>
+                <button class="danger" onclick="applyNameStyle(null)">{{ t 'menu.Inventory.Reset name style' }}</button>
+            </div>
+            <div class="items" id="inventoryitems">
+    
+            </div>
         </div>
     </div>
-</div>
-
-<div class="container" id="dropRatesView" data-path="/drop-rates">
-    <div class="main">
-        <h1>{{ t 'menu.Inventory.Drop rates' }}</h1>
-        <div id="dropRates">
-
+    
+    <div class="container" id="dropRatesView" data-path="/drop-rates">
+        <div class="main">
+            <h1>{{ t 'menu.Inventory.Drop rates' }}</h1>
+            <div id="dropRates">
+    
+            </div>
+            <p>{{ t 'menu.Inventory.Chances dont matter if you own all unique items of a certain category In this case the
+                algorithm chooses the first category under the one picked that you can (still) get items from' }}</p>
         </div>
-        <p>{{ t 'menu.Inventory.Chances dont matter if you own all unique items of a certain category In this case the algorithm chooses the first category under the one picked that you can (still) get items from' }}</p>
     </div>
-</div>
-
-<div class="container" id="settingsView" data-path="/settings">
-    <div>
-        <h1>{{ t 'menu.Settings.Settings' }}</h1>
-        <h2>{{ t 'menu.Settings.General' }}</h2>
-        <label for="language">Language: </label>
-        <select name="language" id="languages">
-            
-        </select>
-
-        <h2>{{ t 'menu.Settings.Account' }}</h2>
-        <h3>{{ t 'menu.Settings.Current nickname:' }} <span class="nickname dynamic">{{ t 'menu.Profile.Loading' }}</span></h3>
-        <button onclick="window.location.href = '/nickname'">{{ t 'menu.Settings.Change nickname' }}</button>
-        <p style="font-size: 0.75rem;opacity: 0.6;">{{ t 'menu.Settings.See: Privacy policy for modifying or removing other account data' }}</p>
-        <h3 onclick="openNewsModal()" id="news">{{ t 'menu.Settings.Show news and changes' }}</h3>
-        <h3 id="logout">{{ t 'menu.Settings.Log out' }}</h3>
-        <p class="versionInfo">Statki ver. {{ ver }}<br>© 2024 mcjk<br><a href="/terms" target="_blank">{{ t 'landing.Terms of service' }}</a> / <a href="/privacy" target="_blank">{{ t 'landing.Privacy policy' }}</a></p>
+    
+    <div class="container" id="settingsView" data-path="/settings">
+        <div>
+            <h1>{{ t 'menu.Settings.Settings' }}</h1>
+            <h2>{{ t 'menu.Settings.General' }}</h2>
+            <label for="language">Language: </label>
+            <select name="language" id="languages">
+    
+            </select>
+    
+            <h2>{{ t 'menu.Settings.Account' }}</h2>
+            <h3>{{ t 'menu.Settings.Current nickname:' }} <span class="nickname dynamic">{{ t 'menu.Profile.Loading'
+                    }}</span></h3>
+            <button onclick="window.location.href = '/nickname'">{{ t 'menu.Settings.Change nickname' }}</button>
+            <p style="font-size: 0.75rem;opacity: 0.6;">{{ t 'menu.Settings.See: Privacy policy for modifying or removing
+                other account data' }}</p>
+            <h3 onclick="openNewsModal()" id="news">{{ t 'menu.Settings.Show news and changes' }}</h3>
+            <h3 id="logout">{{ t 'menu.Settings.Log out' }}</h3>
+            <p class="versionInfo">Statki ver. {{ ver }}<br>© 2024 mcjk<br><a href="/terms" target="_blank">{{ t
+                    'landing.Terms of service' }}</a> / <a href="/privacy" target="_blank">{{ t 'landing.Privacy policy'
+                    }}</a></p>
+        </div>
     </div>
 </div>
 
@@ -293,9 +341,27 @@
         "Theme pack": "{{ t 'menu.Inventory.Theme pack' }}",
         "Name style": "{{ t 'menu.Inventory.Name style' }}",
         "XP Boost": "{{ t 'menu.Inventory.XP Boost' }}",
-        "Nothing to see here": "{{ t 'menu.Inventory.Nothing to see here' }}"
+        "Nothing to see here": "{{ t 'menu.Inventory.Nothing to see here' }}",
+
+        "Chat": "{{ t 'menu.Social.chat.Chat' }}",
+        "Duel": "{{ t 'menu.Social.Duel' }}",
+        "Remove friend": "{{ t 'menu.Social.Remove friend' }}",
+
+        "Offline": "{{ t 'menu.Social.statuses.Offline' }}",
+        "Online": "{{ t 'menu.Social.statuses.Online' }}",
+        "In game": "{{ t 'menu.Social.statuses.In game' }}",
+
+        "Friend online": "{{ t 'menu.Social.toasts.Friend online' }}",
+        "just went online": "{{ t 'menu.Social.toasts.just went online' }}",
+        "Your friend just went online! You can message them through the Social tab": "{{ t 'menu.Social.toasts.Your friend just went online! You can message them through the Social tab' }}",
+
+        "This is the beginning of your conversation": "{{ t 'menu.Social.chat.This is the beginning of your conversation' }}",
+        "New message": "{{ t 'menu.Social.chat.New message' }}",
+        "New message from a friend": "{{ t 'menu.Social.chat.New message from a friend' }}",
+        "just sent you a message! You can read it in the Social tab": "{{ t 'menu.Social.chat.just sent you a message! You can read it in the Social tab' }}",
     };
 </script>
 <script src="/assets/js/spa_lib.js"></script>
 <script src="/assets/js/socket.js"></script>
+<script src="/assets/js/social.js"></script>
 <script src="/assets/js/socket-err-handler.js"></script>

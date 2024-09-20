@@ -225,7 +225,7 @@ var updateTimer = setInterval(() => {
 
 socket.on("game finished", (winnerIdx, oppName, oppNameStyle) => {
     socket.disconnect();
-    $("#opponent").html(`Vs. <span class="important username" style="${oppNameStyle ? 'background: ' + oppNameStyle : ''}">${oppName}</span>`);
+    $("#opponent").html(`Vs. <span class="important username" style="${oppNameStyle ? 'background: ' + oppNameStyle : ''}">${escapeHTML(oppName)}</span>`);
 
     if (winnerIdx === playerIdx) {
         $("#state").html(locale["Victory"]);
@@ -358,6 +358,15 @@ function readyUp() {
     socket.emit("ready", () => {
         $(".readyButton").css({ pointerEvents: 'none', opacity: 0.3 });
     });
+}
+
+function escapeHTML(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 socket.on('player left', () => {

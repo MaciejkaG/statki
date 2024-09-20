@@ -21,7 +21,7 @@
     --ship-ally-sunken: hsl(120, 30%, 30%);
     --ship-enemy-sunken: hsl(0, 30%, 30%);
 
-    --dynamic: rgb(83, 83, 245);
+    --dynamic: rgb(74, 107, 255);
     --danger: rgb(230, 73, 73);
     --important: rgb(203, 50, 241);
 
@@ -35,6 +35,9 @@
     --element-bg-alt: rgba(16, 16, 16, 0.6);
 
     --inventory-item: #101010;
+
+    --social-tab-collapsed-width: 3rem;
+    --social-tab-expanded-width: 20rem;
 
     color: rgb(136, 136, 136)
 }

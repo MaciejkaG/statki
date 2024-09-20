@@ -20,6 +20,9 @@ import SessionRedisStore from 'connect-redis';
 import mysql from 'mysql';
 import { isFakeEmail } from 'fakefilter';
 import winston from 'winston';
+import { EventEmitter } from 'node:events';
+
+const EE = new EventEmitter();
 
 const logger = winston.createLogger({
     level: 'info',
@@ -61,7 +64,9 @@ app.set('views', './views');
 
 const server = createServer(app);
 const io = new Server(server);
-const redis = createClient();
+const redis = createClient({ 
+    url: 'redis://172.20.115.176:6379'
+ });
 redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
 
@@ -171,7 +176,6 @@ app.get('/', async (req, res) => {
                 t: (key) => { return locale.t(key) }
             }
         });
-        // res.redirect('/login');
     } else if (login != 2) {
         res.redirect("/login");
     } else if (req.session.nickname == null) {
@@ -249,7 +253,6 @@ app.get('/match/:searchId', async (req, res) => {
     }
 
     auth.getMatch(req.params.searchId).then(result => {
-        // res.send(result);
         res.render('match', {
             helpers: {
                 t: (key) => { return locale.t(key) },
@@ -424,7 +427,7 @@ app.post('/api/auth', async (req, res) => {
 });
 
 app.post('/api/nickname', (req, res) => {
-    if (loginState(req) == 2 && req.body.nickname != null && 3 <= req.body.nickname.length && escapeHTML(req.body.nickname).length <= 16) {
+    if (loginState(req) == 2 && req.body.nickname != null && 3 <= req.body.nickname.length && req.body.nickname <= 16) {
         req.body.nickname = escapeHTML(req.body.nickname); // Escape HTML from the nickname
         req.session.nickname = req.body.nickname;
         req.session.activeGame = null;
@@ -686,6 +689,26 @@ io.on('connection', async (socket) => {
             }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
+        // The social stuff
+        socket.on('my friends', (callback) => {
+            auth.getFriends(session.userId).then((result) => {
+                callback(result);
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+
+        socket.on('get conversation', (friendId, callback) => {
+            auth.getConversation(session.userId, friendId).then((result) => {
+                callback(result);
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+
+        socket.on('send message', (recipientId, content, callback) => {
+            auth.sendMessage(session.userId, recipientId, content).then(() => {
+                callback();
+                EE.emit(`message_to:${recipientId}`, session.userId, content);
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+
         socket.on('match list', (page, callback) => {
             if (typeof page !== 'number' && 1 > page) {
                 return;
@@ -941,7 +964,22 @@ io.on('connection', async (socket) => {
             session.destroy();
         });
 
+        // Update user's online status.
+        await auth.updateLastOnline(session.userId);
+        const updateOnlineStatus = setInterval(async () => {
+            await auth.updateLastOnline(session.userId);
+        }, 5000);
+
+        // Listen for new messages for the user
+        const callback = async (fromId, content) => {
+            socket.emit('new message', fromId, await auth.getNickname(fromId), content);
+        };
+
+        EE.on(`message_to:${session.userId}`, callback);
+
         socket.on('disconnecting', () => {
+            EE.off(`message_to:${session.userId}`, callback);
+            clearInterval(updateOnlineStatus);
             if (bships.isPlayerInRoom(socket)) {
                 io.to(socket.rooms[1]).emit("player left");
             }
@@ -1004,7 +1042,14 @@ io.on('connection', async (socket) => {
             }
         });
 
+        // Update user's online status.
+        await auth.updateLastOnline(session.userId, true);
+        const updateOnlineStatus = setInterval(async () => {
+            await auth.updateLastOnline(session.userId, true);
+        }, 5000);
+
         socket.on('disconnecting', async () => {
+            clearInterval(updateOnlineStatus);
             const playerGame = await GInfo.getPlayerGameData(socket);
             if (playerGame !== null) {
                 AFKEnd(playerGame.id);
