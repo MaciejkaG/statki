@@ -40,11 +40,11 @@ $('.social').hover(function() {
         });
     }
 }, function () {
-    if (!$('.social *').is(":focus")) closeChat();
+    if (!$('.social *').is(":focus")) closeCards();
 });
 
 $('.social').on('focusout', function () {
-    if (!$('.social').is(":focus") && !$('.social').is(":hover")) closeChat();
+    if (!$('.social').is(":focus") && !$('.social').is(":hover")) closeCards();
 });
 
 const messageBox = document.getElementById('messageBox');
@@ -71,9 +71,9 @@ const buttonsAnimation = {
 
 // Socket connections and data management
 function updateFriendsList() {
-    console.log("Downloading friends list now...");
-    socket.emit("my friends", (friendsList) => {
-        console.log("Successfully received the friends list. Processing...");
+    console.log("Downloading friends list and friend requests now...");
+    socket.emit("my friends", ({ friends: friendsList, requests }) => {
+        console.log("Successfully received the friends list and friend requests. Processing...");
         // Find all existing friend elements in the DOM
         let friendElements = document.querySelectorAll('#friendsList .el');
 
@@ -201,7 +201,38 @@ function updateFriendsList() {
             });
         }
 
-        console.log("Successfully received and processed the friends list.");
+        console.log('Successfully received and processed the friends list.');
+
+        // Friend requests managing here
+        console.log('Processing friend requests now...');
+        const requestsEl = document.getElementById('requests');
+        requestsEl.innerHTML = `<h3>${window.locale['Incoming']}</h3>`;
+        
+        const incoming = requests.filter(x => x.incoming);
+        const outgoing = requests.filter(x => !x.incoming);
+
+        for (let i = 0; i < incoming.length; i++) {
+            const request = incoming[i];
+            
+            requestsEl.innerHTML += `<div class="el" data-user-id="${request.user_id}"><span>${request.nickname}</span><div><span class="material-symbols-outlined confirm" onclick="confirmRequest(this)">check</span><span class="material-symbols-outlined decline" onclick="declineRequest(this)">close</span></div></div>`;
+        }
+
+        if (!incoming.length) {
+            requestsEl.innerHTML += `<span class="placeholder">${window.locale['Nothing to see here']}</span>`;
+        }
+
+        requestsEl.innerHTML += `<h3>${window.locale['Outgoing']}</h3>`;
+        for (let i = 0; i < outgoing.length; i++) {
+            const request = outgoing[i];
+
+            requestsEl.innerHTML += `<div class="el" data-user-id="${request.user_id}"><span>${request.nickname}</span><div><span class="material-symbols-outlined decline" onclick="declineRequest(this)">close</span></div></div>`;
+        }
+
+        if (!outgoing.length) {
+            requestsEl.innerHTML += `<span class="placeholder">${window.locale['Nothing to see here']}</span>`;
+        }
+
+        console.log('Successfully processed the friend requests list.');
     });
 }
 
@@ -210,19 +241,35 @@ setInterval(updateFriendsList, 3000);
 
 socket.on('new message', (fromId, nickname, content) => {
     addMessage(fromId, true, content);
-    sendSocialToast('New message', '', nickname + ' ' + window.locale['just sent you a message! You can read it in the Social tab'])
+    if (fromId !== activeChatFriendId) {
+        sendSocialToast('New message', '', nickname + ' ' + window.locale['just sent you a message! You can read it in the Social tab']);
+    }
 });
 
-// Some functions
+// Confirms a friend request through socket.io
+function confirmRequest(el) {
 
+}
+
+// Removes a friendship through socket.io, but by a request element.
+function declineRequest(el) {
+
+}
+
+// Removes friendship through socket.io by friend's UID
+function removeFriendship(friendUid) {
+
+}
+
+// Some functions
 function toggleSocialTabMobile() {
     $('.social').toggleClass('active');
-    closeChat();
+    closeCards();
 }
 
 // Helper function that physically opens the chat menu, should be called after downloading data.
 const openMenu = () => {
-    $('.chatBox').toggleClass('active');
+    $('#chatbox').toggleClass('active');
 
     // Scroll to the bottom of the message history
     $('#chat').scrollTop($('#chat').get(0).scrollHeight);
@@ -294,7 +341,8 @@ function openChat(el) {
 }
 
 function closeChat() {
-    $('.chatBox').removeClass('active');
+    $('#chatbox').removeClass('active');
+    activeChatFriendId = null;
 }
 
 function addMessage(userId, incoming, content) {
@@ -371,4 +419,29 @@ function sendSocialToast(category, header, content) {
         stopOnFocus: true,
         className: "bshipstoast",
     }).showToast();
+}
+
+// Opens the friend requests card
+function openRequests() {
+    $('#requestsbox').toggleClass('active');
+
+    // Animate messages appearing from the bottom (the most recent)
+    anime({
+        targets: ['#requests h3', '#requests .el', '.placeholder'],
+        easing: 'easeOutExpo',
+        translateY: [-50, 0],
+        opacity: [0, 1],
+        duration: 500,
+        delay: anime.stagger(100, {  start: 300 })
+    });
+};
+
+function closeRequests() {
+    $('#requestsbox').removeClass('active');
+}
+
+// This function closes all cards, it is used when the Social tab collapses
+function closeCards() {
+    closeChat();
+    closeRequests();
 }

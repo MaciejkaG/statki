@@ -36,6 +36,10 @@
         "Social": {
             "Social": "Społecznościowe",
             "Friends": "Znajomi",
+            "Friend requests": "Zaproszenia do znajomych",
+
+            "Outgoing": "Wychodzące",
+            "Incoming": "Przychodzące",
 
             "No new notifications": "Brak nowych powiadomień",
             "Friends online:": "Znajomi online:",

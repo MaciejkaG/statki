@@ -36,6 +36,10 @@
         "Social": {
             "Social": "Social",
             "Friends": "Friends",
+            "Friend requests": "Friend requests",
+
+            "Outgoing": "Outgoing",
+            "Incoming": "Incoming",
 
             "No new notifications": "No new notifications",
             "Friends online:": "Friends online:",

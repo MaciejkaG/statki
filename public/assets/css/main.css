@@ -345,6 +345,45 @@ body {
     background-color: var(--field);
 }
 
+.requestsBox {
+    z-index: 962;
+}
+
+.requestsBox span.placeholder {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--mark-spot);
+}
+
+.requestsBox .el {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.requestsBox .el div {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+}
+
+.requestsBox .el .confirm,
+.requestsBox .el .decline {
+    user-select: none;
+    cursor: pointer;
+}
+
+.requestsBox .el .confirm {
+    color: var(--ship-valid);
+}
+
+.requestsBox .el .decline {
+    color: var(--ship-invalid);
+}
+
 .container {
     display: none;
     transition: opacity .175s;

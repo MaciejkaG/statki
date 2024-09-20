@@ -5,7 +5,13 @@
         <span class="el">{{ t 'menu.Social.Friends online:' }} <span class="important" id="friendsOnline"></span></span>
     </div>
     <div class="expanded">
-        <div class="chatBox">
+        <div class="chatBox requestsBox" id="requestsbox">
+            <h1 class="title">{{ t 'menu.Social.Friend requests' }} <span class="material-symbols-outlined closeX" onclick="closeRequests()">close</span></h1>
+            <div id="requests">
+
+            </div>
+        </div>
+        <div class="chatBox" id="chatbox">
             <h1 class="title">{{ t 'menu.Social.chat.Chat' }} <div><span id="chatFriendName"></span><span class="material-symbols-outlined closeX" onclick="closeChat()">close</span></div></h1>
             <div class="chat" id="chat"></div>
             <textarea id="messageBox" rows="3" placeholder="{{ t 'menu.Social.chat.Type your message here' }}"></textarea>
@@ -24,6 +30,7 @@
             <span>UID: c231c4f7-e179-11ee-920b-fa163e32c013</span>
             {{!-- <input type="text" name="" id="" placeholder="UID znajomego"> --}}
         </div>
+        <button onclick="openRequests()">{{ t 'menu.Social.Friend requests' }}</button>
         <div class="friendsList" id="friendsList"></div>
     </div>
 </section>
@@ -359,6 +366,9 @@
         "New message": "{{ t 'menu.Social.chat.New message' }}",
         "New message from a friend": "{{ t 'menu.Social.chat.New message from a friend' }}",
         "just sent you a message! You can read it in the Social tab": "{{ t 'menu.Social.chat.just sent you a message! You can read it in the Social tab' }}",
+
+        "Outgoing": "{{ t 'menu.Social.Outgoing' }}",
+        "Incoming": "{{ t 'menu.Social.Incoming' }}",
     };
 </script>
 <script src="/assets/js/spa_lib.js"></script>
