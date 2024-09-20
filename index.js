@@ -64,9 +64,7 @@ app.set('views', './views');
 
 const server = createServer(app);
 const io = new Server(server);
-const redis = createClient({ 
-    url: 'redis://172.20.115.176:6379'
- });
+const redis = createClient();
 redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
 
