@@ -210,7 +210,7 @@ setInterval(updateFriendsList, 3000);
 
 socket.on('new message', (fromId, nickname, content) => {
     addMessage(fromId, true, content);
-    if (fromId === activeChatFriendId) {
+    if (fromId !== activeChatFriendId) {
         sendSocialToast('New message', '', nickname + ' ' + window.locale['just sent you a message! You can read it in the Social tab']);
     }
 });
