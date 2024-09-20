@@ -92,7 +92,7 @@ socket.emit("my profile", (profile) => {
     // General profile data
     let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     $("#playerSince").html(new Date(profile.profile.account_creation).toLocaleDateString(undefined, options));
-    $(".nickname").html(profile.profile.nickname);
+    $(".nickname").html(escapeHTML(profile.profile.nickname));
 
     // Profile stats
     $("#monthlyPlayed").html(profile.stats.monthly_matches);
@@ -147,7 +147,7 @@ socket.emit("my profile", (profile) => {
         
         const duration = `${minutes}:${seconds}`;
 
-        matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}" onclick="window.open(\`/match/\${$(this).data('matchid')}\`, '_blank')"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span style="display: flex;align-items: center;gap: 0.5rem;"> vs. <span ${match.match_type === 'pvp' ? `class="username" style="background:${match.opponent_name_style}"` : 'class="important"'}>${match.match_type === "pvp" ? match.opponent : `AI (${match.ai_type})`}</span></span>${match.xp ? `<span class="xpincrease">+${match.xp}XP</span>` : ''}</div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
+        matchHistoryDOM += `<div class="match" data-matchid="${match.match_id}" onclick="window.open(\`/match/\${$(this).data('matchid')}\`, '_blank')"><div><h1 class="dynamic${match.won === 1 ? "" : " danger"}">${match.won === 1 ? window.locale["Victory"] : window.locale["Defeat"]}</h1><span style="display: flex;align-items: center;gap: 0.5rem;"> vs. <span ${match.match_type === 'pvp' ? `class="username" style="background:${match.opponent_name_style}"` : 'class="important"'}>${match.match_type === "pvp" ? escapeHTML(match.opponent) : `AI (${match.ai_type})`}</span></span>${match.xp ? `<span class="xpincrease">+${match.xp}XP</span>` : ''}</div><h2 class="statsButton">${window.locale["Click to view match statistics"]}</h2><span>${date}</span><br><span>${duration}</span></div>`;
     }
 
     if (!matchHistoryDOM) {
@@ -616,7 +616,7 @@ function openLootboxModal() {
 
 socket.emit("whats my nick", (myNickname) => {
     nickname = myNickname;
-    $("#profileButton").html(nickname);
+    $("#profileButton").html(escapeHTML(nickname));
     console.log("Received player nickname:", myNickname);
 });
 
@@ -692,7 +692,7 @@ joinForm.addEventListener('submit', (e) => {
             switch (response.status) {
                 case "ok":
                     console.log("Joined a lobby by:", response.oppNickname);
-                    $("#oppNameField").html(response.oppNickname);
+                    $("#oppNameField").html(escapeHTML(response.oppNickname));
                     $("#oppNameField").css('background', response.oppNameStyle);
                     lockUI(false);
                     switchView("preparingGame");
@@ -774,4 +774,13 @@ function itemCategoryLocalised(category) {
     }
 
     return itemCategoriesLocalised[category];
+}
+
+function escapeHTML(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }

@@ -8,7 +8,7 @@ body {
 
 .sitecontent {
     width: calc(100vw - var(--social-tab-collapsed-width));
-    height: 100vh;
+    height: 100%;
     position: absolute;
     top: 0;
     left: var(--social-tab-collapsed-width);
@@ -27,7 +27,7 @@ body {
     left: 0;
     background-color: var(--element-bg-alt);
     width: var(--social-tab-collapsed-width);
-    height: 100vh;
+    height: 100%;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.5);
@@ -51,7 +51,7 @@ body {
     pointer-events: none;
 }
 
-.social:hover~#themeBackground {
+.social:hover~#themeBackground, .social:has(*:focus)~#themeBackground {
     opacity: .3;
 }
 
@@ -72,6 +72,7 @@ body {
 .social .expanded {
     padding: 0 1rem;
     min-width: calc(var(--social-tab-expanded-width) - 2rem);
+    overflow-y: scroll;
 }
 
 .social .collapsed span.el {
@@ -99,11 +100,17 @@ body {
     display: none;
 }
 
-#closeSocialTab {
-    margin-left: auto;
+.closeX {
     font-weight: 700;
     color: var(--danger);
+    font-size: 1rem;
+    cursor: pointer;
+    user-select: none;
     padding: 0.5rem;
+}
+
+#closeSocialTab {
+    margin-left: auto;
     display: none;
 }
 
@@ -169,7 +176,7 @@ body {
 }
 
 .social .friendsList .el:hover {
-    height: 4rem;
+    height: 3.5rem;
     background-color: var(--accent-bg);
 }
 
@@ -183,9 +190,18 @@ body {
     opacity: .4;
 }
 
+.social .friendsList .el .status span {
+    font-weight: 500;
+}
+
 .social .friendsList .el .status span.online {
     opacity: 1;
     color: var(--ship-valid);
+}
+
+.social .friendsList .el .status span.ingame {
+    opacity: 1;
+    color: var(--dynamic);
 }
 
 .social .friendsList .el .buttons {
@@ -199,7 +215,7 @@ body {
     flex: 1;
     border-radius: 15px;
     padding: .3rem .75rem;
-    font-size: .7rem;
+    font-size: .6rem;
     min-width: fit-content;
     text-wrap: nowrap;
     border: 1px solid white;
@@ -234,25 +250,24 @@ body {
     padding: 0 1rem;
     box-sizing: border-box;
     z-index: 961;
-    bottom: 0;
     left: var(--social-tab-collapsed-width);
     background-color: var(--element-bg-alt);
     backdrop-filter: blur(15px);
     box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.5);
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
-    height: 0;
+    height: 90%;
+    bottom: -90%;
     display: flex;
     flex-direction: column;
-    transition: height 0.5s;
+    transition: bottom  0.5s;
 }
 
 .chatBox.active {
-    height: 70vh;
+    bottom: 0;
 }
 
 .chatBox .chat {
-    background-color: red;
     flex: 1;
 }
 
@@ -262,9 +277,16 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin: .75rem 0;
 }
 
-.chatBox .title span {
+.chatBox .title div {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.chatBox .title div span:first-child {
     font-size: 0.8rem;
     font-weight: 500;
 }
@@ -279,7 +301,48 @@ body {
     border-radius: 10px;
     padding: 0.5rem;
     box-sizing: border-box;
-    margin-bottom: 1.5rem;
+    margin: 1rem 0;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.chat {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 .5rem;
+    box-sizing: border-box;
+    overflow-y: scroll;
+}
+
+.chat .wrapper {
+    display: flex;
+    justify-content: end;
+}
+
+.chat .wrapper:has(.bubble.incoming) {
+    justify-content: start;
+}
+
+.chat .wrapper.info {
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    text-align: center;
+    justify-content: center;
+}
+
+.chat .bubble {
+    background-color: var(--dynamic);
+    border-radius: 15px;
+    padding: .5rem;
+    font-size: .8rem;
+    max-width: 60%;
+    margin: 0;
+    overflow: hidden;
+}
+
+.chat .bubble.incoming {
+    background-color: var(--field);
 }
 
 .container {
@@ -323,16 +386,36 @@ body {
 }
 
 .bshipstoast {
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--element-bg-alt);
     backdrop-filter: blur(15px);
     color: white;
-    padding: 0.75rem 1rem;
+    padding: 1.2rem .8rem;
     border-radius: 15px;
-    border: solid 2px white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    border: solid 2px var(--mark-line);
     box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    text-align: left;
+    width: 20rem;
+    max-width: 85vw;
+}
+
+.bshipstoast * {
+    margin: 0;
+}
+
+.bshipstoast h1 {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.bshipstoast h2 {
+    color: var(--mark-spot);
+    font-weight: 500;
+    font-size: 0.9rem;
 }
 
 nav {

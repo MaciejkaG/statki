@@ -40,10 +40,35 @@
             "No new notifications": "No new notifications",
             "Friends online:": "Friends online:",
 
+            "Duel": "Duel",
+            "Remove friend": "Remove friend",
+
             "addafriend": {
                 "Add a friend!": "Add a friend!",
                 "Your friend needs to scan this QR code or alternatively add you through your UID": "Your friend needs to scan this QR code or alternatively add you through your UID.",
                 "Scan a code": "Scan a code"
+            },
+
+            "chat": {
+                "Chat": "Chat",
+                "This is the beginning of your conversation": "This is the beginning of your conversation.",
+                "Type your message here": "Type your message here",
+
+                "New message": "New message",
+                "New message from a friend": "New message from a friend",
+                "just sent you a message! You can read it in the Social tab": "just sent you a message! You can read it in the Social tab."
+            },
+
+            "statuses": {
+                "In game": "In game",
+                "Online": "Online",
+                "Offline": "Offline"
+            },
+
+            "toasts": {
+                "Friend online": "Friend online",
+                "just went online": "just went online",
+                "Your friend just went online! You can message them through the Social tab": "Your friend just went online! You can message them through the Social tab."
             }
         },
         "navbar": {

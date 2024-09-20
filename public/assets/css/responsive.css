@@ -104,6 +104,10 @@
         min-width: calc(100vw - 2rem);
     }
 
+    .chatBox {
+        width: calc(100vw);
+    }
+
     .social:hover, .social:has(*:focus) {
         width: var(--social-tab-collapsed-width);
         transform: none;

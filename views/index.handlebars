@@ -2,17 +2,15 @@
     <div class="collapsed">
         <span class="el">{{ t 'menu.Social.Social' }}</span>
         <span class="el">{{ t 'menu.Social.No new notifications' }}</span>
-        <span class="el">{{ t 'menu.Social.Friends online:' }} <span class="important">1</span></span>
+        <span class="el">{{ t 'menu.Social.Friends online:' }} <span class="important" id="friendsOnline"></span></span>
     </div>
     <div class="expanded">
         <div class="chatBox">
-            <h1 class="title">Czat <span>maciej 2</span></h1>
-            <div class="chat">
-                
-            </div>
-            <textarea id="messageBox" rows="3"></textarea>
+            <h1 class="title">{{ t 'menu.Social.chat.Chat' }} <div><span id="chatFriendName"></span><span class="material-symbols-outlined closeX" onclick="closeChat()">close</span></div></h1>
+            <div class="chat" id="chat"></div>
+            <textarea id="messageBox" rows="3" placeholder="{{ t 'menu.Social.chat.Type your message here' }}"></textarea>
         </div>
-        <h1 class="mainTitle">{{ t 'menu.Social.Friends' }} <span class="material-symbols-outlined" id="closeSocialTab" onclick="toggleSocialTabMobile()">close</span></h1>
+        <h1 class="mainTitle">{{ t 'menu.Social.Friends' }} <span class="material-symbols-outlined closeX" id="closeSocialTab" onclick="toggleSocialTabMobile()">close</span></h1>
         <div class="inviteFriends">
             <h3>{{ t 'menu.Social.addafriend.Add a friend!' }}</h3>
             <span>{{ t 'menu.Social.addafriend.Your friend needs to scan this QR code or alternatively add you through your UID' }}</span>
@@ -26,30 +24,7 @@
             <span>UID: c231c4f7-e179-11ee-920b-fa163e32c013</span>
             {{!-- <input type="text" name="" id="" placeholder="UID znajomego"> --}}
         </div>
-        <div class="friendsList">
-            <div class="el">
-                <div class="status">
-                    <span>maciej 2</span>
-                    <span class="online">Online</span>
-                </div>
-                <div class="buttons">
-                    <button onclick="openChat()">Czat</button>
-                    <button>Pojedynkuj</button>
-                    <button class="danger">Usuń znajomego</button>
-                </div>
-            </div>
-            <div class="el">
-                <div class="status">
-                    <span>Test</span>
-                    <span>Offline</span>
-                </div>
-                <div class="buttons">
-                    <button>Czat</button>
-                    <button>Pojedynkuj</button>
-                    <button class="danger">Usuń znajomego</button>
-                </div>
-            </div>
-        </div>
+        <div class="friendsList" id="friendsList"></div>
     </div>
 </section>
 
@@ -378,7 +353,24 @@
         "Theme pack": "{{ t 'menu.Inventory.Theme pack' }}",
         "Name style": "{{ t 'menu.Inventory.Name style' }}",
         "XP Boost": "{{ t 'menu.Inventory.XP Boost' }}",
-        "Nothing to see here": "{{ t 'menu.Inventory.Nothing to see here' }}"
+        "Nothing to see here": "{{ t 'menu.Inventory.Nothing to see here' }}",
+
+        "Chat": "{{ t 'menu.Social.chat.Chat' }}",
+        "Duel": "{{ t 'menu.Social.Duel' }}",
+        "Remove friend": "{{ t 'menu.Social.Remove friend' }}",
+
+        "Offline": "{{ t 'menu.Social.statuses.Offline' }}",
+        "Online": "{{ t 'menu.Social.statuses.Online' }}",
+        "In game": "{{ t 'menu.Social.statuses.In game' }}",
+
+        "Friend online": "{{ t 'menu.Social.toasts.Friend online' }}",
+        "just went online": "{{ t 'menu.Social.toasts.just went online' }}",
+        "Your friend just went online! You can message them through the Social tab": "{{ t 'menu.Social.toasts.Your friend just went online! You can message them through the Social tab' }}",
+
+        "This is the beginning of your conversation": "{{ t 'menu.Social.chat.This is the beginning of your conversation' }}",
+        "New message": "{{ t 'menu.Social.chat.New message' }}",
+        "New message from a friend": "{{ t 'menu.Social.chat.New message from a friend' }}",
+        "just sent you a message! You can read it in the Social tab": "{{ t 'menu.Social.chat.just sent you a message! You can read it in the Social tab' }}",
     };
 </script>
 <script src="/assets/js/spa_lib.js"></script>

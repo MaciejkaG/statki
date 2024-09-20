@@ -40,10 +40,35 @@
             "No new notifications": "Brak nowych powiadomień",
             "Friends online:": "Znajomi online:",
 
+            "Duel": "Pojedynkuj",
+            "Remove friend": "Usuń znajomego",
+
             "addafriend": {
                 "Add a friend!": "Dodaj znajomego!",
                 "Your friend needs to scan this QR code or alternatively add you through your UID": "Twój znajomy musi zeskanować ten kod QR lub przepisać Twoje poniższe UID aby móc wysłać Tobie zaproszenie.",
                 "Scan a code": "Skanuj kod"
+            },
+
+            "chat": {
+                "Chat": "Czat",
+                "This is the beginning of your conversation": "To jest początek waszej konwersacji.",
+                "Type your message here": "Napisz swoją wiadomość tutaj",
+
+                "New message": "Nowa wiadomość",
+                "New message from a friend": "Nowa wiadomość od znajomego",
+                "just sent you a message! You can read it in the Social tab": "właśnie wysłał ci wiadomość! Możesz ją przeczytać w karcie Społecznościowe."
+            },
+
+            "statuses": {
+                "In game": "W grze",
+                "Online": "Online",
+                "Offline": "Offline"
+            },
+
+            "toasts": {
+                "Friend online": "Znajomy online",
+                "just went online": "właśnie się pojawił(a)",
+                "Your friend just went online! You can message them through the Social tab": "Twój znajomy właśnie się pojawił! Napisz do nich poprzez kartę Społecznościowe."
             }
         },
         "navbar": {
