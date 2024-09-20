@@ -27,7 +27,7 @@ setInterval(cycleMessages, 5000);
 $('.social').hover(function() {
     if ($(window).width() > 820) {
         anime({
-            targets: ['.social .expanded h1', '.social .expanded .inviteFriends', '.social .expanded .friendsList .el'],
+            targets: ['.social .expanded h1.mainTitle', '.social .expanded .inviteFriends', '.social .expanded .friendsList .el'],
             easing: 'easeOutQuint',
             translateX: [100, 0],
             opacity: [0, 1],
@@ -56,4 +56,8 @@ $('.friendsList .el').hover(function(e) {
 
 function toggleSocialTabMobile() {
     $('.social').toggleClass('active');
+}
+
+function openChat() {
+    $('.chatBox').toggleClass('active');
 }

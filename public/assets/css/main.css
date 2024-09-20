@@ -228,6 +228,60 @@ body {
     background-color: var(--danger);
 }
 
+.chatBox {
+    position: absolute;
+    width: var(--social-tab-expanded-width);
+    padding: 0 1rem;
+    box-sizing: border-box;
+    z-index: 961;
+    bottom: 0;
+    left: var(--social-tab-collapsed-width);
+    background-color: var(--element-bg-alt);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.5);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    height: 0;
+    display: flex;
+    flex-direction: column;
+    transition: height 0.5s;
+}
+
+.chatBox.active {
+    height: 70vh;
+}
+
+.chatBox .chat {
+    background-color: red;
+    flex: 1;
+}
+
+.chatBox .title {
+    font-weight: 600;
+    font-size: 1.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatBox .title span {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.chatBox textarea {
+    width: 100%;
+    resize: none;
+    border: solid 1px var(--mark-line);
+    outline: none;
+    background-color: var(--element-bg);
+    color: white;
+    border-radius: 10px;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    margin-bottom: 1.5rem;
+}
+
 .container {
     display: none;
     transition: opacity .175s;

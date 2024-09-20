@@ -1,3 +1,5 @@
+// Don't get deceived by the name of this file, it actually contains most of the MySQL connecting stuff, like managing account data..
+
 import nodemailer from 'nodemailer';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -856,6 +858,18 @@ export class MailAuth {
                 conn.query('UPDATE accounts SET xp = ?, level = ?, masts = masts + ? WHERE user_id = ?;', [xp, level, mastsEarned, userId], (err, results) => {
                     if (err) return reject(err);
                     resolve(amount);
+                });
+            });
+        });
+    }
+
+    sendMessage(senderId, recipientId, messageContent) {
+        return new Promise((resolve, reject) => {
+            conn.query('SELECT friendship_id FROM friendships WHERE (user1 = ? OR user2 = ?) AND (user1 = ? OR user2 = ?);', [senderId, senderId, recipientId, recipientId], (err, [result]) => {
+                if (err) return reject(err);
+                conn.query('INSERT INTO messages(friendship_id, sender, content) VALUES (?, ?, ?);', [result.friendship_id, senderId, messageContent], (err) => {
+                    if (err) return reject(err);
+                    resolve();
                 });
             });
         });

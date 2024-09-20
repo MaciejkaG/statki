@@ -171,7 +171,6 @@ app.get('/', async (req, res) => {
                 t: (key) => { return locale.t(key) }
             }
         });
-        // res.redirect('/login');
     } else if (login != 2) {
         res.redirect("/login");
     } else if (req.session.nickname == null) {
@@ -249,7 +248,6 @@ app.get('/match/:searchId', async (req, res) => {
     }
 
     auth.getMatch(req.params.searchId).then(result => {
-        // res.send(result);
         res.render('match', {
             helpers: {
                 t: (key) => { return locale.t(key) },
@@ -683,6 +681,13 @@ io.on('connection', async (socket) => {
         socket.on('use xp boost', (itemId, callback) => {
             auth.useXPBoost(session.userId, itemId).then(result => {
                 callback(result);
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+
+        // The social stuff
+        socket.on('send message', (recipient, content) => {
+            auth.sendMessage(session.userId, recipient, content, callback).then(() => {
+                callback();
             }).catch(err => logger.error({ level: 'error', message: err }));
         });
 

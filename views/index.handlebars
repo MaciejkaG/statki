@@ -5,7 +5,14 @@
         <span class="el">{{ t 'menu.Social.Friends online:' }} <span class="important">1</span></span>
     </div>
     <div class="expanded">
-        <h1>{{ t 'menu.Social.Friends' }} <span class="material-symbols-outlined" id="closeSocialTab" onclick="toggleSocialTabMobile()">close</span></h1>
+        <div class="chatBox">
+            <h1 class="title">Czat <span>maciej 2</span></h1>
+            <div class="chat">
+                
+            </div>
+            <textarea id="messageBox" rows="3"></textarea>
+        </div>
+        <h1 class="mainTitle">{{ t 'menu.Social.Friends' }} <span class="material-symbols-outlined" id="closeSocialTab" onclick="toggleSocialTabMobile()">close</span></h1>
         <div class="inviteFriends">
             <h3>{{ t 'menu.Social.addafriend.Add a friend!' }}</h3>
             <span>{{ t 'menu.Social.addafriend.Your friend needs to scan this QR code or alternatively add you through your UID' }}</span>
@@ -26,7 +33,7 @@
                     <span class="online">Online</span>
                 </div>
                 <div class="buttons">
-                    <button>Czat</button>
+                    <button onclick="openChat()">Czat</button>
                     <button>Pojedynkuj</button>
                     <button class="danger">Usuń znajomego</button>
                 </div>
