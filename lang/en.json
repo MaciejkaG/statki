@@ -50,7 +50,13 @@
             "addafriend": {
                 "Add a friend!": "Add a friend!",
                 "Your friend needs to scan this QR code or alternatively add you through your UID": "Your friend needs to scan this QR code or alternatively add you through your UID.",
-                "Scan a code": "Scan a code"
+                "Your friend needs to add you through your UID": "Your friend needs to add you through your UID.",
+                "Friends UID": "Friend's UID",
+                "Scan a code": "Scan a code",
+                "Send a request": "Send a request",
+
+                "New friend request": "New friend request",
+                "invited you to become friends You can respond to the invitation in the Social tab": "invited you to become friends. You can respond to the invitation in the Social tab."
             },
 
             "chat": {

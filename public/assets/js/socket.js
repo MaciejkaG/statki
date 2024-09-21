@@ -93,6 +93,7 @@ socket.emit("my profile", (profile) => {
     let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     $("#playerSince").html(new Date(profile.profile.account_creation).toLocaleDateString(undefined, options));
     $(".nickname").html(escapeHTML(profile.profile.nickname));
+    $(".myuid").html(escapeHTML(profile.uid));
 
     // Profile stats
     $("#monthlyPlayed").html(profile.stats.monthly_matches);
@@ -171,7 +172,7 @@ const endReached = () => {
     allMatches = true;
 }
 
-$(window).scroll(function () {
+$('.sitecontent').scroll(function () {
     if ($(window).scrollTop() + $(window).height() == $(document).height() && profileLoaded && !allMatches && !loadLock && activeView === 'profileView' && new Date().getTime() - lastLoad > 300) {
         loadLock = true;
 
