@@ -147,6 +147,7 @@ function updateFriendsList() {
             // If the last online status is from less than 5 seconds ago, we assume the user is online
             if (lastOnline && lastOnline.secondsAgo < 5) {
                 // We now determine whether they are playing or just online
+                console.log(lastOnline.activity);
                 if (['Vs. AI', 'PvP'].includes(lastOnline.activity)) {
                     statusText = window.locale[`In game - ${lastOnline.activity}`];
                     statusClass = 'ingame';
@@ -190,7 +191,7 @@ function updateFriendsList() {
                     <div class="buttons">
                         <button onclick="openChat(this)">${window.locale['Chat']}</button>
                         <button>${window.locale['Duel']}</button>
-                        <button class="danger">${window.locale['Remove friend']}</button>
+                        <button class="danger" onclick="removeFriend(this)">${window.locale['Remove friend']}</button>
                     </div>
                 `;
 
@@ -279,25 +280,66 @@ socket.on('new message', (fromId, nickname, content) => {
     }
 });
 
+// Declare a variable that will contain the last notification timestamp
+let lastRequest = 0;
+socket.on('new friend request', (nickname) => {
+    // If there was no notification for the past 15 seconds (to prevent flooding the screen with notifications).
+    if (new Date().getTime() / 1000 - lastMessage > 15) {
+        sendSocialToast(window.locale['Friend requests'], window.locale['New friend request'], nickname + ' ' + window.locale['invited you to become friends. You can respond to the invitation in the Social tab']);
+        // Update last notification timestamp.
+        lastMessage = new Date().getTime() / 1000;
+    }
+});
+
+// Confirms a friend request through socket.io
+function sendRequest() {
+    const friendId = $('#uidInput').val();
+
+    socket.emit('invite to friends', friendId, (result) => {
+        if (result) {
+            $('#uidInput').val('');
+            updateFriendsList();
+            openRequests();
+        }
+    });
+}
+
 // Confirms a friend request through socket.io
 function confirmRequest(el) {
-    console.log('a')
+    const friendId = $(el).parents('.el').data('user-id');
+
+    $(el).parents('.el').hide();
+    socket.emit('accept friendship', friendId, (result) => {
+        if (result) {
+            $(el).parents('.el').remove();
+            updateFriendsList();
+            closeRequests();
+        } else $(el).parents('.el').show();
+    });
 }
 
 // Removes a friendship through socket.io, but by a request element.
 function declineRequest(el) {
     const friendId = $(el).parents('.el').data('user-id');
-    
+    removeFriendship(friendId, el);
 }
 
 // Removes friendship through socket.io by friend's UID
+// elToRemove is an optional argument containing the HTML element to remove after successful friendship removal.
 function removeFriendship(friendUid, elToRemove) {
-    $(el).parents('.el').hide();
-    socket.emit('remove friend', friendUid, () => {
-        if (elToRemove) {
-
-        }
+    if (elToRemove) $(elToRemove).parents('.el').hide();
+    socket.emit('remove friend', friendUid, (result) => {
+        if (result && elToRemove) {
+            $(elToRemove).remove();
+            updateFriendsList();
+        } else $(elToRemove).parents('.el').show();
     });
+}
+
+function removeFriend(el) {
+    const userId = $(el).parents('.el').data('friend-id');
+
+    removeFriendship(userId, $(el).parents('.el'));
 }
 
 // Some functions
@@ -403,8 +445,10 @@ function addMessage(userId, incoming, content) {
         duration: 500,
         delay: 200
     }).finished.then(() => {
-        // Update the cache
-        conversationCache[userId] += wrapper.outerHTML;
+        // Update the cache if it exists
+        if (conversationCache[userId]) {
+            conversationCache[userId] += wrapper.outerHTML;
+        }
     });
 
     // Scroll to the bottom of the message history
@@ -459,17 +503,7 @@ function sendSocialToast(category, header, content) {
 // Opens the friend requests card
 function openRequests() {
     $('#requestsbox').toggleClass('active');
-
-    // Animate messages appearing from the bottom (the most recent)
-    anime({
-        targets: ['#requests h3', '#requests .el', '.placeholder'],
-        easing: 'easeOutExpo',
-        translateY: [-50, 0],
-        opacity: [0, 1],
-        duration: 500,
-        delay: anime.stagger(100, {  start: 300 })
-    });
-};
+}
 
 function closeRequests() {
     $('#requestsbox').removeClass('active');

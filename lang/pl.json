@@ -50,7 +50,13 @@
             "addafriend": {
                 "Add a friend!": "Dodaj znajomego!",
                 "Your friend needs to scan this QR code or alternatively add you through your UID": "Twój znajomy musi zeskanować ten kod QR lub przepisać Twoje poniższe UID aby móc wysłać Tobie zaproszenie.",
-                "Scan a code": "Skanuj kod"
+                "Your friend needs to add you through your UID": "Twój znajomy musi dodać cię poprzez Twoje UID.",
+                "Friends UID": "UID znajomego",
+                "Scan a code": "Skanuj kod",
+                "Send a request": "Wyślij prośbę",
+
+                "New friend request": "Nowe zaproszenie do znajomych",
+                "invited you to become friends You can respond to the invitation in the Social tab": "zaprosił(a) Cię do grona znajomych. Możesz odpowiedzieć w karcie Społecznościowe."
             },
 
             "chat": {
@@ -61,7 +67,7 @@
 
                 "New message": "Nowa wiadomość",
                 "New message from a friend": "Nowa wiadomość od znajomego",
-                "just sent you a message! You can read it in the Social tab": "właśnie wysłał ci wiadomość! Możesz ją przeczytać w karcie Społecznościowe."
+                "just sent you a message! You can read it in the Social tab": "właśnie wysłał(a) ci wiadomość! Możesz ją przeczytać w karcie Społecznościowe."
             },
 
             "statuses": {
@@ -285,7 +291,7 @@
 
     "match": {
         "Match statistics": "Statystyki meczu",
-        "Host": "Host",
+        "Host": "Gospodarz",
         "Guest": "Gość",
 
         "Stats": "Statystyki",

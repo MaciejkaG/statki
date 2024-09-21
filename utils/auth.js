@@ -370,6 +370,49 @@ export class MailAuth {
         });
     }
 
+    removeFriendship(userId, friendId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            conn.query(`
+                DELETE FROM friendships WHERE (user1 = ? AND user2 = ?) OR (user2 = ? AND user1 = ?);
+            `, [userId, friendId, userId, friendId], async (error) => {
+                if (error) reject(error);
+                else resolve();
+            });
+        });
+    }
+
+    acceptFriendship(userId, friendId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            conn.query(`
+                UPDATE friendships SET active = 1 WHERE user1 = ? AND user2 = ?;
+            `, [friendId, userId], async (error) => {
+                if (error) reject(error);
+                else resolve();
+            });
+        });
+    }
+
+    inviteToFriends(userId, friendId) {
+        return new Promise((resolve, reject) => {
+            const conn = mysql.createConnection(this.mysqlOptions);
+            conn.query(`
+                INSERT INTO friendships (user1, user2)
+                SELECT ?, ?
+                WHERE NOT EXISTS (
+                    SELECT 1 
+                    FROM friendships 
+                    WHERE (user1 = ? AND user2 = ?)
+                    OR (user1 = ? AND user2 = ?)
+                );
+            `, [userId, friendId, userId, friendId, friendId, userId], async (error) => {
+                if (error) reject(error);
+                else resolve();
+            });
+        });
+    }
+
     getMatchList(userId, page) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);

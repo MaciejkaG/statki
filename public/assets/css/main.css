@@ -6,6 +6,10 @@ body {
     overflow-x: hidden;
 }
 
+.monospace {
+    font-family: 'Roboto Mono', monospace;
+}
+
 .sitecontent {
     width: calc(100vw - var(--social-tab-collapsed-width));
     height: 100%;
@@ -118,19 +122,40 @@ body {
 .social .inviteFriends {
     border-radius: 15px;
     border: solid 1px white;
-    padding: .25rem 1rem;
+    padding: 1rem 1rem;
     padding-bottom: 1rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
 .social .inviteFriends h3 {
     font-size: 1rem;
 }
 
-.social .inviteFriends span {
+.social .inviteFriends h3,
+.social .inviteFriends p,
+.social .inviteFriends h4,
+.social .inviteFriends input {
+    margin: 0;
+    margin-bottom: .75rem;
+}
+
+.social .inviteFriends h4 {
+    margin-bottom: .25rem;
+}
+
+.social .inviteFriends p {
     font-size: .8rem;
 }
 
-.social .inviteFriends img {
+.social .inviteFriends p.monospace {
+    font-size: .7rem;
+    margin-bottom: 2rem;
+}
+
+/* .social .inviteFriends img {
     padding: .5rem;
     background-color: white;
     height: 8rem;
@@ -154,6 +179,17 @@ body {
 
 .social .inviteFriends .qrContainer div span {
     font-size: 0.8rem;
+} */
+
+.social .inviteFriends input {
+    background-color: var(--element-bg);
+    color: white;
+    border-radius: 15px;
+    border: 1px solid white;
+    font-size: .65rem;
+    padding: 0.5rem .75rem;
+    outline: none;
+    font-family: 'Roboto Mono', monospace;
 }
 
 .social .friendsList {
@@ -162,6 +198,7 @@ body {
     gap: .5rem;
     width: 100%;
     margin-top: 1rem;
+    margin-bottom: 4rem;
 }
 
 .social .friendsList .el {
@@ -212,7 +249,7 @@ body {
 }
 
 .social .friendsList .el button,
-.social .inviteFriends .qrContainer div button,
+.social .inviteFriends button,
 .social .expanded button {
     flex: 1;
     border-radius: 15px;
@@ -235,22 +272,26 @@ body {
 }
 
 .social .friendsList .el button.danger,
-.social .inviteFriends .qrContainer div button.danger {
+.social .inviteFriends button.danger {
     border: 1px solid var(--danger);
     color: var(--danger);
 }
 
 .social .friendsList .el button:hover,
-.social .inviteFriends .qrContainer div button:hover,
+.social .inviteFriends button:hover,
 .social .expanded button:hover {
     color: black;
     background-color: white;
 }
 
 .social .friendsList .el button.danger:hover,
-.social .inviteFriends .qrContainer div button.danger:hover {
+.social .inviteFriends button.danger:hover {
     color: white;
     background-color: var(--danger);
+}
+
+.social .inviteFriends button {
+    font-size: .8rem;
 }
 
 .chatBox {
@@ -282,7 +323,7 @@ body {
 
 .chatBox .title {
     font-weight: 600;
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1467,6 +1508,10 @@ nav div:last-child {
     margin: 0;
 }
 
+.newsModalContainer .newsModal h1 {
+    margin-bottom: .25rem;
+}
+
 .newsModalContainer .newsModal a {
     text-decoration: none;
     color: var(--dynamic);
@@ -1499,7 +1544,6 @@ nav div:last-child {
 }
 
 .newsModalContainer .newsModal .actualText {
-    margin-top: 1rem;
     overflow-y: scroll;
 }
 

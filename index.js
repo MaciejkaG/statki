@@ -710,7 +710,34 @@ io.on('connection', async (socket) => {
 
             auth.sendMessage(session.userId, recipientId, content).then(() => {
                 callback(true);
-                EE.emit(`message_to:${recipientId}`, session.userId, content);
+                EE.emit(`socket_event:${recipientId}`, 'new message', { fromId: session.userId, content });
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+
+        socket.on('remove friend', (friendId, callback) => {
+            auth.removeFriendship(session.userId, friendId).then(() => {
+                callback(true);
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+
+        socket.on('invite to friends', (friendId, callback) => {
+            if (friendId === session.userId) {
+                return;
+            }
+
+            auth.inviteToFriends(session.userId, friendId).then(() => {
+                callback(true);
+                EE.emit(`socket_event:${friendId}`, 'new friend request', { fromId: session.userId });
+            }).catch(err => logger.error({ level: 'error', message: err }));
+        });
+
+        socket.on('accept friendship', (friendId, callback) => {
+            if (friendId === session.userId) {
+                return;
+            }
+
+            auth.acceptFriendship(session.userId, friendId).then(() => {
+                callback(true);
             }).catch(err => logger.error({ level: 'error', message: err }));
         });
 
@@ -985,14 +1012,28 @@ io.on('connection', async (socket) => {
         }, 3000);
 
         // Listen for new messages for the user
-        const callback = async (fromId, content) => {
-            socket.emit('new message', fromId, await auth.getNickname(fromId), content);
+        const callback = async (type, data) => {
+            switch (type) {
+                case 'new message':
+                    socket.emit('new message', data.fromId, await auth.getNickname(data.fromId), data.content);
+                    break;
+
+                case 'new friend request':
+                    socket.emit('new friend request', await auth.getNickname(data.fromId));
+                    break;
+
+                default:
+                    break;
+            }
         };
 
-        EE.on(`message_to:${session.userId}`, callback);
+        // Set up a handler for general socket events like new messages and friend requests
+        // The callback will then pass the information to the socket so it can display it in real time.
+        EE.on(`socket_event:${session.userId}`, callback);
 
         socket.on('disconnecting', () => {
-            EE.off(`message_to:${session.userId}`, callback);
+            // Remove the event handler on disconnection
+            EE.off(`socket_event:${session.userId}`, callback);
             clearInterval(updateOnlineStatus);
             if (bships.isPlayerInRoom(socket)) {
                 io.to(socket.rooms[1]).emit("player left");
@@ -1059,9 +1100,9 @@ io.on('connection', async (socket) => {
         const currentActivity = playerGameData.data.type === 'pvp' ? 'PvP' : 'Vs. AI';
 
         // Update user's online status.
-        await auth.updateLastOnline(session.userId, true, currentActivity);
+        await auth.updateLastOnline(session.userId, currentActivity);
         const updateOnlineStatus = setInterval(async () => {
-            await auth.updateLastOnline(session.userId, true, currentActivity);
+            await auth.updateLastOnline(session.userId, currentActivity);
         }, 5000);
 
         socket.on('disconnecting', async () => {
