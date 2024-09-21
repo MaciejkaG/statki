@@ -292,23 +292,32 @@ export class MailAuth {
     getFriends(userId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
+            // Getting actual friends
             const query = `
             SELECT (CASE WHEN user1 = ? THEN user2 ELSE user1 END) AS friend_id, a.nickname FROM friendships f JOIN accounts a ON (CASE WHEN f.user1 = ? THEN f.user2 ELSE user1 END) = a.user_id WHERE active = 1 AND (user1 = ? OR user2 = ?);
             `;
             conn.query(query, [userId, userId, userId, userId], async (error, response) => {
                 if (error) reject(error);
                 else {
-                    const updatedResponse = await Promise.all(
+                    const friends = await Promise.all(
                         response.map(async friendship => ({
                             ...friendship,
                             lastOnline: await this.getLastOnline(friendship.friend_id)
                         }))
                     );
 
-                    resolve(updatedResponse);
-                }
+                    // Getting incoming friend requests
+                    conn.query(`
+                        SELECT (CASE WHEN user1 = ? THEN user2 ELSE user1 END) AS user_id, a.nickname, (CASE WHEN user1 = ? THEN 0 ELSE 1 END) AS incoming FROM friendships f JOIN accounts a ON (CASE WHEN f.user1 = ? THEN f.user2 ELSE user1 END) = a.user_id WHERE active = 0 AND (user1 = ? OR user2 = ?) ORDER BY incoming DESC;
+                    `, [userId, userId, userId, userId, userId], async (error, requests) => {
+                        if (error) reject(error);
+                        else {
+                            resolve({ friends, requests })
+                        }
 
-                conn.end();
+                        conn.end();
+                    });
+                }
             });
         });
     }
@@ -328,8 +337,8 @@ export class MailAuth {
     }
 
     // This function updates user's online status.
-    async updateLastOnline(userId, inGame = false) {
-        await this.redis.json.set(`lastOnline:${userId}`, '$', { timestamp: Math.floor(new Date().getTime() / 1000), activity: inGame ? 'playing' : 'menu' });
+    async updateLastOnline(userId, activity) {
+        await this.redis.json.set(`lastOnline:${userId}`, '$', { timestamp: Math.floor(new Date().getTime() / 1000), activity });
     }
 
     getConversation(userId, friendId) {
@@ -346,7 +355,6 @@ export class MailAuth {
                     }
 
                     const friendshipId = response.friendship_id;
-
                     conn.query(`
                         SELECT sender, content, created_at FROM messages WHERE friendship_id = ? AND (sender = ? OR sender = ?) ORDER BY message_id ASC LIMIT 200;
                     `, [friendshipId, userId, friendId], async (error, response) => {

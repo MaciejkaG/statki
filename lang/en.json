@@ -36,6 +36,10 @@
         "Social": {
             "Social": "Social",
             "Friends": "Friends",
+            "Friend requests": "Friend requests",
+
+            "Outgoing": "Outgoing",
+            "Incoming": "Incoming",
 
             "No new notifications": "No new notifications",
             "Friends online:": "Friends online:",
@@ -52,6 +56,7 @@
             "chat": {
                 "Chat": "Chat",
                 "This is the beginning of your conversation": "This is the beginning of your conversation.",
+                "Chats are not supervised nor encrypted": "Chats are not supervised nor encrypted.",
                 "Type your message here": "Type your message here",
 
                 "New message": "New message",
@@ -60,8 +65,13 @@
             },
 
             "statuses": {
-                "In game": "In game",
-                "Online": "Online",
+                "In game - PvP": "In game - PvP",
+                "In game - Vs AI": "In game - Vs. AI",
+                "Online - Main menu": "Online - Main menu",
+                "Online - My profile": "Online - My profile",
+                "Online - Shop": "Online - Shop",
+                "Online - Inventory": "Online - Inventory",
+                "Online - Settings": "Online - Settings",
                 "Offline": "Offline"
             },
 

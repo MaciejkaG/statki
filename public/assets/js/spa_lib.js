@@ -1,7 +1,7 @@
 var activeView;
 var returnLock = false;
 
-function switchView(viewContainerId, useReplaceState=false) {
+function switchView(viewContainerId, useReplaceState = false) {
     if (!returnLock && viewContainerId !== activeView) {
         $(`.container`).css({ opacity: 0, animation: "OutAnim 0.2s 1 ease" });
         setTimeout(() => {
@@ -17,6 +17,12 @@ function switchView(viewContainerId, useReplaceState=false) {
 
             activeView = viewContainerId;
         }, 200);
+
+        // Create and dispatch an event on view switch
+        const event = new CustomEvent('switchviews', {
+            detail: { destination: viewContainerId }
+        });
+        document.dispatchEvent(event);
     }
 }
 

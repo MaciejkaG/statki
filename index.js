@@ -64,7 +64,9 @@ app.set('views', './views');
 
 const server = createServer(app);
 const io = new Server(server);
-const redis = createClient();
+const redis = createClient({
+    url: process.env.redis_url
+});
 redis.on('error', err => console.log('Redis Client Error', err));
 await redis.connect();
 
@@ -701,8 +703,13 @@ io.on('connection', async (socket) => {
         });
 
         socket.on('send message', (recipientId, content, callback) => {
+            if (content.length > 65535 || content.match(/^\s*$/)) {
+                callback(false);
+                return;
+            }
+
             auth.sendMessage(session.userId, recipientId, content).then(() => {
-                callback();
+                callback(true);
                 EE.emit(`message_to:${recipientId}`, session.userId, content);
             }).catch(err => logger.error({ level: 'error', message: err }));
         });
@@ -962,11 +969,20 @@ io.on('connection', async (socket) => {
             session.destroy();
         });
 
-        // Update user's online status.
-        await auth.updateLastOnline(session.userId);
+        // Update user's activity status.
+        let currentActivity = 'Main menu';
+        const allowedActivities = ['Main menu', 'Shop', 'My profile', 'Inventory', 'Settings'];
+
+        socket.on('set activity', async (activity) => {
+            if (allowedActivities.includes(activity)) {
+                currentActivity = activity;
+            }
+        });
+
+        await auth.updateLastOnline(session.userId, currentActivity);
         const updateOnlineStatus = setInterval(async () => {
-            await auth.updateLastOnline(session.userId);
-        }, 5000);
+            await auth.updateLastOnline(session.userId, currentActivity);
+        }, 3000);
 
         // Listen for new messages for the user
         const callback = async (fromId, content) => {
@@ -1040,10 +1056,12 @@ io.on('connection', async (socket) => {
             }
         });
 
+        const currentActivity = playerGameData.data.type === 'pvp' ? 'PvP' : 'Vs. AI';
+
         // Update user's online status.
-        await auth.updateLastOnline(session.userId, true);
+        await auth.updateLastOnline(session.userId, true, currentActivity);
         const updateOnlineStatus = setInterval(async () => {
-            await auth.updateLastOnline(session.userId, true);
+            await auth.updateLastOnline(session.userId, true, currentActivity);
         }, 5000);
 
         socket.on('disconnecting', async () => {
