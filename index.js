@@ -97,7 +97,8 @@ const auth = new MailAuth(redis, {
     host: process.env.db_host,
     user: process.env.db_user,
     password: process.env.db_pass,
-    database: 'statki'
+    database: 'statki',
+    charset: 'utf8mb4'
 });
 
 app.set('trust proxy', 1);
