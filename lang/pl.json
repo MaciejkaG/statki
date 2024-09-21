@@ -56,6 +56,7 @@
             "chat": {
                 "Chat": "Czat",
                 "This is the beginning of your conversation": "To jest początek waszej konwersacji.",
+                "Chats are not supervised nor encrypted": "Czaty nie są nadzorowane ani szyfrowane.",
                 "Type your message here": "Napisz swoją wiadomość tutaj",
 
                 "New message": "Nowa wiadomość",
@@ -64,8 +65,13 @@
             },
 
             "statuses": {
-                "In game": "W grze",
-                "Online": "Online",
+                "In game - PvP": "W grze - PvP",
+                "In game - Vs AI": "W grze - Vs. AI",
+                "Online - Main menu": "Online - Menu główne",
+                "Online - My profile": "Online - Mój profil",
+                "Online - Shop": "Online - Sklep",
+                "Online - Inventory": "Online - Ekwipunek",
+                "Online - Settings": "Online - Ustawienia",
                 "Offline": "Offline"
             },
 

@@ -31,7 +31,12 @@ setInterval(cycleMessages, 5000);
 $('.social').hover(function() {
     if ($(window).width() > 820 && !$('.social *').is(":focus")) {
         anime({
-            targets: ['.social .expanded h1.mainTitle', '.social .expanded .inviteFriends', '.social .expanded .friendsList .el'],
+            targets: [
+                '.social .expanded h1.mainTitle',
+                '.social .expanded .inviteFriends',
+                '.social .expanded button.topBtn',
+                '.social .expanded .friendsList .el'
+            ],
             easing: 'easeOutQuint',
             translateX: [100, 0],
             opacity: [0, 1],
@@ -54,7 +59,9 @@ messageBox.addEventListener('keydown', (e) => {
         // Prevent making an indent in the textarea.
         e.preventDefault();
 
-        socket.emit('send message', activeChatFriendId, messageBox.value, () => {
+        socket.emit('send message', activeChatFriendId, messageBox.value, (success) => {
+            if (!success) return;
+
             addMessage(activeChatFriendId, false, messageBox.value);
             messageBox.value = '';
         });
@@ -70,6 +77,27 @@ const buttonsAnimation = {
 };
 
 // Socket connections and data management
+const viewIdToActivity = {
+    mainMenuView: 'Main menu',
+    vsAiView: 'Main menu',
+    pvpMenuView: 'Main menu',
+    pvpCreateView: 'Main menu',
+    pvpJoinView: 'Main menu',
+    prepairingGame: 'Main menu',
+    profileView: 'My profile',
+    shopView: 'Shop',
+    inventoryView: 'Inventory',
+    dropRatesView: 'Main menu',
+    settingsView: 'Settings',
+};
+// When "switchviews" event is dispatched from the SPA library, update the activity on the server.
+document.addEventListener('switchviews', function (e) {
+    if (viewIdToActivity[e.detail.destination]) {
+        socket.emit('set activity', viewIdToActivity[e.detail.destination]);
+    }
+});
+
+// Updating the friends list and friend requests.
 function updateFriendsList() {
     console.log("Downloading friends list and friend requests now...");
     socket.emit("my friends", ({ friends: friendsList, requests }) => {
@@ -87,7 +115,7 @@ function updateFriendsList() {
         });
 
         // Find out how many friends are online right now.
-        const friendsOnline = friendsList.filter(friend => friend.lastOnline && friend.lastOnline.secondsAgo < 6).length;
+        const friendsOnline = friendsList.filter(friend => friend.lastOnline && friend.lastOnline.secondsAgo < 5).length;
         // Show this count in the Social tab quick access.
         document.getElementById('friendsOnline').innerHTML = friendsOnline;
 
@@ -95,8 +123,8 @@ function updateFriendsList() {
         friendsList.sort((a, b) => {
             const getStatusPriority = (friend) => {
                 if (!friend.lastOnline) return 3; // Offline
-                if (friend.lastOnline.secondsAgo < 6) return 1; // Online
-                if (friend.lastOnline.activity === 'playing') return 2; // Ingame
+                if (friend.lastOnline.secondsAgo < 5) return 1; // Online
+                if (['Vs. AI', 'PvP'].includes(friend.lastOnline.activity)) return 2; // Ingame
                 return 3; // Offline
             };
             return getStatusPriority(a) - getStatusPriority(b);
@@ -116,14 +144,14 @@ function updateFriendsList() {
             let statusText = window.locale['Offline'];
             let statusClass = 'offline';
 
-            // If the last online status is from less than 6 seconds ago, we assume the user is online
-            if (lastOnline && lastOnline.secondsAgo < 6) {
+            // If the last online status is from less than 5 seconds ago, we assume the user is online
+            if (lastOnline && lastOnline.secondsAgo < 5) {
                 // We now determine whether they are playing or just online
-                if (lastOnline.activity === 'playing') {
-                    statusText = window.locale['In game'];
+                if (['Vs. AI', 'PvP'].includes(lastOnline.activity)) {
+                    statusText = window.locale[`In game - ${lastOnline.activity}`];
                     statusClass = 'ingame';
                 } else {
-                    statusText = window.locale['Online'];
+                    statusText = window.locale[`Online - ${lastOnline.activity}`];
                     statusClass = 'online';
                 }
             }
@@ -239,26 +267,37 @@ function updateFriendsList() {
 updateFriendsList();
 setInterval(updateFriendsList, 3000);
 
+// Declare a variable that will contain the last notification timestamp
+let lastMessage = 0;
 socket.on('new message', (fromId, nickname, content) => {
     addMessage(fromId, true, content);
-    if (fromId !== activeChatFriendId) {
-        sendSocialToast('New message', '', nickname + ' ' + window.locale['just sent you a message! You can read it in the Social tab']);
+    // If the new message is not in the currently opened chat, and there was no notification for the past 15 seconds (to prevent flooding the screen with notifications).
+    if (fromId !== activeChatFriendId && new Date().getTime() / 1000 - lastMessage > 15) {
+        sendSocialToast(window.locale['New message'], window.locale['New message from a friend'], nickname + ' ' + window.locale['just sent you a message! You can read it in the Social tab']);
+        // Update last notification timestamp.
+        lastMessage = new Date().getTime() / 1000;
     }
 });
 
 // Confirms a friend request through socket.io
 function confirmRequest(el) {
-
+    console.log('a')
 }
 
 // Removes a friendship through socket.io, but by a request element.
 function declineRequest(el) {
-
+    const friendId = $(el).parents('.el').data('user-id');
+    
 }
 
 // Removes friendship through socket.io by friend's UID
-function removeFriendship(friendUid) {
+function removeFriendship(friendUid, elToRemove) {
+    $(el).parents('.el').hide();
+    socket.emit('remove friend', friendUid, () => {
+        if (elToRemove) {
 
+        }
+    });
 }
 
 // Some functions
@@ -296,7 +335,6 @@ function tryLoadConversationFromCache(el) {
     const nickname = ($(el).parents('.el').get(0)).querySelector('.friendNickname').innerHTML;
     $('#chatFriendName').html(nickname);
 
-    console.log(conversationCache[userId]);
     if (conversationCache[userId]) {
         console.log('Loading message history from cache for conversation with user of UID:', userId);
         $('#chat').html(conversationCache[userId]);
@@ -322,7 +360,7 @@ function openChat(el) {
             created_at: new Date(msg.created_at)
         }));
 
-        let finalHTML = `<div class="wrapper info">${window.locale['This is the beginning of your conversation']}</div>`;
+        let finalHTML = `<div class="wrapper info">${window.locale['This is the beginning of your conversation']}<br>${window.locale['Chats are not supervised nor encrypted']}</div>`;
         // Add messages to the HTML
         for (let i = 0; i < messages.length; i++) {
             const msg = messages[i];
@@ -369,7 +407,6 @@ function addMessage(userId, incoming, content) {
     }).finished.then(() => {
         // Update the cache
         conversationCache[userId] += wrapper.outerHTML;
-        console.log(conversationCache)
     });
 
     // Scroll to the bottom of the message history
@@ -412,10 +449,10 @@ function sendSocialToast(category, header, content) {
     Toastify({
         text: `<h2>${category}</h2><h1>${header}</h1><p>${content}</p>`,
         escapeMarkup: false,
-        duration: 7000,
+        duration: 5000,
         newWindow: true,
         gravity: "bottom",
-        position: "left",
+        position: "right",
         stopOnFocus: true,
         className: "bshipstoast",
     }).showToast();

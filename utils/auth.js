@@ -337,15 +337,15 @@ export class MailAuth {
     }
 
     // This function updates user's online status.
-    async updateLastOnline(userId, inGame = false) {
-        await this.redis.json.set(`lastOnline:${userId}`, '$', { timestamp: Math.floor(new Date().getTime() / 1000), activity: inGame ? 'playing' : 'menu' });
+    async updateLastOnline(userId, activity) {
+        await this.redis.json.set(`lastOnline:${userId}`, '$', { timestamp: Math.floor(new Date().getTime() / 1000), activity });
     }
 
     getConversation(userId, friendId) {
         return new Promise((resolve, reject) => {
             const conn = mysql.createConnection(this.mysqlOptions);
             conn.query(`
-                SELECT friendship_id FROM friendships WHERE active = 1 AND (user1 = ? OR user2 = ?) OR (user2 = ? OR user1 = ?);
+                SELECT friendship_id FROM friendships WHERE active = 1 AND (user1 = ? AND user2 = ?) OR (user2 = ? AND user1 = ?);
             `, [userId, friendId, userId, friendId], async (error, [response]) => {
                 if (error) reject(error);
                 else {
@@ -355,7 +355,6 @@ export class MailAuth {
                     }
 
                     const friendshipId = response.friendship_id;
-
                     conn.query(`
                         SELECT sender, content, created_at FROM messages WHERE friendship_id = ? AND (sender = ? OR sender = ?) ORDER BY message_id ASC LIMIT 200;
                     `, [friendshipId, userId, friendId], async (error, response) => {

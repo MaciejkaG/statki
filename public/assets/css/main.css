@@ -79,6 +79,7 @@ body {
     transform: rotate(-90deg);
     /* text-orientation: sideways; */
     text-wrap: nowrap;
+    white-space: pre;
     height: auto;
     width: auto;
     text-align: center;
@@ -211,7 +212,8 @@ body {
 }
 
 .social .friendsList .el button,
-.social .inviteFriends .qrContainer div button {
+.social .inviteFriends .qrContainer div button,
+.social .expanded button {
     flex: 1;
     border-radius: 15px;
     padding: .3rem .75rem;
@@ -226,6 +228,12 @@ body {
     transition: color .3s, border .3s, background-color .3s;
 }
 
+.social .expanded button.topBtn {
+    font-size: .8rem;
+    width: 100%;
+    margin: 1rem 0;
+}
+
 .social .friendsList .el button.danger,
 .social .inviteFriends .qrContainer div button.danger {
     border: 1px solid var(--danger);
@@ -233,7 +241,8 @@ body {
 }
 
 .social .friendsList .el button:hover,
-.social .inviteFriends .qrContainer div button:hover {
+.social .inviteFriends .qrContainer div button:hover,
+.social .expanded button:hover {
     color: black;
     background-color: white;
 }
