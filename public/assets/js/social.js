@@ -384,8 +384,6 @@ function closeChat() {
 }
 
 function addMessage(userId, incoming, content) {
-    // document.getElementById('chat').innerHTML += `<div class="wrapper"><p class="bubble ${incoming && 'incoming'}">${content}</p></div>`;
-
     const wrapper = document.createElement("div");
     wrapper.classList = 'wrapper';
 
