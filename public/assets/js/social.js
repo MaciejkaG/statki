@@ -407,7 +407,7 @@ function openChat(el) {
         for (let i = 0; i < messages.length; i++) {
             const msg = messages[i];
 
-            finalHTML += `<div class="wrapper"><p class="bubble ${msg.sender === userId ? 'incoming' : ''}">${msg.content}</p></div>`;
+            finalHTML += `<div class="wrapper"><p class="bubble ${msg.sender === userId ? 'incoming' : ''}">${escapeHTML(msg.content).replace(/(?:\r\n|\r|\n)/g, '<br>') }</p></div>`;
         }
 
         $('#chat').html(finalHTML);
