@@ -41,7 +41,7 @@ $('.social').hover(function() {
             translateX: [100, 0],
             opacity: [0, 1],
             duration: 500,
-            delay: anime.stagger(150, { start: 200 })
+            delay: anime.stagger(80, { start: 100 })
         });
     }
 }, function () {
@@ -366,7 +366,7 @@ const openMenu = () => {
         translateY: [-50, 0],
         opacity: [0, 1],
         duration: 500,
-        delay: anime.stagger(100, { direction: 'reverse', start: 300 })
+        delay: anime.stagger(50, { direction: 'reverse', start: 300 })
     });
 };
 
