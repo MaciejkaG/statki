@@ -1,5 +1,7 @@
 @media only screen and (max-width: 1280px) {
-
+    .mainTitle {
+        font-size: 1.5rem;
+    }
 }
 
 @media only screen and (max-width: 820px) {
@@ -10,6 +12,7 @@
 
     .panelContainer {
         flex-direction: column-reverse;
+        gap: 3rem ;
         align-items: center;
     }
 
