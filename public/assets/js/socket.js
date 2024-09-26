@@ -173,7 +173,7 @@ const endReached = () => {
 }
 
 $('.sitecontent').scroll(function () {
-    if ($(window).scrollTop() + $(window).height() == $(document).height() && profileLoaded && !allMatches && !loadLock && activeView === 'profileView' && new Date().getTime() - lastLoad > 300) {
+    if ($('.sitecontent').scrollTop() + $('.sitecontent').height() == $('.sitecontent').get(0).scrollHeight && profileLoaded && !allMatches && !loadLock && activeView === 'profileView' && new Date().getTime() - lastLoad > 300) {
         loadLock = true;
 
         console.log('Requesting match list continuation. Page:', page);

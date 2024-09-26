@@ -52,12 +52,21 @@ $('.social').on('focusout', function () {
     if (!$('.social').is(":focus") && !$('.social').is(":hover")) closeCards();
 });
 
+const lengthLimit = 21844;
 const messageBox = document.getElementById('messageBox');
 messageBox.addEventListener('keydown', (e) => {
     // If Enter has been pressed without shift
     if (e.key === 'Enter' && !e.shiftKey) {
         // Prevent making an indent in the textarea.
         e.preventDefault();
+
+        // Check if the textarea length surpasses the database limit
+        // If it does, send a toast message notifying about the limit
+        // Check whether the content is not blank
+        // If it is, then do not submit the message
+        if (messageBox.value.match(/^\s*$/) || messageBox.value > lengthLimit) {
+            return;
+        }
 
         socket.emit('send message', activeChatFriendId, messageBox.value, (success) => {
             if (!success) return;
@@ -66,6 +75,21 @@ messageBox.addEventListener('keydown', (e) => {
             messageBox.value = '';
         });
     }
+});
+messageBox.addEventListener('input', (e) => {
+    // Update the progressbar
+    if (messageBox.value.length >= lengthLimit) { // If no characters left.
+        e.preventDefault();
+        messageBox.value = messageBox.value.slice(0, lengthLimit);
+    } else if (messageBox.value.length < lengthLimit - 50) { // If more than 50 characters left
+        $('#messageRemainingChars').removeClass('active');
+        $('#messageProgressBar').css('width', `${Math.floor(messageBox.value.length / lengthLimit * 10000) / 100}%`);
+        return;
+    }
+
+    $('#messageProgressBar').css('width', `${Math.floor(messageBox.value.length / lengthLimit * 10000) / 100}%`);
+    $('#messageRemainingChars').html(lengthLimit - messageBox.value.length);
+    $('#messageRemainingChars').addClass('active');
 });
 
 const buttonsAnimation = {
@@ -190,7 +214,6 @@ function updateFriendsList() {
                     </div>
                     <div class="buttons">
                         <button onclick="openChat(this)">${window.locale['Chat']}</button>
-                        <button>${window.locale['Duel']}</button>
                         <button class="danger" onclick="removeFriend(this)">${window.locale['Remove friend']}</button>
                     </div>
                 `;
