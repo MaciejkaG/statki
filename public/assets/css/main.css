@@ -21,10 +21,6 @@ body {
     transition: transform 0.5s, filter 0.5s;
 }
 
-.sitecontent::-webkit-scrollbar {
-    display: none;
-}
-
 .social {
     position: absolute;
     top: 0;
@@ -76,6 +72,7 @@ body {
 .social .expanded {
     padding: 0 1rem;
     min-width: calc(var(--social-tab-expanded-width) - 2rem);
+    overflow: hidden;
     overflow-y: scroll;
 }
 
@@ -351,8 +348,55 @@ body {
     border-radius: 10px;
     padding: 0.5rem;
     box-sizing: border-box;
-    margin: 1rem 0;
+    margin-top: 1rem;
     font-family: 'Roboto Mono', monospace;
+}
+
+.messageLengthIndicator {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    transition: gap 0.5s;
+}
+
+.messageLengthIndicator:has(#messageRemainingChars.active) {
+    gap: 1rem;
+}
+
+.messageProgressContainer {
+    height: 0.3rem;
+    flex: 1;
+    border-radius: 10px;
+    background-color: var(--element-bg-alt);
+}
+
+#messageProgressBar {
+    height: 100%;
+    width: 0;
+    border-radius: 10px;
+    background-color: var(--mark-ship-valid);
+    transition: width 0.5s ease-out, background-color 0.5s;
+}
+
+.messageLengthIndicator:has(#messageRemainingChars.active) #messageProgressBar {
+    background-color: var(--mark-ship-invalid);
+}
+
+#messageRemainingChars {
+    font-size: 0.8rem;
+    color: var(--mark-ship-invalid);
+    text-align: center;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    width: 0;
+    opacity: 0;
+    transition: width 0.5s, opacity 0.5s;
+}
+
+#messageRemainingChars.active {
+    width: 2em;
+    opacity: 1;
 }
 
 .chat {
@@ -798,10 +842,6 @@ nav div:last-child {
     flex: 2;
 
     user-select: none;
-}
-
-#profileView .matchList::-webkit-scrollbar {
-    display: none;
 }
 
 #profileView .matchList .match {

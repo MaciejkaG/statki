@@ -704,7 +704,7 @@ io.on('connection', async (socket) => {
         });
 
         socket.on('send message', (recipientId, content, callback) => {
-            if (content.length > 65535 || content.match(/^\s*$/)) {
+            if (content.length > 21844 || content.match(/^\s*$/)) {
                 callback(false);
                 return;
             }

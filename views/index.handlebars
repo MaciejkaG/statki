@@ -15,6 +15,12 @@
             <h1 class="title">{{ t 'menu.Social.chat.Chat' }} <div><span id="chatFriendName"></span><span class="material-symbols-outlined closeX" onclick="closeChat()">close</span></div></h1>
             <div class="chat" id="chat"></div>
             <textarea id="messageBox" rows="3" placeholder="{{ t 'menu.Social.chat.Type your message here' }}"></textarea>
+            <div class="messageLengthIndicator">
+                <div class="messageProgressContainer">
+                    <div id="messageProgressBar"></div>
+                </div>
+                <p id="messageRemainingChars"></p>
+            </div>
         </div>
         <h1 class="mainTitle">{{ t 'menu.Social.Friends' }} <span class="material-symbols-outlined closeX" id="closeSocialTab" onclick="toggleSocialTabMobile()">close</span></h1>
         <div class="inviteFriends">
